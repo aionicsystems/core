@@ -1,0 +1,85 @@
+.positionsCard {
+    padding: 20px 16px;
+    border-radius: 10px;
+}
+.positionsCardActions {
+    border-top: #47546752 1px solid;
+    padding-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+.positionsCardActionButton {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+.positionsCardInner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-bottom: 20px;
+}
+.positionsCardButton {
+    transition: 0.3s all ease-in-out;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.positionsCardButton:hover {
+    opacity: 0.8;
+}
+.positionsCardInnerWrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.positionsCardIcon {
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+}
+.positionsCardVolume {
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: 500;
+    letter-spacing: -0.762px;
+}
+.positionsCardVolumeType {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #475467;
+    letter-spacing: -0.762px;
+    margin-top: 10px;
+}
+@media (min-width: 992px) {
+    .positionsCard {
+        padding: 24px 20px;
+    }
+    .positionsCardVolumeType {
+        margin-top: 12px;
+    }
+    .positionsCardVolume {
+        font-size: 24px;
+    }
+    .positionsCardIcon {
+        width: 48px;
+        height: 48px;
+    }
+    .positionsCardInnerWrapper {
+        gap: 16px;
+    }
+    .positionsCardInner {
+        padding-bottom: 24px;
+    }
+    .positionsCardActions {
+        padding: 24px 28px;
+        gap: 20px;
+    }
+}

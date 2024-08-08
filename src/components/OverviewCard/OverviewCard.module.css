@@ -1,0 +1,37 @@
+.overviewCard {
+    min-width: 256px;
+}
+.overviewCardInner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.overviewCardTitle {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -0.639px;
+    margin-bottom: 10px;
+}
+.overviewCardLabel {
+    color: #475467;
+    font-size: 12px;
+    letter-spacing: -0.639px;
+}
+.overviewCardIconWrapper {
+    border-radius: 100%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (min-width: 768px) {
+    .overviewCard {
+        width: auto;
+    }
+    .overviewCardIconWrapper {
+        margin-right: 24px;
+    }
+}

@@ -1,0 +1,31 @@
+.btnMain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s all ease-in-out;
+    border: none;
+}
+.sm {
+    font-size: 12px;
+    font-weight: 700;
+    height: 33px;
+    padding: 0 12px;
+    letter-spacing: -0.639px;
+}
+.lg {
+    font-weight: 700;
+    height: 40px;
+    padding: 0 48px;
+    letter-spacing: -0.762px;
+}
+.primary {
+    color: #36C5FB;
+    background: linear-gradient(96.71deg, rgba(68, 204, 255, 0.1) 0%, rgba(0, 173, 238, 0.1) 101.64%);
+
+}
+.primary:hover {
+    color: #ffffff;
+    background-color: #36C5FB;
+}

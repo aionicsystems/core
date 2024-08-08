@@ -1,0 +1,44 @@
+.walletList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 11px;
+}
+
+.connectWalletButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 21px;
+    background-color: #08101B38;
+    font-size: 16px;
+    line-height: 24px;
+    color: #ffffff;
+    border: none;
+}
+.connectWalletButton img {
+    width: 43px;
+    height: 43px;
+}
+
+.walletListTitle {
+    text-align: center;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 24px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .connectWalletButton img {
+        width: 65px;
+        height: 65px;
+    }
+    .connectWalletButton {
+        font-size: 18px;
+    }
+}

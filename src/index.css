@@ -1,0 +1,65 @@
+:root {
+  --card-bg: rgba(9, 34, 52, 0.31);
+  --light-skyBlue: rgba(54, 197, 251, 0.29);
+  --light-gold: rgba(193, 137, 46, 0.18);
+  --light-blue: rgba(92, 134, 247, 0.16);
+  --light-gray: rgba(173, 173, 173, 0.14);
+  --light-green: rgba(127, 202, 120, 0.23);
+  --light-orange: rgba(247, 123, 7, 0.23);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: #09121F;
+}
+
+._lock {
+  overflow: hidden;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+}
+
+.text-bg-gray {
+  color: #475467;
+  background-color: var(--light-gray);
+}
+.text-bg-green {
+  color: #7FCA78;
+  background-color: var(--light-green);
+}
+.text-bg-orange {
+  color: #F77B07;
+  background-color: var(--light-orange);
+}
+.text-bg-gold {
+  color: #C1892E;
+  background-color: var(--light-gold);
+}
+
+::-webkit-scrollbar {
+  width: 1px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #475467;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #092234;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
