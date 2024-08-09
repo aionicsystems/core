@@ -35,6 +35,13 @@ contract Brokerage is Ownable {
         uint256 time;
     }
 
+    struct AssetData {
+        address token;
+        string name;
+        string symbol;
+        uint32 rate;
+    }
+
     // Ether held by the contract earned through interest and liquidations
     uint256 contractEther;
 
@@ -89,10 +96,14 @@ contract Brokerage is Ownable {
         assetList.push(assetDataFeedAddress);
     }
 
-    function listAssets() public view returns(Asset[] memory) {
-        Asset[] memory assetArray = new Asset[](assetList.length);
+    function listAssets() public view returns(AssetData[] memory) {
+        AssetData[] memory assetArray = new AssetData[](assetList.length);
         for (uint i = 0; i < assetList.length; i++) {
-            assetArray[i] = assets[assetList[i]];
+            AssetData memory c = assetArray[i];
+            c.token = assetList[i];
+            c.name = assets[assetList[i]].name();
+            c.symbol = assets[assetList[i]].symbol();
+            c.rate = assets[assetList[i]].getRate();
         }
         return assetArray;
     }
