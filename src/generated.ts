@@ -2284,8 +2284,8 @@ export const brokerageAbi = [
         type: 'address',
       },
       { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'rate', internalType: 'uint32', type: 'uint32' },
       { name: 'symbol', internalType: 'string', type: 'string' },
+      { name: 'rate', internalType: 'uint32', type: 'uint32' },
     ],
     name: 'approveAsset',
     outputs: [],
@@ -2437,6 +2437,19 @@ export const brokerageAbi = [
     name: 'liquidate',
     outputs: [],
     stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'listAssets',
+    outputs: [
+      {
+        name: 'assetArray',
+        internalType: 'contract Asset[]',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
   },
   {
     type: 'function',
@@ -11287,6 +11300,14 @@ export const useReadBrokerageGetLoansByOwner =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"listAssets"`
+ */
+export const useReadBrokerageListAssets = /*#__PURE__*/ createUseReadContract({
+  abi: brokerageAbi,
+  functionName: 'listAssets',
+})
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"loan"`
  */
 export const useReadBrokerageLoan = /*#__PURE__*/ createUseReadContract({
@@ -19277,6 +19298,14 @@ export const readBrokerageGetLoan = /*#__PURE__*/ createReadContract({
 export const readBrokerageGetLoansByOwner = /*#__PURE__*/ createReadContract({
   abi: brokerageAbi,
   functionName: 'getLoansByOwner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"listAssets"`
+ */
+export const readBrokerageListAssets = /*#__PURE__*/ createReadContract({
+  abi: brokerageAbi,
+  functionName: 'listAssets',
 })
 
 /**

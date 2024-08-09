@@ -54,6 +54,8 @@ contract Brokerage is Ownable {
     // Assets that are approved for loan
     mapping(address => Asset) public assets;
 
+    address[] assetList;
+
     constructor (
         address owner,
         uint8 _precision,
@@ -81,9 +83,18 @@ contract Brokerage is Ownable {
         params[param] = value;
     }
 
-    function approveAsset(address assetDataFeedAddress, string memory name, uint32 rate, string memory symbol) public onlyOwner {
+    function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate) public onlyOwner {
         Asset asset = new Asset(name, symbol, rate, address(this));
         assets[assetDataFeedAddress] = asset;
+        assetList.push(assetDataFeedAddress);
+    }
+
+    function listAssets() public view returns(Asset[] memory) {
+        Asset[] memory assetArray = new Asset[](assetList.length);
+        for (uint i = 0; i < assetList.length; i++) {
+            assetArray[i] = assets[assetList[i]];
+        }
+        return assetArray;
     }
 
     function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {

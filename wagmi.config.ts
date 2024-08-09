@@ -5,8 +5,8 @@ export default defineConfig({
   out: 'src/generated.ts',
   contracts: [],
   plugins: [
-      hardhat({
-      project: '../frontend',
+    hardhat({
+      project: '../core',
     }),
     react(),
     actions(),

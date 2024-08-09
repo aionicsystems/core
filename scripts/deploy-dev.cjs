@@ -12,6 +12,7 @@ async function main() {
 
     const decimals = BigInt(8);
     const initialEthPrice = BigInt(250000000000);
+    const initialAssetPrice = BigInt(20000000000);
 
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.ethers.getSigners();
@@ -42,6 +43,17 @@ async function main() {
     const latestRoundData = await ethDataFeed.latestRoundData();
 
     console.log(`${latestRoundData}`);
+
+    const AssetDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
+    const assetDataFeed = await AssetDataFeed.deploy(decimals, initialAssetPrice);
+
+    await assetDataFeed.waitForDeployment();
+
+    assetDataFeedAddress = await assetDataFeed.getAddress();
+    console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
+
+    await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);
+    console.log(`Assets: ${await brokerage.listAssets()}`);
 
   } catch (error) {
     console.error(error);
