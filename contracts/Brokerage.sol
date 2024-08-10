@@ -44,9 +44,6 @@ contract Brokerage is Ownable {
     // Loan mapped to LoanID
     mapping(uint256 => Loan) public loan;
 
-    // Loans by owner
-    mapping(address => uint256[]) public loans;
-
     // Parameters are based on number of decimal precision
     // Where if precision is 4 then 11111 represents 1.1111 or 111.11%
     mapping(bytes32 => uint32) public params;
