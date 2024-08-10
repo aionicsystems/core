@@ -53,7 +53,7 @@ async function main() {
     console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
 
     await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);
-    console.log(`Assets: ${await brokerage.listAssets()}`);
+    // console.log(`Assets: ${await brokerage.listAssets()}`);
 
   } catch (error) {
     console.error(error);

@@ -9,7 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "dev-up": "docker compose up -d && sleep 30 && hardhat run scripts/deploy-dev.cjs --network localhost",
+    "dev-init": "docker compose up -d && sleep 30 && hardhat run scripts/deploy-dev.cjs --network localhost",
+    "dev-up": "docker compose up -d",
     "dev-down": "docker compose down",
     "dev-clean": "docker compose down && sudo rm -rf data",
     "generate": "hardhat compile && wagmi generate"

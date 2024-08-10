@@ -11,6 +11,7 @@ contract Brokerage is Ownable {
     AggregatorV3Interface internal assetDataFeed;
 
     event LoanEvent(uint256 indexed loanId, Loan loan);
+    event AssetEvent(address indexed token, string name, string symbol, address dataFeedAddress);
  
     // Number of decimal precision used in ratios and rates
     uint8 precision;
@@ -81,6 +82,7 @@ contract Brokerage is Ownable {
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate) public onlyOwner {
         Asset asset = new Asset(name, symbol, rate, address(this));
         assets[assetDataFeedAddress] = asset;
+        emit AssetEvent(address(asset), name, symbol, assetDataFeedAddress);
     }
 
     function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {

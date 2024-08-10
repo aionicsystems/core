@@ -2213,6 +2213,32 @@ export const brokerageAbi = [
     anonymous: false,
     inputs: [
       {
+        name: 'token',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'symbol',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'dataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+    ],
+    name: 'AssetEvent',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
         name: 'loanId',
         internalType: 'uint256',
         type: 'uint256',
@@ -11483,6 +11509,15 @@ export const useWatchBrokerageEvent = /*#__PURE__*/ createUseWatchContractEvent(
 )
 
 /**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEvent"`
+ */
+export const useWatchBrokerageAssetEventEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: brokerageAbi,
+    eventName: 'AssetEvent',
+  })
+
+/**
  * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEvent"`
  */
 export const useWatchBrokerageLoanEventEvent =
@@ -19449,6 +19484,15 @@ export const simulateBrokerageWithdraw = /*#__PURE__*/ createSimulateContract({
 export const watchBrokerageEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: brokerageAbi,
 })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEvent"`
+ */
+export const watchBrokerageAssetEventEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: brokerageAbi,
+    eventName: 'AssetEvent',
+  })
 
 /**
  * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEvent"`
