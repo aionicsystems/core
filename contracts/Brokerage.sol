@@ -7,9 +7,6 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 
 contract Brokerage is Ownable {
-    AggregatorV3Interface internal etherDataFeed;
-    AggregatorV3Interface internal assetDataFeed;
-
     event LoanEvent(uint256 indexed loanId, Loan loan);
     event AssetEvent(address indexed token, string name, string symbol, address dataFeedAddress);
  
@@ -32,6 +29,7 @@ contract Brokerage is Ownable {
         uint256 collateral;
         address asset;
         uint256 liability;
+        address dataFeed;
         uint256 rate;
         uint256 time;
     }
@@ -41,6 +39,7 @@ contract Brokerage is Ownable {
 
     // Ether data feed address
     address etherDataFeedAddress;
+    AggregatorV3Interface internal etherDataFeed;
     
     // Loan mapped to LoanID
     mapping(uint256 => Loan) public loan;
@@ -73,6 +72,7 @@ contract Brokerage is Ownable {
         params["collectorFee"] = collectorFee;
 
         etherDataFeedAddress = _etherDataFeedAddress;
+        etherDataFeed = AggregatorV3Interface(etherDataFeedAddress);
     }
 
     function paramSetter(bytes32 param, uint32 value) public onlyOwner {
@@ -112,7 +112,13 @@ contract Brokerage is Ownable {
     }
 
     function collateralizationRatio(Loan memory _loan) public view returns(uint256) {
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
         return (assetToUsd(_loan.collateral, etherDataFeed)*10^precision)/assetToUsd(_loan.liability, assetDataFeed);
+    }
+
+    function setEtherDataFeed(address _etherDataFeedAddress) public onlyOwner {
+        etherDataFeedAddress = _etherDataFeedAddress;
+        etherDataFeed = AggregatorV3Interface(_etherDataFeedAddress);
     }
 
     function accruedInterest(Loan memory _loan) public view returns (uint256) {
@@ -123,6 +129,7 @@ contract Brokerage is Ownable {
     }
 
     function withdrawalAmount(Loan memory _loan) public view returns (uint256) {
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
         uint256 usdLiability = assetToUsd(_loan.liability, assetDataFeed);
         uint256 usdCollateralNew = (usdLiability * params["borrowingRatio"]) / 10^precision;
         return usdToAsset((assetToUsd(_loan.collateral, etherDataFeed) - usdCollateralNew), etherDataFeed);
@@ -135,13 +142,7 @@ contract Brokerage is Ownable {
     ) payable public {
         require(msg.value > 0, "Amount ETH must be greater than zero");
 
-        etherDataFeed = AggregatorV3Interface(
-            etherDataFeed
-        );
-
-        assetDataFeed = AggregatorV3Interface(
-            assetDataFeedAddress
-        );
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assetDataFeedAddress);
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
@@ -269,6 +270,8 @@ contract Brokerage is Ownable {
 
         // Collect interest
         uint256 interest = accruedInterest(_loan);
+
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
         
         // Calculate amount of ether redeemed for liquidation payment
         uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeed), etherDataFeed);
