@@ -49,7 +49,7 @@ async function main() {
 
     await assetDataFeed.waitForDeployment();
 
-    assetDataFeedAddress = await assetDataFeed.getAddress();
+    const assetDataFeedAddress = await assetDataFeed.getAddress();
     console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
 
     await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);

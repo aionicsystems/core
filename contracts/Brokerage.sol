@@ -35,20 +35,13 @@ contract Brokerage is Ownable {
         uint256 time;
     }
 
-    struct AssetData {
-        address token;
-        string name;
-        string symbol;
-        uint32 rate;
-    }
-
     // Ether held by the contract earned through interest and liquidations
     uint256 contractEther;
 
     // Ether data feed address
     address etherDataFeedAddress;
     
-    // Single loan by LoanId
+    // Loan mapped to LoanID
     mapping(uint256 => Loan) public loan;
 
     // Loans by owner
@@ -60,8 +53,6 @@ contract Brokerage is Ownable {
 
     // Assets that are approved for loan
     mapping(address => Asset) public assets;
-
-    address[] assetList;
 
     constructor (
         address owner,
@@ -93,19 +84,6 @@ contract Brokerage is Ownable {
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate) public onlyOwner {
         Asset asset = new Asset(name, symbol, rate, address(this));
         assets[assetDataFeedAddress] = asset;
-        assetList.push(assetDataFeedAddress);
-    }
-
-    function listAssets() public view returns(AssetData[] memory) {
-        AssetData[] memory assetArray = new AssetData[](assetList.length);
-        for (uint i = 0; i < assetList.length; i++) {
-            AssetData memory c = assetArray[i];
-            c.token = assetList[i];
-            c.name = assets[assetList[i]].name();
-            c.symbol = assets[assetList[i]].symbol();
-            c.rate = assets[assetList[i]].getRate();
-        }
-        return assetArray;
     }
 
     function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {
@@ -172,7 +150,6 @@ contract Brokerage is Ownable {
         
         // Create loan in storage with loanId = counter
         Loan storage _loan = loan[counter];
-        loans[msg.sender].push(counter);
 
         _loan.owner = msg.sender;
         _loan.collateral = msg.value;
@@ -333,13 +310,5 @@ contract Brokerage is Ownable {
 
     function getLoan (uint256 _uid) view public returns (Loan memory) {
         return loan[_uid];
-    }
-
-    function getLoansByOwner (address owner) view public returns (Loan[] memory) {
-        Loan[] memory ownedLoans = new Loan[](loans[owner].length);
-        for (uint256 i = 0; i < loans[owner].length; i++) {
-            ownedLoans[i] = loan[loans[owner][i]];
-        }
-        return ownedLoans;
     }
 }
