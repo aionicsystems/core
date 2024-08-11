@@ -7,8 +7,36 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 
 contract Brokerage is Ownable {
-    event LoanEvent(uint256 indexed loanId, Loan loan);
-    event AssetEvent(address indexed token, string name, string symbol, address dataFeedAddress);
+    event LoanEvent(
+        uint256 indexed id, 
+        address owner,
+        uint256 collateral,
+        address asset,
+        uint256 liability,
+        address dataFeed,
+        uint256 rate,
+        uint256 time
+    );
+
+    function loanEvent(Loan memory _loan) internal {
+        emit LoanEvent(
+            _loan.id,
+            _loan.owner,
+            _loan.collateral,
+            _loan.asset,
+            _loan.liability,
+            _loan.dataFeed,
+            _loan.rate,
+            _loan.time
+        );
+    }
+
+    event AssetEvent(
+        address indexed token, 
+        string name, 
+        string symbol, 
+        address dataFeedAddress
+    );
  
     // Number of decimal precision used in ratios and rates
     uint8 precision;
@@ -25,6 +53,7 @@ contract Brokerage is Ownable {
     // F: Time of last update
     
     struct Loan {
+        uint256 id;
         address owner;
         uint256 collateral;
         address asset;
@@ -151,6 +180,7 @@ contract Brokerage is Ownable {
         // Create loan in storage with loanId = counter
         Loan storage _loan = loan[counter];
 
+        _loan.id = counter;
         _loan.owner = msg.sender;
         _loan.collateral = msg.value;
         _loan.asset = assetDataFeedAddress;
@@ -158,7 +188,7 @@ contract Brokerage is Ownable {
         _loan.rate = assets[assetDataFeedAddress].getRate();
         _loan.time = block.timestamp;
 
-        emit LoanEvent(counter, _loan);
+        loanEvent(_loan);
 
         assets[assetDataFeedAddress].mint(msg.sender, liability);
 
@@ -183,7 +213,7 @@ contract Brokerage is Ownable {
         contractEther = contractEther + interest;
         _loan.time = block.timestamp;
 
-        emit LoanEvent(_loanId, _loan);
+        loanEvent(_loan);
     }
 
     // Withdraw collateral above the Borrowing Rate
@@ -212,7 +242,7 @@ contract Brokerage is Ownable {
         contractEther = contractEther + interest;
         _loan.time = block.timestamp;
 
-        emit LoanEvent(_loanId, _loan);
+        loanEvent(_loan);
     }
 
     // Payback loan with borrowed assets
@@ -248,7 +278,7 @@ contract Brokerage is Ownable {
             payable(msg.sender).transfer(withdrawal);
         }
 
-        emit LoanEvent(_loanId, _loan);
+        loanEvent(_loan);
     }
 
     // Liquidates collateral to buy back loaned assets off market
@@ -288,7 +318,7 @@ contract Brokerage is Ownable {
         // Pay liquidator ether
         payable(msg.sender).transfer(liquidator);
 
-        emit LoanEvent(_loanId, _loan);
+        loanEvent(_loan);
     }
 
     // Collects interest in the form of Collateral (ETH)
@@ -307,7 +337,7 @@ contract Brokerage is Ownable {
 
         _loan.collateral = _loan.collateral - interest;
 
-        emit LoanEvent(_loanId, _loan);
+        loanEvent(_loan);
     }
 
     function getLoan (uint256 _uid) view public returns (Loan memory) {

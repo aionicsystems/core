@@ -25,7 +25,10 @@
     "wagmi": "^2.12.2"
   },
   "devDependencies": {
+    "apollo-fetch": "^0.7.0",
     "@chainlink/contracts": "^1.2.0",
+    "@graphprotocol/graph-cli": "0.71.2",
+    "@graphprotocol/graph-ts": "0.35.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.0.2",
     "@types/react": "^18.3.3",
