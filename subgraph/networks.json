@@ -1,0 +1,8 @@
+{
+  "mainnet": {
+    "Brokerage": {
+      "address": "0xbC873913990da5673D739be7a2C15AEbA4e651b5",
+      "startBlock": 0
+    }
+  }
+}
