@@ -2232,34 +2232,57 @@ export const brokerageAbi = [
         indexed: false,
       },
     ],
-    name: 'AssetEvent',
+    name: 'AssetEntity',
   },
   {
     type: 'event',
     anonymous: false,
     inputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256', indexed: true },
       {
-        name: 'loanId',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: true,
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
       },
       {
-        name: 'loan',
-        internalType: 'struct Brokerage.Loan',
-        type: 'tuple',
-        components: [
-          { name: 'owner', internalType: 'address', type: 'address' },
-          { name: 'collateral', internalType: 'uint256', type: 'uint256' },
-          { name: 'asset', internalType: 'address', type: 'address' },
-          { name: 'liability', internalType: 'uint256', type: 'uint256' },
-          { name: 'rate', internalType: 'uint256', type: 'uint256' },
-          { name: 'time', internalType: 'uint256', type: 'uint256' },
-        ],
+        name: 'collateral',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'asset',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'liability',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'dataFeed',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'rate',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'time',
+        internalType: 'uint256',
+        type: 'uint256',
         indexed: false,
       },
     ],
-    name: 'LoanEvent',
+    name: 'LoanEntity',
   },
   {
     type: 'event',
@@ -2288,10 +2311,12 @@ export const brokerageAbi = [
         internalType: 'struct Brokerage.Loan',
         type: 'tuple',
         components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
           { name: 'owner', internalType: 'address', type: 'address' },
           { name: 'collateral', internalType: 'uint256', type: 'uint256' },
           { name: 'asset', internalType: 'address', type: 'address' },
           { name: 'liability', internalType: 'uint256', type: 'uint256' },
+          { name: 'dataFeed', internalType: 'address', type: 'address' },
           { name: 'rate', internalType: 'uint256', type: 'uint256' },
           { name: 'time', internalType: 'uint256', type: 'uint256' },
         ],
@@ -2346,10 +2371,12 @@ export const brokerageAbi = [
         internalType: 'struct Brokerage.Loan',
         type: 'tuple',
         components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
           { name: 'owner', internalType: 'address', type: 'address' },
           { name: 'collateral', internalType: 'uint256', type: 'uint256' },
           { name: 'asset', internalType: 'address', type: 'address' },
           { name: 'liability', internalType: 'uint256', type: 'uint256' },
+          { name: 'dataFeed', internalType: 'address', type: 'address' },
           { name: 'rate', internalType: 'uint256', type: 'uint256' },
           { name: 'time', internalType: 'uint256', type: 'uint256' },
         ],
@@ -2422,10 +2449,12 @@ export const brokerageAbi = [
         internalType: 'struct Brokerage.Loan',
         type: 'tuple',
         components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
           { name: 'owner', internalType: 'address', type: 'address' },
           { name: 'collateral', internalType: 'uint256', type: 'uint256' },
           { name: 'asset', internalType: 'address', type: 'address' },
           { name: 'liability', internalType: 'uint256', type: 'uint256' },
+          { name: 'dataFeed', internalType: 'address', type: 'address' },
           { name: 'rate', internalType: 'uint256', type: 'uint256' },
           { name: 'time', internalType: 'uint256', type: 'uint256' },
         ],
@@ -2448,10 +2477,12 @@ export const brokerageAbi = [
     inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     name: 'loan',
     outputs: [
+      { name: 'id', internalType: 'uint256', type: 'uint256' },
       { name: 'owner', internalType: 'address', type: 'address' },
       { name: 'collateral', internalType: 'uint256', type: 'uint256' },
       { name: 'asset', internalType: 'address', type: 'address' },
       { name: 'liability', internalType: 'uint256', type: 'uint256' },
+      { name: 'dataFeed', internalType: 'address', type: 'address' },
       { name: 'rate', internalType: 'uint256', type: 'uint256' },
       { name: 'time', internalType: 'uint256', type: 'uint256' },
     ],
@@ -2500,6 +2531,19 @@ export const brokerageAbi = [
   },
   {
     type: 'function',
+    inputs: [
+      {
+        name: '_etherDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'setEtherDataFeed',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
     name: 'transferOwnership',
     outputs: [],
@@ -2534,10 +2578,12 @@ export const brokerageAbi = [
         internalType: 'struct Brokerage.Loan',
         type: 'tuple',
         components: [
+          { name: 'id', internalType: 'uint256', type: 'uint256' },
           { name: 'owner', internalType: 'address', type: 'address' },
           { name: 'collateral', internalType: 'uint256', type: 'uint256' },
           { name: 'asset', internalType: 'address', type: 'address' },
           { name: 'liability', internalType: 'uint256', type: 'uint256' },
+          { name: 'dataFeed', internalType: 'address', type: 'address' },
           { name: 'rate', internalType: 'uint256', type: 'uint256' },
           { name: 'time', internalType: 'uint256', type: 'uint256' },
         ],
@@ -11388,6 +11434,15 @@ export const useWriteBrokerageRenounceOwnership =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const useWriteBrokerageSetEtherDataFeed =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: brokerageAbi,
+    functionName: 'setEtherDataFeed',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
  */
 export const useWriteBrokerageTransferOwnership =
@@ -11484,6 +11539,15 @@ export const useSimulateBrokerageRenounceOwnership =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const useSimulateBrokerageSetEtherDataFeed =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: brokerageAbi,
+    functionName: 'setEtherDataFeed',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
  */
 export const useSimulateBrokerageTransferOwnership =
@@ -11509,21 +11573,21 @@ export const useWatchBrokerageEvent = /*#__PURE__*/ createUseWatchContractEvent(
 )
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEvent"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEntity"`
  */
-export const useWatchBrokerageAssetEventEvent =
+export const useWatchBrokerageAssetEntityEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: brokerageAbi,
-    eventName: 'AssetEvent',
+    eventName: 'AssetEntity',
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEvent"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEntity"`
  */
-export const useWatchBrokerageLoanEventEvent =
+export const useWatchBrokerageLoanEntityEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: brokerageAbi,
-    eventName: 'LoanEvent',
+    eventName: 'LoanEntity',
   })
 
 /**
@@ -19371,6 +19435,13 @@ export const writeBrokerageRenounceOwnership =
   })
 
 /**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const writeBrokerageSetEtherDataFeed = /*#__PURE__*/ createWriteContract(
+  { abi: brokerageAbi, functionName: 'setEtherDataFeed' },
+)
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
  */
 export const writeBrokerageTransferOwnership =
@@ -19462,6 +19533,15 @@ export const simulateBrokerageRenounceOwnership =
   })
 
 /**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const simulateBrokerageSetEtherDataFeed =
+  /*#__PURE__*/ createSimulateContract({
+    abi: brokerageAbi,
+    functionName: 'setEtherDataFeed',
+  })
+
+/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
  */
 export const simulateBrokerageTransferOwnership =
@@ -19486,21 +19566,21 @@ export const watchBrokerageEvent = /*#__PURE__*/ createWatchContractEvent({
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEvent"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEntity"`
  */
-export const watchBrokerageAssetEventEvent =
+export const watchBrokerageAssetEntityEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: brokerageAbi,
-    eventName: 'AssetEvent',
+    eventName: 'AssetEntity',
   })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEvent"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEntity"`
  */
-export const watchBrokerageLoanEventEvent =
+export const watchBrokerageLoanEntityEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: brokerageAbi,
-    eventName: 'LoanEvent',
+    eventName: 'LoanEntity',
   })
 
 /**

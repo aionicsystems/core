@@ -1,16 +1,16 @@
 import {
-  AssetEvent as AssetEventEvent,
-  LoanEvent as LoanEventEvent,
+  AssetEntity as AssetEntityEvent,
+  LoanEntity as LoanEntityEvent,
   OwnershipTransferred as OwnershipTransferredEvent
 } from "../generated/Brokerage/Brokerage"
 import {
-  AssetEvent,
-  LoanEvent,
+  AssetEntity,
+  LoanEntity,
   OwnershipTransferred
 } from "../generated/schema"
 
-export function handleAssetEvent(event: AssetEventEvent): void {
-  let entity = new AssetEvent(
+export function handleAssetEntity(event: AssetEntityEvent): void {
+  let entity = new AssetEntity(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.token = event.params.token
@@ -25,8 +25,8 @@ export function handleAssetEvent(event: AssetEventEvent): void {
   entity.save()
 }
 
-export function handleLoanEvent(event: LoanEventEvent): void {
-  let entity = new LoanEvent(
+export function handleLoanEntity(event: LoanEntityEvent): void {
+  let entity = new LoanEntity(
     event.transaction.hash.concatI32(event.logIndex.toI32())
   )
   entity.Brokerage_id = event.params.id

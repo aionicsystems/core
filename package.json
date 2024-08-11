@@ -13,7 +13,14 @@
     "dev-up": "docker compose up -d",
     "dev-down": "docker compose down",
     "dev-clean": "docker compose down && sudo rm -rf data",
-    "generate": "hardhat compile && wagmi generate"
+    "generate": "hardhat compile && wagmi generate && graph codegen",
+    "codegen": "graph codegen",
+    "graph-build": "graph build",
+    "graph-deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ AionCoreSubgraph",
+    "create-local": "graph create --node http://localhost:8020/ AionCoreSubgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ AionCoreSubgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 AionCoreSubgraph",
+    "graph-test": "graph test"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.51.21",

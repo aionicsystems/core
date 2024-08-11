@@ -1,4 +1,4 @@
-type AssetEvent @entity(immutable: true) {
+type AssetEntity @entity(immutable: true) {
   id: Bytes!
   token: Bytes! # address
   name: String! # string
@@ -9,7 +9,7 @@ type AssetEvent @entity(immutable: true) {
   transactionHash: Bytes!
 }
 
-type LoanEvent @entity(immutable: true) {
+type LoanEntity @entity(immutable: true) {
   id: Bytes!
   Brokerage_id: BigInt! # uint256
   owner: Bytes! # address

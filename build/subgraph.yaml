@@ -2,11 +2,11 @@ specVersion: 1.0.0
 indexerHints:
   prune: auto
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
-  - kind: ethereum
+  - kind: ethereum/contract
     name: Brokerage
-    network: mainnet
+    network: test
     source:
       address: "0xbC873913990da5673D739be7a2C15AEbA4e651b5"
       abi: Brokerage
@@ -16,17 +16,17 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - AssetEvent
-        - LoanEvent
-        - OwnershipTransferred
+        - AssetEntity
+        - LoanEntity
+        - OwnerTransferred
       abis:
         - name: Brokerage
-          file: ./abis/Brokerage.json
+          file: Brokerage/artifacts/contracts/Brokerage.sol/Brokerage.json
       eventHandlers:
-        - event: AssetEvent(indexed address,string,string,address)
-          handler: handleAssetEvent
-        - event: LoanEvent(indexed uint256,address,uint256,address,uint256,address,uint256,uint256)
-          handler: handleLoanEvent
+        - event: AssetEntity(indexed address,string,string,address)
+          handler: handleAssetEntity
+        - event: LoanEntity(indexed uint256,address,uint256,address,uint256,address,uint256,uint256)
+          handler: handleLoanEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-      file: ./src/brokerage.ts
+      file: Brokerage/Brokerage.wasm
