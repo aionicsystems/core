@@ -8,7 +8,7 @@ const srcDir = path.join(__dirname, '..');
 
 const fetchSubgraphs = createApolloFetch({ uri: 'http://localhost:8030/graphql' });
 const fetchSubgraph = createApolloFetch({
-  uri: 'http://localhost:8000/subgraphs/name/test/basic-event-handlers',
+  uri: 'http://localhost:8000/subgraphs/name/AionCoreSubgraph',
 });
 
 const waitForSubgraphToBeSynced = async () =>
@@ -26,7 +26,7 @@ const waitForSubgraphToBeSynced = async () =>
         query: `
           {
             statuses: indexingStatusesForSubgraphName(
-              subgraphName: "test/basic-event-handlers"
+              subgraphName: "AionCoreSubgraph"
             ) {
               synced
             }
@@ -47,8 +47,35 @@ const waitForSubgraphToBeSynced = async () =>
 describe('Basic event handlers', () => {
   // Deploy the subgraph once before all tests
   before(async () => {
-    const GravatarRegistry = await hre.ethers.getContractFactory('GravatarRegistry');
-    const registry = await GravatarRegistry.deploy();
+    const precision = BigInt(4);
+    const borrowingRatio = BigInt(15000);
+    const liquidationRatio = BigInt(12500);
+    const daoFee = BigInt(300);
+    const liquidatorFee = BigInt(200);
+    const collectorFee = BigInt(100);
+
+    const decimals = BigInt(8);
+    const initialEthPrice = BigInt(250000000000);
+    const initialAssetPrice = BigInt(20000000000);
+
+    // Contracts are deployed using the first signer/account by default
+    const [owner, otherAccount] = await ethers.getSigners();
+
+    const EthDataFeed = await ethers.getContractFactory("MockAggregatorV3Interface");
+    const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice);
+
+    const Brokerage = await ethers.getContractFactory("Brokerage");
+    const brokerage = await Brokerage.deploy(
+      owner,
+      precision,
+      borrowingRatio,
+      liquidationRatio,
+      daoFee,
+      liquidatorFee,
+      collectorFee,
+      ethDataFeed.getAddress()
+    );
+
     const accounts = await ethers.getSigners();
 
     filesystem.copy('template-subgraph.yaml', 'subgraph.yaml', { overwrite: true });
@@ -56,16 +83,25 @@ describe('Basic event handlers', () => {
     await patching.replace(
       path.join(srcDir, 'subgraph.yaml'),
       'DEPLOYED_CONTRACT_ADDRESS',
-      registry.address,
+      brokerage.address,
     );
 
-    await registry.setMythicalGravatar();
-    await registry.createGravatar('Carl', 'https://thegraph.com/img/team/team_04.png');
-    await registry
-      .connect(accounts[1])
-      .createGravatar('Lucas', 'https://thegraph.com/img/team/bw_Lucas.jpg');
-    await registry.connect(accounts[0]).updateGravatarName('Nena');
-    await registry.connect(accounts[1]).updateGravatarName('Jorge');
+    console.log(`Brokerage deployed to: ${await brokerage.getAddress()}`);
+
+    const latestRoundData = await ethDataFeed.latestRoundData();
+
+    console.log(`${latestRoundData}`);
+
+    const AssetDataFeed = await ethers.getContractFactory("MockAggregatorV3Interface");
+    const assetDataFeed = await AssetDataFeed.deploy(decimals, initialAssetPrice);
+
+    await assetDataFeed.waitForDeployment();
+
+    const assetDataFeedAddress = await assetDataFeed.getAddress();
+    console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
+
+    await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);
+
     // Create and deploy the subgraph
     await system.run(`yarn codegen`, { cwd: srcDir });
     await system.run(`yarn create-test`, { cwd: srcDir });
@@ -80,36 +116,17 @@ describe('Basic event handlers', () => {
     const result = await fetchSubgraph({
       query: `
         {
-          newGravatars(orderBy: id) { id displayName imageUrl }
-          updatedGravatars(orderBy: id) { id displayName imageUrl }
+          assetEntity(orderBy: id) { name symbol }
         }
       `,
     });
 
     expect(result.errors).to.be.undefined;
     expect(result.data).to.deep.equal({
-      newGravatars: [
+      assetEntity: [
         {
-          displayName: 'Carl',
-          id: '0x1',
-          imageUrl: 'https://thegraph.com/img/team/team_04.png',
-        },
-        {
-          displayName: 'Lucas',
-          id: '0x2',
-          imageUrl: 'https://thegraph.com/img/team/bw_Lucas.jpg',
-        },
-      ],
-      updatedGravatars: [
-        {
-          displayName: 'Nena',
-          id: '0x1',
-          imageUrl: 'https://thegraph.com/img/team/team_04.png',
-        },
-        {
-          displayName: 'Jorge',
-          id: '0x2',
-          imageUrl: 'https://thegraph.com/img/team/bw_Lucas.jpg',
+          name: 'Nvidia',
+          id: 'NVDA',
         },
       ],
     });
