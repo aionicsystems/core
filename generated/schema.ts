@@ -12,9 +12,9 @@ import {
 } from "@graphprotocol/graph-ts";
 
 export class AssetEntity extends Entity {
-  constructor(id: Bytes) {
+  constructor(id: string) {
     super();
-    this.set("id", Value.fromBytes(id));
+    this.set("id", Value.fromString(id));
   }
 
   save(): void {
@@ -22,36 +22,34 @@ export class AssetEntity extends Entity {
     assert(id != null, "Cannot save AssetEntity entity without an ID");
     if (id) {
       assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type AssetEntity must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+        id.kind == ValueKind.STRING,
+        `Entities of type AssetEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
-      store.set("AssetEntity", id.toBytes().toHexString(), this);
+      store.set("AssetEntity", id.toString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): AssetEntity | null {
+  static loadInBlock(id: string): AssetEntity | null {
     return changetype<AssetEntity | null>(
-      store.get_in_block("AssetEntity", id.toHexString()),
+      store.get_in_block("AssetEntity", id),
     );
   }
 
-  static load(id: Bytes): AssetEntity | null {
-    return changetype<AssetEntity | null>(
-      store.get("AssetEntity", id.toHexString()),
-    );
+  static load(id: string): AssetEntity | null {
+    return changetype<AssetEntity | null>(store.get("AssetEntity", id));
   }
 
-  get id(): Bytes {
+  get id(): string {
     let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
   get token(): Bytes {
@@ -147,9 +145,9 @@ export class AssetEntity extends Entity {
 }
 
 export class LoanEntity extends Entity {
-  constructor(id: Bytes) {
+  constructor(id: string) {
     super();
-    this.set("id", Value.fromBytes(id));
+    this.set("id", Value.fromString(id));
   }
 
   save(): void {
@@ -157,36 +155,32 @@ export class LoanEntity extends Entity {
     assert(id != null, "Cannot save LoanEntity entity without an ID");
     if (id) {
       assert(
-        id.kind == ValueKind.BYTES,
-        `Entities of type LoanEntity must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+        id.kind == ValueKind.STRING,
+        `Entities of type LoanEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
-      store.set("LoanEntity", id.toBytes().toHexString(), this);
+      store.set("LoanEntity", id.toString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): LoanEntity | null {
-    return changetype<LoanEntity | null>(
-      store.get_in_block("LoanEntity", id.toHexString()),
-    );
+  static loadInBlock(id: string): LoanEntity | null {
+    return changetype<LoanEntity | null>(store.get_in_block("LoanEntity", id));
   }
 
-  static load(id: Bytes): LoanEntity | null {
-    return changetype<LoanEntity | null>(
-      store.get("LoanEntity", id.toHexString()),
-    );
+  static load(id: string): LoanEntity | null {
+    return changetype<LoanEntity | null>(store.get("LoanEntity", id));
   }
 
-  get id(): Bytes {
+  get id(): string {
     let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toBytes();
+      return value.toString();
     }
   }
 
-  set id(value: Bytes) {
-    this.set("id", Value.fromBytes(value));
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
   }
 
   get Brokerage_id(): BigInt {

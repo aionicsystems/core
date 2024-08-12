@@ -8,7 +8,7 @@ dataSources:
     name: Brokerage
     network: test
     source:
-      address: "0xbC873913990da5673D739be7a2C15AEbA4e651b5"
+      address: "0x77123eAA9577BeB1b5A2A42d7A0207a7d21a2011"
       abi: Brokerage
       startBlock: 0
     mapping:

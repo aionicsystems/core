@@ -9,10 +9,13 @@ import {
   OwnershipTransferred
 } from "../generated/schema"
 
+import { ipfs, json, JSONValue, log } from '@graphprotocol/graph-ts'
+
 export function handleAssetEntity(event: AssetEntityEvent): void {
-  let entity = new AssetEntity(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
+  let entity = new AssetEntity(event.params.token.toString())
+  
+  log.debug('The Asset Address is: {} ', [event.params.token.toString()]);
+
   entity.token = event.params.token
   entity.name = event.params.name
   entity.symbol = event.params.symbol
@@ -26,9 +29,16 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
 }
 
 export function handleLoanEntity(event: LoanEntityEvent): void {
-  let entity = new LoanEntity(
-    event.transaction.hash.concatI32(event.logIndex.toI32())
-  )
+  let entity = LoanEntity.load(event.params.id.toString());
+
+  if (entity == null) {
+    entity = new LoanEntity(
+      event.params.id.toString()
+    )
+  }
+
+  log.debug('The LoanID is: {} ', [event.params.id.toString()]);
+
   entity.Brokerage_id = event.params.id
   entity.owner = event.params.owner
   entity.collateral = event.params.collateral

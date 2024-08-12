@@ -20,6 +20,9 @@
     "create-local": "graph create --node http://localhost:8020/ AionCoreSubgraph",
     "remove-local": "graph remove --node http://localhost:8020/ AionCoreSubgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 AionCoreSubgraph",
+    "create-test": "graph create AionCoreSubgraph --node http://localhost:8020/",
+    "deploy-test": "graph deploy AionCoreSubgraph --version-label v0.0.1 --ipfs http://localhost:5001 --node http://localhost:8020/",
+    "test": "docker compose up -d && sleep 30 && hardhat test --network localhost && docker compose down",
     "graph-test": "graph test"
   },
   "dependencies": {

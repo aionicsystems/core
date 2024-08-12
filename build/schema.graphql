@@ -1,5 +1,5 @@
 type AssetEntity @entity(immutable: true) {
-  id: Bytes!
+  id: ID!
   token: Bytes! # address
   name: String! # string
   symbol: String! # string
@@ -10,7 +10,7 @@ type AssetEntity @entity(immutable: true) {
 }
 
 type LoanEntity @entity(immutable: true) {
-  id: Bytes!
+  id: ID!
   Brokerage_id: BigInt! # uint256
   owner: Bytes! # address
   collateral: BigInt! # uint256

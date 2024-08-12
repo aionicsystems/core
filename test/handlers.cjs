@@ -83,7 +83,7 @@ describe('Basic event handlers', () => {
     await patching.replace(
       path.join(srcDir, 'subgraph.yaml'),
       'DEPLOYED_CONTRACT_ADDRESS',
-      brokerage.address,
+      brokerage.target,
     );
 
     console.log(`Brokerage deployed to: ${await brokerage.getAddress()}`);
@@ -103,9 +103,9 @@ describe('Basic event handlers', () => {
     await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);
 
     // Create and deploy the subgraph
-    await system.run(`yarn codegen`, { cwd: srcDir });
-    await system.run(`yarn create-test`, { cwd: srcDir });
-    await system.run(`yarn deploy-test`, { cwd: srcDir });
+    await system.run(`npm run codegen`, { cwd: srcDir });
+    await system.run(`npm run create-test`, { cwd: srcDir });
+    await system.run(`npm run deploy-test`, { cwd: srcDir });
 
     // Wait for the subgraph to be indexed
     await waitForSubgraphToBeSynced();
@@ -116,17 +116,17 @@ describe('Basic event handlers', () => {
     const result = await fetchSubgraph({
       query: `
         {
-          assetEntity(orderBy: id) { name symbol }
+          assetEntities(orderBy: id) { name symbol }
         }
       `,
     });
 
     expect(result.errors).to.be.undefined;
     expect(result.data).to.deep.equal({
-      assetEntity: [
+      assetEntities: [
         {
           name: 'Nvidia',
-          id: 'NVDA',
+          symbol: 'NVDA',
         },
       ],
     });
