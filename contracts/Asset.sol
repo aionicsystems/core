@@ -8,14 +8,17 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Asset is ERC20, ERC20Burnable, Ownable {
     uint32 rate;
+    address dataFeedAddress;
 
     constructor (
         string memory name,
         string memory symbol,
         uint32 _rate,
-        address owner
+        address owner,
+        address _dataFeedAddress
     ) ERC20 (name, symbol) Ownable(owner) {
         rate = _rate;
+        dataFeedAddress = _dataFeedAddress;
     }
 
     function mint(address account, uint256 amount) public onlyOwner {
@@ -32,5 +35,13 @@ contract Asset is ERC20, ERC20Burnable, Ownable {
 
     function getRate() public view returns (uint32) {
         return rate;
+    }
+
+    function setDataFeedAddress(address _dataFeedAddress) public onlyOwner {
+        dataFeedAddress = _dataFeedAddress;
+    }
+
+    function getDataFeedAddress() public view returns(address) {
+        return dataFeedAddress;
     }
 }

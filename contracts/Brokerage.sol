@@ -108,10 +108,11 @@ contract Brokerage is Ownable {
         params[param] = value;
     }
 
-    function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate) public onlyOwner {
-        Asset asset = new Asset(name, symbol, rate, address(this));
-        assets[assetDataFeedAddress] = asset;
+    function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate) public onlyOwner returns(address) {
+        Asset asset = new Asset(name, symbol, rate, address(this), assetDataFeedAddress);
+        assets[address(asset)] = asset;
         emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress);
+        return address(asset);
     }
 
     function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {
@@ -164,14 +165,15 @@ contract Brokerage is Ownable {
         return usdToAsset((assetToUsd(_loan.collateral, etherDataFeed) - usdCollateralNew), etherDataFeed);
     }
  
-    // Create loan by depositing collateral and receiving
+    // Issue loan by depositing collateral and receiving
     // loaned assets with collateralization at Borrowing Rate
-    function create(
-        address assetDataFeedAddress
-    ) payable public {
+    function issue(
+        address assetAddress
+    ) payable public returns (uint256) {
         require(msg.value > 0, "Amount ETH must be greater than zero");
+        require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assetDataFeedAddress);
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].getDataFeedAddress());
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
@@ -183,17 +185,19 @@ contract Brokerage is Ownable {
         _loan.id = counter;
         _loan.owner = msg.sender;
         _loan.collateral = msg.value;
-        _loan.asset = assetDataFeedAddress;
+        _loan.asset = assetAddress;
         _loan.liability = liability;
-        _loan.rate = assets[assetDataFeedAddress].getRate();
+        _loan.rate = assets[assetAddress].getRate();
         _loan.time = block.timestamp;
 
         loanEntityEvent(_loan);
 
-        assets[assetDataFeedAddress].mint(msg.sender, liability);
+        assets[assetAddress].mint(msg.sender, liability);
 
         // Advance counter
         counter++;
+
+        return liability;
     }
 
     // Deposit more collateral to avoid liquidation
