@@ -6,53 +6,55 @@ import {
 import {
   AssetEntity,
   LoanEntity,
+  OwnerEntity,
   OwnershipTransferred
 } from "../generated/schema"
 
 import { ipfs, json, JSONValue, log } from '@graphprotocol/graph-ts'
 
 export function handleAssetEntity(event: AssetEntityEvent): void {
-  let entity = new AssetEntity(event.params.token.toString())
+  let asset = new AssetEntity(event.params.token)
   
   log.debug('The Asset Address is: {} ', [event.params.token.toString()]);
 
-  entity.token = event.params.token
-  entity.name = event.params.name
-  entity.symbol = event.params.symbol
-  entity.dataFeedAddress = event.params.dataFeedAddress
+  asset.name = event.params.name
+  asset.symbol = event.params.symbol
+  asset.dataFeedAddress = event.params.dataFeedAddress
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
+  asset.blockNumber = event.block.number
+  asset.blockTimestamp = event.block.timestamp
+  asset.transactionHash = event.transaction.hash
 
-  entity.save()
+  asset.save()
 }
 
 export function handleLoanEntity(event: LoanEntityEvent): void {
-  let entity = LoanEntity.load(event.params.id.toString());
-
-  if (entity == null) {
-    entity = new LoanEntity(
-      event.params.id.toString()
-    )
+  let loan = LoanEntity.load(event.params.id.toString());
+  if (loan == null) {
+    loan = new LoanEntity(event.params.id.toString())
   }
 
+  let owner = OwnerEntity.load(event.params.owner); 
+  if (owner == null) {
+    owner = new OwnerEntity(event.params.owner)
+  }
+  
   log.debug('The LoanID is: {} ', [event.params.id.toString()]);
 
-  entity.Brokerage_id = event.params.id
-  entity.owner = event.params.owner
-  entity.collateral = event.params.collateral
-  entity.asset = event.params.asset
-  entity.liability = event.params.liability
-  entity.dataFeed = event.params.dataFeed
-  entity.rate = event.params.rate
-  entity.time = event.params.time
+  loan.owner = event.params.owner
+  loan.collateral = event.params.collateral
+  
+  loan.asset = event.params.asset
+  loan.liability = event.params.liability
+  loan.dataFeed = event.params.dataFeed
+  loan.rate = event.params.rate
+  loan.time = event.params.time
+  
+  loan.blockNumber = event.block.number
+  loan.blockTimestamp = event.block.timestamp
+  loan.transactionHash = event.transaction.hash
 
-  entity.blockNumber = event.block.number
-  entity.blockTimestamp = event.block.timestamp
-  entity.transactionHash = event.transaction.hash
-
-  entity.save()
+  loan.save()
 }
 
 export function handleOwnershipTransferred(

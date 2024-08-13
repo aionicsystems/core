@@ -12,7 +12,7 @@
     "dev-init": "docker compose up -d && sleep 30 && hardhat run scripts/deploy-dev.cjs --network localhost",
     "dev-up": "docker compose up -d",
     "dev-down": "docker compose down",
-    "dev-clean": "docker compose down && sudo rm -rf data",
+    "dev-clean": "docker compose down && sudo rm -rf data && graph clean",
     "generate": "hardhat compile && wagmi generate && graph codegen",
     "codegen": "graph codegen",
     "graph-build": "graph build",

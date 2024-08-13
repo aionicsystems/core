@@ -1,20 +1,20 @@
-type AssetEntity @entity(immutable: true) {
-  id: ID!
-  token: Bytes! # address
+type AssetEntity @entity {
+  id: Bytes!
   name: String! # string
   symbol: String! # string
   dataFeedAddress: Bytes! # address
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+  loans: [LoanEntity!]! @derivedFrom(field: "asset")
 }
 
 type LoanEntity @entity(immutable: true) {
   id: ID!
   Brokerage_id: BigInt! # uint256
-  owner: Bytes! # address
+  owner: OwnerEntity!
   collateral: BigInt! # uint256
-  asset: Bytes! # address
+  asset: AssetEntity!
   liability: BigInt! # uint256
   dataFeed: Bytes! # address
   rate: BigInt! # uint256
@@ -22,6 +22,11 @@ type LoanEntity @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type OwnerEntity @entity {
+  id: Bytes!
+  loans: [LoanEntity!]! @derivedFrom(field: "owner")
 }
 
 type OwnershipTransferred @entity(immutable: true) {

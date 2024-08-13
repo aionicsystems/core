@@ -29,4 +29,4 @@ dataSources:
           handler: handleLoanEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-      file: ./src/brokerage.ts
+      file: ./src/mapping.ts
