@@ -23,7 +23,7 @@ dataSources:
         - name: Brokerage
           file: ./artifacts/contracts/Brokerage.sol/Brokerage.json
       eventHandlers:
-        - event: AssetEntity(indexed address,string,string,address)
+        - event: AssetEntity(indexed address,string,string,address,uint32,uint32)
           handler: handleAssetEntity
         - event: LoanEntity(indexed uint256,address,uint256,address,uint256,address,uint256,uint256)
           handler: handleLoanEntity

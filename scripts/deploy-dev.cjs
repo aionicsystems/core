@@ -31,7 +31,6 @@ async function main() {
       borrowingRatio,
       liquidationRatio,
       daoFee,
-      liquidatorFee,
       collectorFee,
       ethDataFeed.getAddress()
     );
@@ -51,8 +50,11 @@ async function main() {
 
     const assetDataFeedAddress = await assetDataFeed.getAddress();
     console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
-
-    await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);
+    
+    await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "ANVDA", 200, 12500);
+    await brokerage.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
+    await brokerage.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
+    await brokerage.approveAsset(assetDataFeedAddress, "Google", "AGOOG", 500, 13000);
     // console.log(`Assets: ${await brokerage.listAssets()}`);
 
   } catch (error) {

@@ -3,6 +3,8 @@ type AssetEntity @entity {
   name: String! # string
   symbol: String! # string
   dataFeedAddress: Bytes! # address
+  rate: BigInt! # 500 = 5%
+  liquidationRatio: BigInt! # 12500 = 125%
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

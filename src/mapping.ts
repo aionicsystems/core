@@ -20,10 +20,13 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.name = event.params.name
   asset.symbol = event.params.symbol
   asset.dataFeedAddress = event.params.dataFeedAddress
+  asset.rate = event.params.rate
+  asset.liquidationRatio = event.params.liquidationRatio
 
   asset.blockNumber = event.block.number
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
+  
 
   asset.save()
 }

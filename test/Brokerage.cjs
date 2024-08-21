@@ -11,7 +11,6 @@ describe("Brokerage", function () {
   async function deployBrokerageFixture() {
     const precision = BigInt(4);
     const borrowingRatio = BigInt(15000);
-    const liquidationRatio = BigInt(12500);
     const daoFee = BigInt(300);
     const liquidatorFee = BigInt(200);
     const collectorFee = BigInt(100);
@@ -30,7 +29,6 @@ describe("Brokerage", function () {
       owner,
       precision,
       borrowingRatio,
-      liquidationRatio,
       daoFee,
       liquidatorFee,
       collectorFee,

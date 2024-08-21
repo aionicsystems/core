@@ -69,7 +69,6 @@ describe('Basic event handlers', () => {
       owner,
       precision,
       borrowingRatio,
-      liquidationRatio,
       daoFee,
       liquidatorFee,
       collectorFee,
@@ -100,7 +99,7 @@ describe('Basic event handlers', () => {
     const assetDataFeedAddress = await assetDataFeed.getAddress();
     console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
 
-    let tx = await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400);
+    let tx = await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400, 12500);
     let result = await tx.wait();
     let assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
