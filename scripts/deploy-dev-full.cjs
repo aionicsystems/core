@@ -1,9 +1,8 @@
+const hre = require("hardhat");
 const path = require('node:path');
 const { system, patching, filesystem } = require('gluegun');
 const { createApolloFetch } = require('apollo-fetch');
 const { ethers } = require('hardhat');
-const { expect } = require('chai');
-
 const srcDir = path.join(__dirname, '..');
 
 const fetchSubgraphs = createApolloFetch({ uri: 'http://localhost:8030/graphql' });
@@ -44,11 +43,12 @@ const waitForSubgraphToBeSynced = async () =>
     setTimeout(checkSubgraphSynced, 0);
   });
 
-describe('Basic event handlers', () => {
-  // Deploy the subgraph once before all tests
-  before(async () => {
+async function main() {
+  try {
+    
     const precision = BigInt(4);
     const borrowingRatio = BigInt(15000);
+    const liquidationRatio = BigInt(12500);
     const daoFee = BigInt(300);
     const liquidatorFee = BigInt(200);
     const collectorFee = BigInt(100);
@@ -58,23 +58,29 @@ describe('Basic event handlers', () => {
     const initialAssetPrice = BigInt(20000000000);
 
     // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await ethers.getSigners();
+    const [owner, otherAccount] = await hre.ethers.getSigners();
 
-    const EthDataFeed = await ethers.getContractFactory("MockAggregatorV3Interface");
+    const EthDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
     const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice);
 
-    const Brokerage = await ethers.getContractFactory("Brokerage");
+    await ethDataFeed.waitForDeployment();
+
+    console.log(`Mock ETH Data Feed deployed to: ${await ethDataFeed.getAddress()}`);
+
+    const Brokerage = await hre.ethers.getContractFactory("Brokerage");
     const brokerage = await Brokerage.deploy(
       owner,
       precision,
       borrowingRatio,
+      liquidationRatio,
       daoFee,
-      liquidatorFee,
       collectorFee,
       ethDataFeed.getAddress()
     );
 
-    const accounts = await ethers.getSigners();
+    await brokerage.waitForDeployment();
+
+    console.log(`Brokerage deployed to: ${await brokerage.getAddress()}`);
 
     filesystem.copy('template-subgraph.yaml', 'subgraph.yaml', { overwrite: true });
     // Insert its address into subgraph manifest
@@ -84,23 +90,36 @@ describe('Basic event handlers', () => {
       brokerage.target,
     );
 
-    console.log(`Brokerage deployed to: ${await brokerage.getAddress()}`);
-
     const latestRoundData = await ethDataFeed.latestRoundData();
 
     console.log(`${latestRoundData}`);
 
-    const AssetDataFeed = await ethers.getContractFactory("MockAggregatorV3Interface");
+    const AssetDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
     const assetDataFeed = await AssetDataFeed.deploy(decimals, initialAssetPrice);
 
     await assetDataFeed.waitForDeployment();
 
     const assetDataFeedAddress = await assetDataFeed.getAddress();
     console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
-
-    let tx = await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400, 12500);
+    
+    let tx = await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "ANVDA", 200, 12500);
     let result = await tx.wait();
     let assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    tx = await brokerage.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
+    result = await tx.wait();
+    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    tx = await brokerage.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
+    result = await tx.wait();
+    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    tx = await brokerage.approveAsset(assetDataFeedAddress, "Google", "AGOOG", 500, 13000);
+    result = await tx.wait();
+    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
 
     const options = {value: ethers.parseEther("1.0")}
@@ -115,26 +134,11 @@ describe('Basic event handlers', () => {
 
     // Wait for the subgraph to be indexed
     await waitForSubgraphToBeSynced();
-  });
 
-  it('all events are indexed', async () => {
-    // Query the subgraph for entities
-    const result = await fetchSubgraph({
-      query: `
-        {
-          assetEntities(orderBy: id) { name symbol }
-        }
-      `,
-    });
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+}
 
-    expect(result.errors).to.be.undefined;
-    expect(result.data).to.deep.equal({
-      assetEntities: [
-        {
-          name: 'Nvidia',
-          symbol: 'NVDA',
-        },
-      ],
-    });
-  });
-});
+main();

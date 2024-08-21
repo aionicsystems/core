@@ -55,6 +55,8 @@ async function main() {
     await brokerage.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
     await brokerage.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
     await brokerage.approveAsset(assetDataFeedAddress, "Google", "AGOOG", 500, 13000);
+
+    
     // console.log(`Assets: ${await brokerage.listAssets()}`);
 
   } catch (error) {

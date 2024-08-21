@@ -2,13 +2,13 @@ specVersion: 1.0.0
 indexerHints:
   prune: auto
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Brokerage
     network: test
     source:
-      address: '0xbC873913990da5673D739be7a2C15AEbA4e651b5'
+      address: "0xbC873913990da5673D739be7a2C15AEbA4e651b5"
       abi: Brokerage
       startBlock: 0
     mapping:
@@ -21,7 +21,7 @@ dataSources:
         - OwnerTransferred
       abis:
         - name: Brokerage
-          file: ./artifacts/contracts/Brokerage.sol/Brokerage.json
+          file: Brokerage/artifacts/contracts/Brokerage.sol/Brokerage.json
       eventHandlers:
         - event: AssetEntity(indexed address,string,string,address,uint32,uint32)
           handler: handleAssetEntity
@@ -29,4 +29,4 @@ dataSources:
           handler: handleLoanEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-      file: ./src/mapping.ts
+      file: Brokerage/Brokerage.wasm
