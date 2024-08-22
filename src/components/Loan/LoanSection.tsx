@@ -4,16 +4,9 @@ import { overviewCards } from "../../static/data.ts";
 import { OverviewCard } from "../OverviewCard/OverviewCard.tsx";
 import { Card } from "../Card/Card.tsx";
 import { FC, useState } from "react";
-import { LoanSelect } from "./LoanSelect.tsx";
-import { SelectOption } from "../../types/dataTypes.ts";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
+import { Button } from "../Button/Button.tsx";
 
-const selectOptions: SelectOption[] = [
-  { label: "#0", value: 1 },
-  { label: "#1", value: 2 },
-  { label: "#2", value: 3 },
-  { label: "#3", value: 4 },
-];
 
 export const LoanSection: FC = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
@@ -22,6 +15,7 @@ export const LoanSection: FC = () => {
   const toggleSelectAsset = () => {
     setSelectAssetModal(!selectAssetModal);
   };
+
   const toggleLoanModal = () => {
     setLoanModal(!loanModal);
   };
@@ -32,10 +26,9 @@ export const LoanSection: FC = () => {
         <h2 className={`${styles.sectionTitle} ${styles.overviewTitle}`}>
           Loan Overview
         </h2>
-        <LoanSelect
-          options={selectOptions}
-          onChangeAction={toggleSelectAsset}
-        />
+        <Button size={"sm"} btnType={"primary"} onClick={() => toggleSelectAsset()}>
+          Issue Loan
+        </Button>
       </div>
       <div className={styles.overviewCardsWrapper}>
         {overviewCards.slice(0.2).map((item) => (
