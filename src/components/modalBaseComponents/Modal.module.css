@@ -1,0 +1,17 @@
+.modalInner {
+    border-radius: 40px 40px 0 0;
+    background-color: #092234;
+}
+
+.modalContent {
+    padding: 21px;
+}
+
+@media (min-width: 768px) {
+    .modalInner {
+        border-radius: 40px;
+    }
+    .modalContent {
+        padding: 32px;
+    }
+}

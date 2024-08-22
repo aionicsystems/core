@@ -11,6 +11,8 @@ import iIcon from "../assets/iIcon.svg";
 import btnArrow from "../assets/btnArrow.svg";
 import xClose from "../assets/xclose.svg";
 import questionMark from "../assets/questionMark.svg";
+import searchGlass from "../assets/search.png";
+import aionCoin from "../assets/aion_coin.png";
 
 export {
   loanId,
@@ -26,4 +28,6 @@ export {
   chevron,
   btnArrow,
   iIcon,
+  aionCoin,
+  searchGlass,
 };

@@ -1,0 +1,49 @@
+.loanAssetItem {
+    width: 100%;
+    padding: 12px 30px 12px 16px;
+    background-color: #08101B38;
+    border-radius: 21px;
+    transition: 0.3s all ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+}
+.loanAssetItem:hover {
+    background-color: rgba(156, 163, 175, 0.22);
+}
+.loanAssetItem:not(:first-child) {
+    margin-top: 11px;
+}
+.loanAssetSymbol {
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 12px;
+    color: #ffffff;
+}
+.loanAssetValue {
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 12px;
+    color: #ffffff;
+}
+.loanAssetIcon {
+    width: 40px;
+    height: 40px;
+}
+
+@media (min-width: 768px) {
+    .loanAssetIcon {
+        width: 60px;
+        height: 60px;
+    }
+    .loanAssetSymbol {
+        font-size: 18px;
+        line-height: 24px;
+    }
+    .loanAssetValue {
+        font-size: 18px;
+        line-height: 24px;
+    }
+}

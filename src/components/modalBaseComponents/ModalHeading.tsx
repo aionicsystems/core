@@ -4,28 +4,24 @@ import styles from "./ModalHeading.module.css";
 
 type ModalHeadingProps = {
   onClose: () => void;
+  toggleFaq: () => void;
   modalTitle: string;
-  modalTooltipText?: string;
 };
 
 export const ModalHeading: FC<ModalHeadingProps> = ({
   modalTitle = "",
   onClose,
-  modalTooltipText = "",
+  toggleFaq,
 }) => {
   return (
     <div className={styles.modalHeading}>
-      <div
-        style={{ cursor: modalTooltipText ? "pointer" : "none" }}
+      <button
+        style={{ cursor: "pointer" }}
         className={styles.modalQuestionWrapper}
+        onClick={() => toggleFaq()}
       >
-        {modalTooltipText && (
-          <Fragment>
-            <img src={questionMark as string} alt="question mark" />
-            <span className={styles.modalTooltip}>{modalTooltipText}</span>
-          </Fragment>
-        )}
-      </div>
+        <img src={questionMark as string} alt="question mark" />
+      </button>
       <p className={styles.modalTitle}>{modalTitle}</p>
       <button
         className={styles.modalClose}

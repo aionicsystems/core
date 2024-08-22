@@ -1915,6 +1915,7 @@ export const assetAbi = [
       { name: 'symbol', internalType: 'string', type: 'string' },
       { name: '_rate', internalType: 'uint32', type: 'uint32' },
       { name: 'owner', internalType: 'address', type: 'address' },
+      { name: '_dataFeedAddress', internalType: 'address', type: 'address' },
     ],
     stateMutability: 'nonpayable',
   },
@@ -2089,6 +2090,13 @@ export const assetAbi = [
   {
     type: 'function',
     inputs: [],
+    name: 'getDataFeedAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
     name: 'getRate',
     outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
     stateMutability: 'view',
@@ -2121,6 +2129,15 @@ export const assetAbi = [
     type: 'function',
     inputs: [],
     name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: '_dataFeedAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'setDataFeedAddress',
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -2339,7 +2356,7 @@ export const brokerageAbi = [
       { name: 'rate', internalType: 'uint32', type: 'uint32' },
     ],
     name: 'approveAsset',
-    outputs: [],
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
     stateMutability: 'nonpayable',
   },
   {
@@ -2397,19 +2414,6 @@ export const brokerageAbi = [
     type: 'function',
     inputs: [
       {
-        name: 'assetDataFeedAddress',
-        internalType: 'address',
-        type: 'address',
-      },
-    ],
-    name: 'create',
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
         name: 'dataFeed',
         internalType: 'contract AggregatorV3Interface',
         type: 'address',
@@ -2461,6 +2465,15 @@ export const brokerageAbi = [
       },
     ],
     stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'assetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'issue',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'payable',
   },
   {
     type: 'function',
@@ -11017,6 +11030,15 @@ export const useReadAssetDecimals = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getDataFeedAddress"`
+ */
+export const useReadAssetGetDataFeedAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: assetAbi,
+    functionName: 'getDataFeedAddress',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getRate"`
  */
 export const useReadAssetGetRate = /*#__PURE__*/ createUseReadContract({
@@ -11105,6 +11127,15 @@ export const useWriteAssetRenounceOwnership =
   })
 
 /**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setDataFeedAddress"`
+ */
+export const useWriteAssetSetDataFeedAddress =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: assetAbi,
+    functionName: 'setDataFeedAddress',
+  })
+
+/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setRate"`
  */
 export const useWriteAssetSetRate = /*#__PURE__*/ createUseWriteContract({
@@ -11182,6 +11213,15 @@ export const useSimulateAssetRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
     abi: assetAbi,
     functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setDataFeedAddress"`
+ */
+export const useSimulateAssetSetDataFeedAddress =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: assetAbi,
+    functionName: 'setDataFeedAddress',
   })
 
 /**
@@ -11384,19 +11424,19 @@ export const useWriteBrokerageCollect = /*#__PURE__*/ createUseWriteContract({
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"create"`
- */
-export const useWriteBrokerageCreate = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
-  functionName: 'create',
-})
-
-/**
  * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
  */
 export const useWriteBrokerageDeposit = /*#__PURE__*/ createUseWriteContract({
   abi: brokerageAbi,
   functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ */
+export const useWriteBrokerageIssue = /*#__PURE__*/ createUseWriteContract({
+  abi: brokerageAbi,
+  functionName: 'issue',
 })
 
 /**
@@ -11485,21 +11525,21 @@ export const useSimulateBrokerageCollect =
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"create"`
- */
-export const useSimulateBrokerageCreate =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
-    functionName: 'create',
-  })
-
-/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
  */
 export const useSimulateBrokerageDeposit =
   /*#__PURE__*/ createUseSimulateContract({
     abi: brokerageAbi,
     functionName: 'deposit',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ */
+export const useSimulateBrokerageIssue =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: brokerageAbi,
+    functionName: 'issue',
   })
 
 /**
@@ -19028,6 +19068,14 @@ export const readAssetDecimals = /*#__PURE__*/ createReadContract({
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getDataFeedAddress"`
+ */
+export const readAssetGetDataFeedAddress = /*#__PURE__*/ createReadContract({
+  abi: assetAbi,
+  functionName: 'getDataFeedAddress',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getRate"`
  */
 export const readAssetGetRate = /*#__PURE__*/ createReadContract({
@@ -19113,6 +19161,14 @@ export const writeAssetRenounceOwnership = /*#__PURE__*/ createWriteContract({
 })
 
 /**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setDataFeedAddress"`
+ */
+export const writeAssetSetDataFeedAddress = /*#__PURE__*/ createWriteContract({
+  abi: assetAbi,
+  functionName: 'setDataFeedAddress',
+})
+
+/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setRate"`
  */
 export const writeAssetSetRate = /*#__PURE__*/ createWriteContract({
@@ -19190,6 +19246,15 @@ export const simulateAssetRenounceOwnership =
   /*#__PURE__*/ createSimulateContract({
     abi: assetAbi,
     functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setDataFeedAddress"`
+ */
+export const simulateAssetSetDataFeedAddress =
+  /*#__PURE__*/ createSimulateContract({
+    abi: assetAbi,
+    functionName: 'setDataFeedAddress',
   })
 
 /**
@@ -19386,19 +19451,19 @@ export const writeBrokerageCollect = /*#__PURE__*/ createWriteContract({
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"create"`
- */
-export const writeBrokerageCreate = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
-  functionName: 'create',
-})
-
-/**
  * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
  */
 export const writeBrokerageDeposit = /*#__PURE__*/ createWriteContract({
   abi: brokerageAbi,
   functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ */
+export const writeBrokerageIssue = /*#__PURE__*/ createWriteContract({
+  abi: brokerageAbi,
+  functionName: 'issue',
 })
 
 /**
@@ -19483,19 +19548,19 @@ export const simulateBrokerageCollect = /*#__PURE__*/ createSimulateContract({
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"create"`
- */
-export const simulateBrokerageCreate = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
-  functionName: 'create',
-})
-
-/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
  */
 export const simulateBrokerageDeposit = /*#__PURE__*/ createSimulateContract({
   abi: brokerageAbi,
   functionName: 'deposit',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ */
+export const simulateBrokerageIssue = /*#__PURE__*/ createSimulateContract({
+  abi: brokerageAbi,
+  functionName: 'issue',
 })
 
 /**

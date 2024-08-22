@@ -21,3 +21,8 @@ export type AccountType = {
   text: string;
   btnText: string;
 };
+
+export type SelectOption = {
+  label: string | number;
+  value: string | number;
+};
