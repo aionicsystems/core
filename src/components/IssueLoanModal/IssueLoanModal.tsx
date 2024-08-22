@@ -6,13 +6,13 @@ import { ModalHeading } from "../modalBaseComponents/ModalHeading.tsx";
 import { IssueLoanModalFaq } from "./IssueLoanModalFaq.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { assetEntities, client } from "../../repository/requests.ts";
-import { gql } from "@apollo/client";
 import { AssetType } from "../../types/assetTypes.ts";
 import { IssueAssetInfo } from "./IssueAssetInfo.tsx";
 import { IssueLoanForm } from "./IssueLoanForm.tsx";
+import { ModalError } from "../ModalError/ModalError.tsx";
 
 export type IssueLoanModalProps = Modal & {
-  selectedLoan: string;
+  selectedLoan?: string;
 };
 
 export const IssueLoanModal: FC<IssueLoanModalProps> = ({
@@ -22,13 +22,19 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   selectedLoan,
 }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
-  const { data, isLoading } = useQuery({
+  const [error, setError] = useState<boolean>(false);
+  const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
-      const result = await client.query({
-        query: assetEntities,
-        variables: { id: selectedLoan },
-      });
-      return result.data;
+      try {
+        const result = await client.query({
+          query: assetEntities,
+          variables: { id: selectedLoan },
+        });
+        return result.data;
+      } catch (error) {
+        setError(true);
+        throw error;
+      }
     },
     queryKey: [`asset_entities_${selectedLoan}`],
   });
@@ -54,6 +60,8 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
         <div className={styles.modalContent}>
           {modalFaq ? (
             <IssueLoanModalFaq />
+          ) : error || isError ? (
+            <ModalError />
           ) : (
             <>
               <IssueLoanForm loanID={selectedLoan} />
@@ -61,7 +69,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
                 issue={
                   assets &&
                   (assets.find(
-                    (asset) => asset.id === selectedLoan,
+                    (asset) => asset.id === selectedLoan
                   ) as AssetType)
                 }
               />

@@ -3,7 +3,7 @@ import { Button } from "../Button/Button.tsx";
 import styles from "./IssueLoanForm.module.css";
 
 export type IssueLoanFormProps = {
-  loanID: string;
+  loanID?: string;
 };
 
 export const IssueLoanForm: FC<IssueLoanFormProps> = ({ loanID }) => {

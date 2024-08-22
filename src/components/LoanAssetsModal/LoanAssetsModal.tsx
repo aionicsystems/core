@@ -11,18 +11,27 @@ import { IssueLoanModal } from "../IssueLoanModal/IssueLoanModal.tsx";
 import { assetEntities, client } from "../../repository/requests.ts";
 import { useQuery } from "@tanstack/react-query";
 import { LoanAsset } from "./LoanAsset.tsx";
+import { ModalError } from "../ModalError/ModalError.tsx";
 
 export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [loanIssueModal, setLoanIssueModal] = useState<boolean>(false);
-  const [selectedLoan, setSelectedLoan] = useState<AssetType>(null);
+  const [selectedLoan, setSelectedLoan] = useState<AssetType | undefined>(
+    undefined
+  );
+  const [error, setError] = useState<boolean>(false);
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
-      const result = await client.query({
-        query: assetEntities,
-      });
-      return result.data;
+      try {
+        const result = await client.query({
+          query: assetEntities,
+        });
+        return result.data;
+      } catch (error) {
+        setError(true);
+        throw error;
+      }
     },
     queryKey: ["asset_entities"],
   });
@@ -57,6 +66,8 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
         <div className={styles.modalContent}>
           {modalFaq ? (
             <LoanAssetsModalFaq />
+          ) : error || isError ? (
+            <ModalError />
           ) : (
             <>
               <SearchInput name={"search-asset"} />
@@ -77,7 +88,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
         <IssueLoanModal
           onClose={toggleLoanIssue}
           size={size}
-          selectedLoan={selectedLoan.id}
+          selectedLoan={selectedLoan && selectedLoan.id}
           modalTitle={"Issue Loan"}
         />
       )}
