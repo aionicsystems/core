@@ -38,6 +38,14 @@ export class AssetEntity__Params {
   get dataFeedAddress(): Address {
     return this._event.parameters[3].value.toAddress();
   }
+
+  get rate(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+
+  get liquidationRatio(): BigInt {
+    return this._event.parameters[5].value.toBigInt();
+  }
 }
 
 export class LoanEntity extends ethereum.Event {
@@ -355,15 +363,17 @@ export class Brokerage extends ethereum.SmartContract {
     name: string,
     symbol: string,
     rate: BigInt,
+    liquidationRatio: BigInt,
   ): Address {
     let result = super.call(
       "approveAsset",
-      "approveAsset(address,string,string,uint32):(address)",
+      "approveAsset(address,string,string,uint32,uint32):(address)",
       [
         ethereum.Value.fromAddress(assetDataFeedAddress),
         ethereum.Value.fromString(name),
         ethereum.Value.fromString(symbol),
         ethereum.Value.fromUnsignedBigInt(rate),
+        ethereum.Value.fromUnsignedBigInt(liquidationRatio),
       ],
     );
 
@@ -375,15 +385,17 @@ export class Brokerage extends ethereum.SmartContract {
     name: string,
     symbol: string,
     rate: BigInt,
+    liquidationRatio: BigInt,
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "approveAsset",
-      "approveAsset(address,string,string,uint32):(address)",
+      "approveAsset(address,string,string,uint32,uint32):(address)",
       [
         ethereum.Value.fromAddress(assetDataFeedAddress),
         ethereum.Value.fromString(name),
         ethereum.Value.fromString(symbol),
         ethereum.Value.fromUnsignedBigInt(rate),
+        ethereum.Value.fromUnsignedBigInt(liquidationRatio),
       ],
     );
     if (result.reverted) {
@@ -712,24 +724,20 @@ export class ConstructorCall__Inputs {
     return this._call.inputValues[2].value.toBigInt();
   }
 
-  get liquidationRatio(): BigInt {
+  get daoFee(): BigInt {
     return this._call.inputValues[3].value.toBigInt();
   }
 
-  get daoFee(): BigInt {
+  get liquidatorFee(): BigInt {
     return this._call.inputValues[4].value.toBigInt();
   }
 
-  get liquidatorFee(): BigInt {
+  get collectorFee(): BigInt {
     return this._call.inputValues[5].value.toBigInt();
   }
 
-  get collectorFee(): BigInt {
-    return this._call.inputValues[6].value.toBigInt();
-  }
-
   get _etherDataFeedAddress(): Address {
-    return this._call.inputValues[7].value.toAddress();
+    return this._call.inputValues[6].value.toAddress();
   }
 }
 
@@ -772,6 +780,10 @@ export class ApproveAssetCall__Inputs {
 
   get rate(): BigInt {
     return this._call.inputValues[3].value.toBigInt();
+  }
+
+  get liquidationRatio(): BigInt {
+    return this._call.inputValues[4].value.toBigInt();
   }
 }
 

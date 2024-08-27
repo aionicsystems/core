@@ -35,7 +35,9 @@ contract Brokerage is Ownable {
         address indexed token, 
         string name, 
         string symbol, 
-        address dataFeedAddress
+        address dataFeedAddress,
+        uint32 rate,
+        uint32 liquidationRatio
     );
  
     // Number of decimal precision used in ratios and rates
@@ -84,7 +86,6 @@ contract Brokerage is Ownable {
         address owner,
         uint8 _precision,
         uint32 borrowingRatio,
-        uint32 liquidationRatio,
         uint32 daoFee,
         uint32 liquidatorFee,
         uint32 collectorFee,
@@ -95,7 +96,6 @@ contract Brokerage is Ownable {
         precision = _precision;
 
         params["borrowingRatio"] = borrowingRatio;
-        params["liquidationRatio"] = liquidationRatio;
         params["daoFee"] = daoFee;
         params["liquidatorFee"] = liquidatorFee;
         params["collectorFee"] = collectorFee;
@@ -108,10 +108,10 @@ contract Brokerage is Ownable {
         params[param] = value;
     }
 
-    function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate) public onlyOwner returns(address) {
-        Asset asset = new Asset(name, symbol, rate, address(this), assetDataFeedAddress);
+    function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate, uint32 liquidationRatio) public onlyOwner returns(address) {
+        Asset asset = new Asset(name, symbol, rate, liquidationRatio, address(this), assetDataFeedAddress);
         assets[address(asset)] = asset;
-        emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress);
+        emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, rate, liquidationRatio);
         return address(asset);
     }
 

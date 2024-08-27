@@ -93,6 +93,32 @@ export class AssetEntity extends Entity {
     this.set("dataFeedAddress", Value.fromBytes(value));
   }
 
+  get rate(): BigInt {
+    let value = this.get("rate");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set rate(value: BigInt) {
+    this.set("rate", Value.fromBigInt(value));
+  }
+
+  get liquidationRatio(): BigInt {
+    let value = this.get("liquidationRatio");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set liquidationRatio(value: BigInt) {
+    this.set("liquidationRatio", Value.fromBigInt(value));
+  }
+
   get blockNumber(): BigInt {
     let value = this.get("blockNumber");
     if (!value || value.kind == ValueKind.NULL) {

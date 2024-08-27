@@ -8,7 +8,7 @@ dataSources:
     name: Brokerage
     network: test
     source:
-      address: "0x45852187DD0CA6709bDa7c7AC8856b1e14B827A8"
+      address: "0xbC873913990da5673D739be7a2C15AEbA4e651b5"
       abi: Brokerage
       startBlock: 0
     mapping:
@@ -23,7 +23,7 @@ dataSources:
         - name: Brokerage
           file: Brokerage\artifacts\contracts\Brokerage.sol\Brokerage.json
       eventHandlers:
-        - event: AssetEntity(indexed address,string,string,address)
+        - event: AssetEntity(indexed address,string,string,address,uint32,uint32)
           handler: handleAssetEntity
         - event: LoanEntity(indexed uint256,address,uint256,address,uint256,address,uint256,uint256)
           handler: handleLoanEntity

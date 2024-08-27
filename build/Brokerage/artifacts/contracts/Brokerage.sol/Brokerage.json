@@ -18,11 +18,6 @@
       },
       {
         "internalType": "uint32",
-        "name": "liquidationRatio",
-        "type": "uint32"
-      },
-      {
-        "internalType": "uint32",
         "name": "daoFee",
         "type": "uint32"
       },
@@ -93,6 +88,18 @@
         "internalType": "address",
         "name": "dataFeedAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "rate",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "liquidationRatio",
+        "type": "uint32"
       }
     ],
     "name": "AssetEntity",
@@ -253,6 +260,11 @@
       {
         "internalType": "uint32",
         "name": "rate",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "liquidationRatio",
         "type": "uint32"
       }
     ],
