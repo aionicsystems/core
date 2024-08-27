@@ -26,17 +26,20 @@
     "graph-test": "graph test"
   },
   "dependencies": {
+    "@apollo/client": "^3.11.4",
     "@tanstack/react-query": "^5.51.21",
     "@web3modal/wagmi": "^5.0.11",
+    "graphql": "^16.9.0",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-loader-spinner": "^6.1.6",
     "viem": "^2.18.7",
     "wagmi": "^2.12.2"
   },
   "devDependencies": {
-    "apollo-fetch": "^0.7.0",
     "@chainlink/contracts": "^1.2.0",
+    "@graphprotocol/client-cli": "^3.0.6",
     "@graphprotocol/graph-cli": "0.71.2",
     "@graphprotocol/graph-ts": "0.35.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
@@ -47,6 +50,7 @@
     "@typescript-eslint/parser": "^7.15.0",
     "@vitejs/plugin-react": "^4.3.1",
     "@wagmi/cli": "^2.1.15",
+    "apollo-fetch": "^0.7.0",
     "dotenv": "^16.4.5",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.2",

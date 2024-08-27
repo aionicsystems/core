@@ -10,3 +10,11 @@ export const formatAddress = (addr: string) => {
   const upperAfterLastTwo = addr.slice(0, 2) + addr.slice(2);
   return `${upperAfterLastTwo.substring(0, 5)}...${upperAfterLastTwo.substring(39)}`;
 };
+
+export const formatAssetLoanRate = (rate: string) => {
+  return `${Number(rate) / 100}%`;
+};
+
+export const formatAssetLiquidationRatio = (rate: string) => {
+  return `${Number(rate) / 100}%`;
+};

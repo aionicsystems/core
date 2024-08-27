@@ -1,0 +1,12 @@
+.modalErrorWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalErrorText {
+  font-size: 18px;
+  color: #ffffff;
+  text-align: center;
+  line-height: 24px;
+}
