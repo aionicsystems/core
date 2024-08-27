@@ -116,7 +116,7 @@ export class OwnershipTransferred__Params {
   }
 }
 
-export class Brokerage__accruedInterestInput_loanStruct extends ethereum.Tuple {
+export class Window__accruedInterestInput_loanStruct extends ethereum.Tuple {
   get id(): BigInt {
     return this[0].toBigInt();
   }
@@ -150,7 +150,7 @@ export class Brokerage__accruedInterestInput_loanStruct extends ethereum.Tuple {
   }
 }
 
-export class Brokerage__collateralizationRatioInput_loanStruct extends ethereum.Tuple {
+export class Window__collateralizationRatioInput_loanStruct extends ethereum.Tuple {
   get id(): BigInt {
     return this[0].toBigInt();
   }
@@ -184,7 +184,7 @@ export class Brokerage__collateralizationRatioInput_loanStruct extends ethereum.
   }
 }
 
-export class Brokerage__getLoanResultValue0Struct extends ethereum.Tuple {
+export class Window__getLoanResultValue0Struct extends ethereum.Tuple {
   get id(): BigInt {
     return this[0].toBigInt();
   }
@@ -218,7 +218,7 @@ export class Brokerage__getLoanResultValue0Struct extends ethereum.Tuple {
   }
 }
 
-export class Brokerage__loanResult {
+export class Window__loanResult {
   value0: BigInt;
   value1: Address;
   value2: BigInt;
@@ -294,7 +294,7 @@ export class Brokerage__loanResult {
   }
 }
 
-export class Brokerage__withdrawalAmountInput_loanStruct extends ethereum.Tuple {
+export class Window__withdrawalAmountInput_loanStruct extends ethereum.Tuple {
   get id(): BigInt {
     return this[0].toBigInt();
   }
@@ -328,12 +328,12 @@ export class Brokerage__withdrawalAmountInput_loanStruct extends ethereum.Tuple 
   }
 }
 
-export class Brokerage extends ethereum.SmartContract {
-  static bind(address: Address): Brokerage {
-    return new Brokerage("Brokerage", address);
+export class Window extends ethereum.SmartContract {
+  static bind(address: Address): Window {
+    return new Window("Window", address);
   }
 
-  accruedInterest(_loan: Brokerage__accruedInterestInput_loanStruct): BigInt {
+  accruedInterest(_loan: Window__accruedInterestInput_loanStruct): BigInt {
     let result = super.call(
       "accruedInterest",
       "accruedInterest((uint256,address,uint256,address,uint256,address,uint256,uint256)):(uint256)",
@@ -344,7 +344,7 @@ export class Brokerage extends ethereum.SmartContract {
   }
 
   try_accruedInterest(
-    _loan: Brokerage__accruedInterestInput_loanStruct,
+    _loan: Window__accruedInterestInput_loanStruct,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "accruedInterest",
@@ -457,7 +457,7 @@ export class Brokerage extends ethereum.SmartContract {
   }
 
   collateralizationRatio(
-    _loan: Brokerage__collateralizationRatioInput_loanStruct,
+    _loan: Window__collateralizationRatioInput_loanStruct,
   ): BigInt {
     let result = super.call(
       "collateralizationRatio",
@@ -469,7 +469,7 @@ export class Brokerage extends ethereum.SmartContract {
   }
 
   try_collateralizationRatio(
-    _loan: Brokerage__collateralizationRatioInput_loanStruct,
+    _loan: Window__collateralizationRatioInput_loanStruct,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "collateralizationRatio",
@@ -531,21 +531,19 @@ export class Brokerage extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getLoan(_uid: BigInt): Brokerage__getLoanResultValue0Struct {
+  getLoan(_uid: BigInt): Window__getLoanResultValue0Struct {
     let result = super.call(
       "getLoan",
       "getLoan(uint256):((uint256,address,uint256,address,uint256,address,uint256,uint256))",
       [ethereum.Value.fromUnsignedBigInt(_uid)],
     );
 
-    return changetype<Brokerage__getLoanResultValue0Struct>(
-      result[0].toTuple(),
-    );
+    return changetype<Window__getLoanResultValue0Struct>(result[0].toTuple());
   }
 
   try_getLoan(
     _uid: BigInt,
-  ): ethereum.CallResult<Brokerage__getLoanResultValue0Struct> {
+  ): ethereum.CallResult<Window__getLoanResultValue0Struct> {
     let result = super.tryCall(
       "getLoan",
       "getLoan(uint256):((uint256,address,uint256,address,uint256,address,uint256,uint256))",
@@ -556,18 +554,18 @@ export class Brokerage extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      changetype<Brokerage__getLoanResultValue0Struct>(value[0].toTuple()),
+      changetype<Window__getLoanResultValue0Struct>(value[0].toTuple()),
     );
   }
 
-  loan(param0: BigInt): Brokerage__loanResult {
+  loan(param0: BigInt): Window__loanResult {
     let result = super.call(
       "loan",
       "loan(uint256):(uint256,address,uint256,address,uint256,address,uint256,uint256)",
       [ethereum.Value.fromUnsignedBigInt(param0)],
     );
 
-    return new Brokerage__loanResult(
+    return new Window__loanResult(
       result[0].toBigInt(),
       result[1].toAddress(),
       result[2].toBigInt(),
@@ -579,7 +577,7 @@ export class Brokerage extends ethereum.SmartContract {
     );
   }
 
-  try_loan(param0: BigInt): ethereum.CallResult<Brokerage__loanResult> {
+  try_loan(param0: BigInt): ethereum.CallResult<Window__loanResult> {
     let result = super.tryCall(
       "loan",
       "loan(uint256):(uint256,address,uint256,address,uint256,address,uint256,uint256)",
@@ -590,7 +588,7 @@ export class Brokerage extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new Brokerage__loanResult(
+      new Window__loanResult(
         value[0].toBigInt(),
         value[1].toAddress(),
         value[2].toBigInt(),
@@ -669,7 +667,7 @@ export class Brokerage extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  withdrawalAmount(_loan: Brokerage__withdrawalAmountInput_loanStruct): BigInt {
+  withdrawalAmount(_loan: Window__withdrawalAmountInput_loanStruct): BigInt {
     let result = super.call(
       "withdrawalAmount",
       "withdrawalAmount((uint256,address,uint256,address,uint256,address,uint256,uint256)):(uint256)",
@@ -680,7 +678,7 @@ export class Brokerage extends ethereum.SmartContract {
   }
 
   try_withdrawalAmount(
-    _loan: Brokerage__withdrawalAmountInput_loanStruct,
+    _loan: Window__withdrawalAmountInput_loanStruct,
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "withdrawalAmount",

@@ -13,7 +13,7 @@ type AssetEntity @entity {
 
 type LoanEntity @entity(immutable: true) {
   id: ID!
-  Brokerage_id: BigInt! # uint256
+  Window_id: BigInt! # uint256
   owner: OwnerEntity!
   collateral: BigInt! # uint256
   asset: AssetEntity!

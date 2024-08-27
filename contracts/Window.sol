@@ -6,7 +6,7 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 
-contract Brokerage is Ownable {
+contract Window is Ownable {
     event LoanEntity(
         uint256 indexed id, 
         address owner,

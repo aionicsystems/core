@@ -4,11 +4,11 @@ const {
 const { expect } = require("chai");
 
 
-describe("Brokerage", function () {
+describe("Window", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
-  async function deployBrokerageFixture() {
+  async function deployWindowFixture() {
     const precision = BigInt(4);
     const borrowingRatio = BigInt(15000);
     const daoFee = BigInt(300);
@@ -24,8 +24,8 @@ describe("Brokerage", function () {
     const EthDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
     const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice);
 
-    const Brokerage = await hre.ethers.getContractFactory("Brokerage");
-    const brokerage = await Brokerage.deploy(
+    const Window = await hre.ethers.getContractFactory("Window");
+    const window = await Window.deploy(
       owner,
       precision,
       borrowingRatio,
@@ -37,13 +37,13 @@ describe("Brokerage", function () {
 
     
 
-    return { brokerage, ethDataFeed, owner, otherAccount };
+    return { window, ethDataFeed, owner, otherAccount };
   }
 
   describe("Deployment", function () {
     it("Should have right owner", async function () {
-      const { owner, brokerage } = await loadFixture(deployBrokerageFixture);
-      expect(await brokerage.owner()).to.equal(owner);
+      const { owner, window } = await loadFixture(deployWindowFixture);
+      expect(await window.owner()).to.equal(owner);
     });
   });
 });

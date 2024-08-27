@@ -4,7 +4,7 @@ import {
   AssetEvent,
   LoanEvent,
   OwnershipTransferred
-} from "../generated/Brokerage/Brokerage"
+} from "../generated/Window/Window"
 
 export function createAssetEventEvent(
   token: Address,

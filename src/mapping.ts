@@ -2,7 +2,7 @@ import {
   AssetEntity as AssetEntityEvent,
   LoanEntity as LoanEntityEvent,
   OwnershipTransferred as OwnershipTransferredEvent
-} from "../generated/Brokerage/Brokerage"
+} from "../generated/Window/Window"
 import {
   AssetEntity,
   LoanEntity,

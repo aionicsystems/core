@@ -206,8 +206,8 @@ export class LoanEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get Brokerage_id(): BigInt {
-    let value = this.get("Brokerage_id");
+  get Window_id(): BigInt {
+    let value = this.get("Window_id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -215,8 +215,8 @@ export class LoanEntity extends Entity {
     }
   }
 
-  set Brokerage_id(value: BigInt) {
-    this.set("Brokerage_id", Value.fromBigInt(value));
+  set Window_id(value: BigInt) {
+    this.set("Window_id", Value.fromBigInt(value));
   }
 
   get owner(): Bytes {
