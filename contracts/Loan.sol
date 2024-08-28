@@ -2,17 +2,17 @@
 
 pragma solidity ^0.8.24;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { IERC20 } from '@openzeppelin/contracts/interfaces/IERC20.sol';
 
 contract Loan is Ownable {
-    uint256 collateral;
-    address asset;
-    uint256 liability;
-    address dataFeed;
-    uint32 borrowingRatio;
-    uint32 liquidationRatio;
-    uint32 rate;
-    uint256 time;
-
+    uint256 public collateral;
+    IERC20 public asset;
+    uint256 public liability;
+    address public dataFeed;
+    uint32 public borrowingRatio;
+    uint32 public liquidationRatio;
+    uint32 public rate;
+    uint256 public time;
 
     constructor (
         address owner,
@@ -27,7 +27,7 @@ contract Loan is Ownable {
         uint256 _time
     ) Ownable(owner) {
         collateral = _collateral;
-        asset = _asset;
+        asset = IERC20(_asset);
         liability = _liability;
         dataFeed = _dataFeed;
         borrowingRatio = _borrowingRatio;
@@ -36,28 +36,13 @@ contract Loan is Ownable {
         time = _time;
     }
 
-    function getRate() public view returns (uint32) {
-        return rate;
-    }
-
-    function getLiquidationRatio() public view returns (uint32) {
-        return liquidationRatio;
-    }
-
-    function getDataFeed() public view returns(address) {
-        return dataFeed;
-    }
-
     // Payback loan with borrowed assets
     // Payback can be called with zero payment and be just a withdrawal
     function payback(uint256 _loanId, uint256 payment) public {
         require(payment > 0, "payment must be greater than zero");
-    
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.owner == msg.sender);
-        require(_loan.liability >= payment);
-        require(assets[_loan.asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
+        require(this.owner() == msg.sender);
+        require(liability >= payment);
+        require(IERC20[asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
         _loan.liability = _loan.liability - payment;

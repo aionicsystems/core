@@ -5,31 +5,35 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
+import { Loan } from "./Loan.sol";
 
 contract Window is Ownable {
     event LoanEntity(
-        uint256 indexed id, 
+        address loanAddress, 
         address owner,
-        uint256 collateral,
-        address asset,
-        uint256 liability,
-        address dataFeed,
-        uint32 rate,
-        uint32 liquidationRatio,
+        uint256 collateralAmount,
+        address assetAddress,
+        uint256 liabilityAmount,
+        address dataFeedAddress,
         uint32 borrowingRatio,
-        uint256 time
+        uint32 liquidationRatio,
+        uint32 interestRate,
+        uint256 lastCollection
     );
 
-    function loanEntityEvent(Loan memory _loan) internal {
+    function loanEntityEvent(Loan memory _loan) public view {
+        require(loans[msg.sender].getTime() > 0, "loan does not exist");
         emit LoanEntity(
-            _loan.id,
-            _loan.owner,
-            _loan.collateral,
-            _loan.asset,
-            _loan.liability,
-            _loan.dataFeed,
-            _loan.rate,
-            _loan.time
+            address(loan),
+            loan.owner(),
+            loan.collateral(),
+            loan.asset(),
+            loan.liability(),
+            loan.dataFeed(),
+            loan.borrowingRatio(),
+            loan.liquidationRatio(),
+            loan.rate(),
+            loan.time()
         );
     }
 
@@ -48,25 +52,6 @@ contract Window is Ownable {
     // Counter is used for UID of each loan
     uint256 counter;
 
-    // Loan structure
-    // A: Owner
-    // B: Collateral Balance
-    // C: Asset Data Feed Address
-    // D: Liability Balance
-    // E: Interest Rate (Fixed interest)
-    // F: Time of last update
-    
-    struct Loan {
-        uint256 id;
-        address owner;
-        uint256 collateral;
-        address asset;
-        uint256 liability;
-        address dataFeed;
-        uint256 rate;
-        uint256 time;
-    }
-
     // Ether held by the contract earned through interest and liquidations
     uint256 contractEther;
 
@@ -74,8 +59,8 @@ contract Window is Ownable {
     address etherDataFeedAddress;
     AggregatorV3Interface internal etherDataFeed;
     
-    // Loan mapped to LoanID
-    mapping(uint256 => Loan) public loan;
+    // Loan mapped to Address
+    mapping(address => Loan) public loans;
 
     // Parameters are based on number of decimal precision
     // Where if precision is 4 then 11111 represents 1.1111 or 111.11%
@@ -181,18 +166,26 @@ contract Window is Ownable {
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
         uint256 liability = (usdLiability * assetDataFeed.decimals()) / dataFeedPrice(assetDataFeed);
         
-        // Create loan in storage with loanId = counter
-        Loan storage _loan = loan[counter];
+        // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
+        // User collateral for the issued loan is only ever stored in this contract with no other funds from
+        // other loans or users.
+        Loan loan = new Loan(
+            msg.sender,                         // Loan owner
+            address(this),                      // Window Address
+            msg.value,                          // Collateral Amount
+            assetAddress,                       // Asset Address
+            liability,                          // Asset Amount
+            assetDataFeedAddress,               // Asset Price Data Feed
+            block.timestamp,                    // Time
+            borrowingRatio,                     // Borrowing Ratio
+            liquidationRatio,                   // Liquidation Ratio
+            assets[assetAddress].getRate()      // Interest Rate
+        );
 
-        _loan.id = counter;
-        _loan.owner = msg.sender;
-        _loan.collateral = msg.value;
-        _loan.asset = assetAddress;
-        _loan.liability = liability;
-        _loan.rate = assets[assetAddress].getRate();
-        _loan.time = block.timestamp;
-
-        loanEntityEvent(_loan);
+        loans[address(loan)] = loan;
+        emit LoanEntity(address(asset), name, symbol, assetDataFeedAddress, rate, liquidationRatio);
+        
+        loanEntityEvent(loan);
 
         assets[assetAddress].mint(msg.sender, liability);
 
