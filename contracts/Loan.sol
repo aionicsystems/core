@@ -3,20 +3,31 @@
 pragma solidity ^0.8.24;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IERC20 } from '@openzeppelin/contracts/interfaces/IERC20.sol';
+import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+
+interface IERC20Burnable is IERC20 {
+    function burnFrom(address account, uint256 value) public;
+    function balanceOf(address account) external view returns (uint256);
+}
+
+interface Window {
+    function getParam(string) external returns (uint32);
+}
 
 contract Loan is Ownable {
-    uint256 public collateral;
-    IERC20 public asset;
+    Window window;
+    IERC20Burnable public asset;
     uint256 public liability;
     address public dataFeed;
     uint32 public borrowingRatio;
     uint32 public liquidationRatio;
     uint32 public rate;
     uint256 public time;
+    uint8 precision;
 
     constructor (
         address owner,
-        address window,
+        address _window,
         uint256 _collateral,
         address _asset,
         uint256 _liability,
@@ -24,39 +35,41 @@ contract Loan is Ownable {
         uint32 _borrowingRatio,
         uint32 _liquidationRatio,
         uint32 _rate,
-        uint256 _time
+        uint256 _time,
+        uint8 _precision
     ) Ownable(owner) {
+        window = Window(window);
         collateral = _collateral;
-        asset = IERC20(_asset);
+        asset = IERC20Burnable(_asset);
         liability = _liability;
         dataFeed = _dataFeed;
         borrowingRatio = _borrowingRatio;
         liquidationRatio = _liquidationRatio;
         rate = _rate;
         time = _time;
+        precision = _precision;
+    }
+
+    function withdrawalAmount(Loan memory _loan) public view returns (uint256) {
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
+        uint256 usdLiability = assetToUsd(_loan.liability, assetDataFeed);
+        uint256 usdCollateralNew = (usdLiability * params["borrowingRatio"]) / 10^precision;
+        return usdToAsset((assetToUsd(_loan.collateral, etherDataFeed) - usdCollateralNew), etherDataFeed);
     }
 
     // Payback loan with borrowed assets
     // Payback can be called with zero payment and be just a withdrawal
-    function payback(uint256 _loanId, uint256 payment) public {
-        require(payment > 0, "payment must be greater than zero");
+    function payback(uint256 payment) public {
         require(this.owner() == msg.sender);
         require(liability >= payment);
         require(IERC20[asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
-        _loan.liability = _loan.liability - payment;
+        liability = liability - payment;
 
-        // Burn the payment
-        assets[_loan.asset].burn(msg.sender, payment);
-
-        // Collect interest
-        uint256 interest = accruedInterest(_loan);
-        _loan.collateral = _loan.collateral - interest;
-        contractEther = contractEther + interest;
-        _loan.time = block.timestamp;
+        // Burn the payment. Owner needs to approve the token first.
+        asset.burnFrom(msg.sender, payment);
         
-
         if (collateralizationRatio(_loan) > params["borrowingRatio"]) {
             uint256 withdrawal = withdrawalAmount(_loan);
         
@@ -111,20 +124,24 @@ contract Loan is Ownable {
     }
 
     // Collects interest in the form of Collateral (ETH)
-    function collect(uint256 _loanId) public {
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.collateral > 0, "Loan must be active");
+    function collect() public {
+        require(collateral > 0, "Loan must be active");
+
+        // Calculate interest
+        // Collateral * Interest Rate = Yearly Interest
+        // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
+        window.transfer(collateral * rate * (block.timestamp - time)) / (31536000 * 10^precision);
+        time = block.timestamp;
 
         // Collect interest
-        uint256 interest = accruedInterest(_loan);
-        uint256 collector = (interest * params["collectorFee"]) / 10^precision;
-        contractEther = contractEther + interest - collector;
+        uint256 interest = (collateral * rate * (block.timestamp - time)) / (31536000 * 10^precision);
+        uint256 collector = (interest * window.getParam("collectorFee")) / 10^precision;
+        
+        // Pay window interest - collector fee
+        payable(address(window)).transfer(interest - collector);
 
         // Pay collector ether
         payable(msg.sender).transfer(collector);
-
-        _loan.collateral = _loan.collateral - interest;
 
         loanEntityEvent(_loan);
     }

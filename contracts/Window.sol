@@ -91,8 +91,12 @@ contract Window is Ownable {
         etherDataFeed = AggregatorV3Interface(etherDataFeedAddress);
     }
 
-    function paramSetter(bytes32 param, uint32 value) public onlyOwner {
+    function setParam(bytes32 param, uint32 value) public onlyOwner {
         params[param] = value;
+    }
+
+    function getParam(bytes32 param) external returns (uint32) {
+        return params[param];
     }
 
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate, uint32 liquidationRatio) public onlyOwner returns(address) {
@@ -136,13 +140,6 @@ contract Window is Ownable {
     function setEtherDataFeed(address _etherDataFeedAddress) public onlyOwner {
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorV3Interface(_etherDataFeedAddress);
-    }
-
-    function accruedInterest(Loan memory _loan) public view returns (uint256) {
-        // Calculate interest
-        // Collateral * Interest Rate = Yearly Interest
-        // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
-        return (_loan.collateral * _loan.rate * (block.timestamp - _loan.time)) / (31536000 * 10^precision);
     }
 
     function withdrawalAmount(Loan memory _loan) public view returns (uint256) {
