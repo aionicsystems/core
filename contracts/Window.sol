@@ -56,7 +56,7 @@ contract Window is Ownable {
     uint256 contractEther;
 
     // Ether data feed address
-    address etherDataFeedAddress;
+    address public etherDataFeedAddress;
     AggregatorV3Interface internal etherDataFeed;
     
     // Loan mapped to Address

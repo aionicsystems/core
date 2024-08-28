@@ -7,7 +7,6 @@ import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/inte
 
 interface IERC20Burnable is IERC20 {
     function burnFrom(address account, uint256 value) public;
-    function balanceOf(address account) external view returns (uint256);
 }
 
 interface Window {
@@ -16,9 +15,10 @@ interface Window {
 
 contract Loan is Ownable {
     Window window;
-    IERC20Burnable public asset;
+    address public asset;
+    address public assetDataFeedAddress;
+    address public etherDataFeedAddress;
     uint256 public liability;
-    address public dataFeed;
     uint32 public borrowingRatio;
     uint32 public liquidationRatio;
     uint32 public rate;
@@ -31,7 +31,6 @@ contract Loan is Ownable {
         uint256 _collateral,
         address _asset,
         uint256 _liability,
-        address _dataFeed,
         uint32 _borrowingRatio,
         uint32 _liquidationRatio,
         uint32 _rate,
@@ -39,10 +38,8 @@ contract Loan is Ownable {
         uint8 _precision
     ) Ownable(owner) {
         window = Window(window);
-        collateral = _collateral;
         asset = IERC20Burnable(_asset);
         liability = _liability;
-        dataFeed = _dataFeed;
         borrowingRatio = _borrowingRatio;
         liquidationRatio = _liquidationRatio;
         rate = _rate;
@@ -50,25 +47,56 @@ contract Loan is Ownable {
         precision = _precision;
     }
 
+    function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {
+        // prettier-ignore
+        (
+            /* uint320 roundID */,
+            int answer,
+            /*uint startedAt*/,
+            /*uint timeStamp*/,
+            /*uint320 answeredInRound*/
+        ) = dataFeed.latestRoundData();
+        return answer;
+    }
+
+    function dataFeedPrice(AggregatorV3Interface dataFeed) public view returns (uint256) {
+        int price = getChainlinkDataFeedLatestAnswer(dataFeed);
+        require(price > 0, "price must be greater than zero");
+        return uint256(price);
+    }
+
+    function assetToUsd(uint256 amount, AggregatorV3Interface dataFeed) public view returns (uint256) {
+        return dataFeedPrice(dataFeed)*amount/dataFeed.decimals();
+    }
+
+    function usdToAsset(uint256 amount, AggregatorV3Interface dataFeed) public view returns (uint256) {
+        return (amount * dataFeed.decimals()) / dataFeedPrice(dataFeed);
+    }
+
     function withdrawalAmount(Loan memory _loan) public view returns (uint256) {
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
-        uint256 usdLiability = assetToUsd(_loan.liability, assetDataFeed);
-        uint256 usdCollateralNew = (usdLiability * params["borrowingRatio"]) / 10^precision;
-        return usdToAsset((assetToUsd(_loan.collateral, etherDataFeed) - usdCollateralNew), etherDataFeed);
+        uint256 usdLiability = assetToUsd(_loan.liability, AggregatorV3Interface(asset.assetDataFeedAddress()));
+        uint256 usdCollateralNew = (usdLiability * borrowingRatio) / 10^precision;
+        return usdToAsset((assetToUsd(_loan.collateral, AggregatorV3Interface(etherDataFeedAddress)) - usdCollateralNew), AggregatorV3Interface(etherDataFeedAddress));
+    }
+
+    function collateralizationRatio() public view returns(uint256) {
+        return (assetToUsd(address(this).balance, AggregatorV3Interface(etherDataFeedAddress))*10^precision)/assetToUsd(liability, AggregatorV3Interface(assetDataFeedAddress));
     }
 
     // Payback loan with borrowed assets
     // Payback can be called with zero payment and be just a withdrawal
-    function payback(uint256 payment) public {
+    function payback(uint256 payment) public onlyOwner {
         require(this.owner() == msg.sender);
         require(liability >= payment);
-        require(IERC20[asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
-        // Update Loan Liability
-        liability = liability - payment;
+        if (payment > 0) {
+            // Burn the payment. Owner needs to approve the token first.
+            // Will revert if Owner does not have sufficient funds.
+            asset.burnFrom(msg.sender, payment);
 
-        // Burn the payment. Owner needs to approve the token first.
-        asset.burnFrom(msg.sender, payment);
+            // Update Loan Liability
+            liability = liability - payment;
+        }
         
         if (collateralizationRatio(_loan) > params["borrowingRatio"]) {
             uint256 withdrawal = withdrawalAmount(_loan);
