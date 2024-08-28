@@ -14,7 +14,9 @@ contract Window is Ownable {
         address asset,
         uint256 liability,
         address dataFeed,
-        uint256 rate,
+        uint32 rate,
+        uint32 liquidationRatio,
+        uint32 borrowingRatio,
         uint256 time
     );
 
@@ -200,55 +202,6 @@ contract Window is Ownable {
         return liability;
     }
 
-    // Deposit more collateral to avoid liquidation
-    // Collateralization Ratio <= Borrowing Rate
-    function deposit(uint256 _loanId) payable public {
-        require(msg.value > 0, "Amount ETH must be greater than zero");
-        
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.collateral > 0, "Loan must be active");
-        
-        uint256 interest = accruedInterest(_loan);
-        _loan.collateral = _loan.collateral + msg.value - interest;
-        require(collateralizationRatio(_loan) <= params["borrowingRatio"], "Collateralization Ratio after deposit must be less than Borrowing Ratio");
-        
-        // Collect interest into contract
-        contractEther = contractEther + interest;
-        _loan.time = block.timestamp;
-
-        loanEntityEvent(_loan);
-    }
-
-    // Withdraw collateral above the Borrowing Rate
-    // Collateralization Ratio >= Borrowing Rate
-    function withdraw(uint256 _loanId) public {
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        
-        require(msg.sender == _loan.owner, "Only callable by loan owner");
-        require(_loan.collateral > 0, "Loan must be active");
-        
-        uint256 interest = accruedInterest(_loan);
-        _loan.collateral = _loan.collateral - interest;
-
-        require(collateralizationRatio(_loan) > params["borrowingRatio"]);
-
-        uint256 withdrawal = withdrawalAmount(_loan);
-        
-        // Update collateral balance
-        _loan.collateral = _loan.collateral - withdrawal;
-
-        // Pay msg sender ether
-        payable(msg.sender).transfer(withdrawal);
-
-        // Collect interest into contract
-        contractEther = contractEther + interest;
-        _loan.time = block.timestamp;
-
-        loanEntityEvent(_loan);
-    }
-
     // Payback loan with borrowed assets
     function payback(uint256 _loanId, uint256 payment) public {
         require(payment > 0, "payment must be greater than zero");
@@ -321,25 +274,6 @@ contract Window is Ownable {
 
         // Pay liquidator ether
         payable(msg.sender).transfer(liquidator);
-
-        loanEntityEvent(_loan);
-    }
-
-    // Collects interest in the form of Collateral (ETH)
-    function collect(uint256 _loanId) public {
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.collateral > 0, "Loan must be active");
-
-        // Collect interest
-        uint256 interest = accruedInterest(_loan);
-        uint256 collector = (interest * params["collectorFee"]) / 10^precision;
-        contractEther = contractEther + interest - collector;
-
-        // Pay collector ether
-        payable(msg.sender).transfer(collector);
-
-        _loan.collateral = _loan.collateral - interest;
 
         loanEntityEvent(_loan);
     }
