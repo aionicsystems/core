@@ -21,19 +21,30 @@ contract Window is Ownable {
         uint256 lastCollection
     );
 
-    function loanEntityEvent(Loan memory _loan) public {
+    function loanEntityEvent(
+        address loanAddress, 
+        address owner,
+        uint256 collateralAmount,
+        address assetAddress,
+        uint256 liabilityAmount,
+        address dataFeedAddress,
+        uint32 borrowingRatio,
+        uint32 liquidationRatio,
+        uint32 interestRate,
+        uint256 lastCollection
+    ) public {
         require(loans[msg.sender].getTime() > 0, "loan does not exist");
         emit LoanEntity(
-            address(loan),
-            loan.owner(),
-            loan.collateral(),
-            loan.asset(),
-            loan.liability(),
-            loan.dataFeed(),
-            loan.borrowingRatio(),
-            loan.liquidationRatio(),
-            loan.rate(),
-            loan.time()
+            loanAddress, 
+            owner,
+            collateralAmount,
+            assetAddress,
+            liabilityAmount,
+            dataFeedAddress,
+            borrowingRatio,
+            liquidationRatio,
+            interestRate,
+            lastCollection
         );
     }
 
@@ -157,7 +168,7 @@ contract Window is Ownable {
         require(msg.value > 0, "Amount ETH must be greater than zero");
         require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].getDataFeedAddress());
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].assetDataFeedAddress);
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
@@ -167,22 +178,34 @@ contract Window is Ownable {
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
         // other loans or users.
         Loan loan = new Loan(
-            msg.sender,                         // Loan owner
-            address(this),                      // Window Address
-            msg.value,                          // Collateral Amount
-            assetAddress,                       // Asset Address
-            liability,                          // Asset Amount
-            assetDataFeedAddress,               // Asset Price Data Feed
-            block.timestamp,                    // Time
-            borrowingRatio,                     // Borrowing Ratio
-            liquidationRatio,                   // Liquidation Ratio
-            assets[assetAddress].getRate()      // Interest Rate
+            msg.sender,                                 // Loan owner
+            address(this),                              // Window Address
+            msg.value,                                  // Collateral Amount
+            assetAddress,                               // Asset Address
+            liability,                                  // Asset Amount
+            assets[assetAddress].assetDataFeedAddress,  // Asset Price Data Feed
+            block.timestamp,                            // Time
+            assets[assetAddress].borrowingRatio,        // Borrowing Ratio
+            assets[assetAddress].liquidationRatio,      // Liquidation Ratio
+            assets[assetAddress].getRate()              // Interest Rate
         );
 
+        // Transfer Ether to address of Loan Contract owned by Issuer
+        payable(address(loan)).transfer(msg.value);
+
         loans[address(loan)] = loan;
-        emit LoanEntity(address(asset), name, symbol, assetDataFeedAddress, rate, liquidationRatio);
-        
-        loanEntityEvent(loan);
+        emit LoanEntity(
+            address(loan), 
+            owner,
+            msg.value,
+            assetAddress,
+            liabilityAmount,
+            dataFeedAddress,
+            borrowingRatio,
+            liquidationRatio,
+            interestRate,
+            lastCollection
+        );
 
         assets[assetAddress].mint(msg.sender, liability);
 
@@ -190,85 +213,5 @@ contract Window is Ownable {
         counter++;
 
         return liability;
-    }
-
-    // Payback loan with borrowed assets
-    function payback(uint256 _loanId, uint256 payment) public {
-        require(payment > 0, "payment must be greater than zero");
-    
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.owner == msg.sender);
-        require(_loan.liability >= payment);
-        require(assets[_loan.asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
-
-        // Update Loan Liability
-        _loan.liability = _loan.liability - payment;
-
-        // Burn the payment
-        assets[_loan.asset].burn(msg.sender, payment);
-
-        // Collect interest
-        uint256 interest = accruedInterest(_loan);
-        _loan.collateral = _loan.collateral - interest;
-        contractEther = contractEther + interest;
-        _loan.time = block.timestamp;
-        
-
-        if (collateralizationRatio(_loan) > params["borrowingRatio"]) {
-            uint256 withdrawal = withdrawalAmount(_loan);
-        
-            // Update collateral balance
-            _loan.collateral = _loan.collateral - withdrawal;
-
-            // Pay msg sender ether
-            payable(msg.sender).transfer(withdrawal);
-        }
-
-        loanEntityEvent(_loan);
-    }
-
-    // Liquidates collateral to buy back loaned assets off market
-    function liquidate(uint256 _loanId, uint256 payment) public {
-        require(payment > 0, "payment must be greater than zero");
-        
-
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.owner == msg.sender);
-        require(_loan.liability >= payment);
-        require(assets[_loan.asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
-
-        // Update Loan Liability
-        _loan.liability = _loan.liability - payment;
-
-        // Burn the payment
-        assets[_loan.asset].burn(msg.sender, payment);
-
-        // Collect interest
-        uint256 interest = accruedInterest(_loan);
-
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
-        
-        // Calculate amount of ether redeemed for liquidation payment
-        uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeed), etherDataFeed);
-        
-        // Calculate total liquidator payment redemption plus fee
-        uint256 liquidator = redemption + (redemption * params["liquidatorFee"]) / 10^precision;
-
-        // Calculate Dao fee
-        uint256 dao = (redemption * params["daoFee"]) / 10^precision;
-        contractEther = contractEther + interest + dao;
-        _loan.collateral = _loan.collateral - interest - liquidator - dao;
-        _loan.time = block.timestamp;
-
-        // Pay liquidator ether
-        payable(msg.sender).transfer(liquidator);
-
-        loanEntityEvent(_loan);
-    }
-
-    function getLoan (uint256 _uid) view public returns (Loan memory) {
-        return loan[_uid];
     }
 }
