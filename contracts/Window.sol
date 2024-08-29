@@ -21,7 +21,7 @@ contract Window is Ownable {
         uint256 lastCollection
     );
 
-    function loanEntityEvent(Loan memory _loan) public view {
+    function loanEntityEvent(Loan memory _loan) public {
         require(loans[msg.sender].getTime() > 0, "loan does not exist");
         emit LoanEntity(
             address(loan),

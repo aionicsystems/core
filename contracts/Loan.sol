@@ -11,6 +11,18 @@ interface IERC20Burnable is IERC20 {
 
 interface Window {
     function getParam(string) external returns (uint32);
+    function loanEntityEvent(
+        address loanAddress, 
+        address owner,
+        uint256 collateralAmount,
+        address assetAddress,
+        uint256 liabilityAmount,
+        address dataFeedAddress,
+        uint32 borrowingRatio,
+        uint32 liquidationRatio,
+        uint32 interestRate,
+        uint256 lastCollection
+    ) public;
 }
 
 contract Loan is Ownable {
@@ -38,7 +50,7 @@ contract Loan is Ownable {
         uint8 _precision
     ) Ownable(owner) {
         window = Window(window);
-        asset = IERC20Burnable(_asset);
+        asset = _asset;
         liability = _liability;
         borrowingRatio = _borrowingRatio;
         liquidationRatio = _liquidationRatio;
@@ -47,40 +59,50 @@ contract Loan is Ownable {
         precision = _precision;
     }
 
-    function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {
+    function loanEvent() {
+        window.loanEntityEvent(
+            address(this),
+            owner,
+            address(this).balance,
+            asset,
+            liability,
+            dataFeedAddress,
+            borrowingRatio,
+            liquidationRatio,
+            interestRate,
+            lastCollection
+        );
+    }
+
+    function dataFeedPrice(address dataFeedAddress) public view returns (uint256) {
         // prettier-ignore
         (
             /* uint320 roundID */,
-            int answer,
+            int price,
             /*uint startedAt*/,
             /*uint timeStamp*/,
             /*uint320 answeredInRound*/
-        ) = dataFeed.latestRoundData();
-        return answer;
-    }
-
-    function dataFeedPrice(AggregatorV3Interface dataFeed) public view returns (uint256) {
-        int price = getChainlinkDataFeedLatestAnswer(dataFeed);
+        ) = AggregatorV3Interface(dataFeedAddress).latestRoundData();
         require(price > 0, "price must be greater than zero");
         return uint256(price);
     }
 
-    function assetToUsd(uint256 amount, AggregatorV3Interface dataFeed) public view returns (uint256) {
+    function assetToUsd(uint256 amount, address dataFeed) public view returns (uint256) {
         return dataFeedPrice(dataFeed)*amount/dataFeed.decimals();
     }
 
-    function usdToAsset(uint256 amount, AggregatorV3Interface dataFeed) public view returns (uint256) {
+    function usdToAsset(uint256 amount, address dataFeed) public view returns (uint256) {
         return (amount * dataFeed.decimals()) / dataFeedPrice(dataFeed);
     }
 
-    function withdrawalAmount(Loan memory _loan) public view returns (uint256) {
-        uint256 usdLiability = assetToUsd(_loan.liability, AggregatorV3Interface(asset.assetDataFeedAddress()));
+    function withdrawalAmount() public view returns (uint256) {
+        uint256 usdLiability = assetToUsd(liability, assetDataFeedAddress);
         uint256 usdCollateralNew = (usdLiability * borrowingRatio) / 10^precision;
-        return usdToAsset((assetToUsd(_loan.collateral, AggregatorV3Interface(etherDataFeedAddress)) - usdCollateralNew), AggregatorV3Interface(etherDataFeedAddress));
+        return usdToAsset((assetToUsd(address(this).balance, etherDataFeedAddress) - usdCollateralNew), etherDataFeedAddress);
     }
 
     function collateralizationRatio() public view returns(uint256) {
-        return (assetToUsd(address(this).balance, AggregatorV3Interface(etherDataFeedAddress))*10^precision)/assetToUsd(liability, AggregatorV3Interface(assetDataFeedAddress));
+        return (assetToUsd(address(this).balance, etherDataFeedAddress)*10^precision)/assetToUsd(liability, assetDataFeedAddress);
     }
 
     // Payback loan with borrowed assets
@@ -98,57 +120,39 @@ contract Loan is Ownable {
             liability = liability - payment;
         }
         
-        if (collateralizationRatio(_loan) > params["borrowingRatio"]) {
-            uint256 withdrawal = withdrawalAmount(_loan);
-        
-            // Update collateral balance
-            _loan.collateral = _loan.collateral - withdrawal;
-
+        if (collateralizationRatio() > borrowingRatio) {
             // Pay msg sender ether
-            payable(msg.sender).transfer(withdrawal);
+            payable(msg.sender).transfer(withdrawalAmount());
         }
 
-        loanEntityEvent(_loan);
+        loanEvent();
     }
 
     // Liquidates collateral to buy back loaned assets off market
-    function liquidate(uint256 _loanId, uint256 payment) public {
+    function liquidate(uint256 payment) public {
         require(payment > 0, "payment must be greater than zero");
         
-
-        // Get loan from storage
-        Loan storage _loan = loan[_loanId];
-        require(_loan.owner == msg.sender);
-        require(_loan.liability >= payment);
-        require(assets[_loan.asset].balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
+        require(liability >= payment);
+        require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
-        _loan.liability = _loan.liability - payment;
+        liability = liability - payment;
 
         // Burn the payment
-        assets[_loan.asset].burn(msg.sender, payment);
-
-        // Collect interest
-        uint256 interest = accruedInterest(_loan);
-
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
+        IERC20Burnable(asset).burn(msg.sender, payment);
         
         // Calculate amount of ether redeemed for liquidation payment
-        uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeed), etherDataFeed);
+        uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeedAddress), etherDataFeedAddress);
         
         // Calculate total liquidator payment redemption plus fee
         uint256 liquidator = redemption + (redemption * params["liquidatorFee"]) / 10^precision;
-
-        // Calculate Dao fee
-        uint256 dao = (redemption * params["daoFee"]) / 10^precision;
-        contractEther = contractEther + interest + dao;
-        _loan.collateral = _loan.collateral - interest - liquidator - dao;
-        _loan.time = block.timestamp;
-
-        // Pay liquidator ether
         payable(msg.sender).transfer(liquidator);
 
-        loanEntityEvent(_loan);
+        // Calculate Dao fee
+        uint256 dao = (redemption * window.getParam("daoFee")) / 10^precision;
+        payable(address(window)).transfer(dao);
+
+        loanEvent();
     }
 
     // Collects interest in the form of Collateral (ETH)
@@ -158,11 +162,11 @@ contract Loan is Ownable {
         // Calculate interest
         // Collateral * Interest Rate = Yearly Interest
         // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
-        window.transfer(collateral * rate * (block.timestamp - time)) / (31536000 * 10^precision);
+        window.transfer(address(this).balance * rate * (block.timestamp - time)) / (31536000 * 10^precision);
         time = block.timestamp;
 
         // Collect interest
-        uint256 interest = (collateral * rate * (block.timestamp - time)) / (31536000 * 10^precision);
+        uint256 interest = (address(this).balance * rate * (block.timestamp - time)) / (31536000 * 10^precision);
         uint256 collector = (interest * window.getParam("collectorFee")) / 10^precision;
         
         // Pay window interest - collector fee
@@ -171,6 +175,6 @@ contract Loan is Ownable {
         // Pay collector ether
         payable(msg.sender).transfer(collector);
 
-        loanEntityEvent(_loan);
+        loanEvent();
     }
 }
