@@ -10,7 +10,7 @@ interface IERC20Burnable is IERC20 {
 }
 
 interface Window {
-    function getParam(string) external returns (uint32);
+    function getParam(string calldata) external returns (uint32);
     function loanEntityEvent(
         address loanAddress, 
         address owner,
@@ -22,7 +22,7 @@ interface Window {
         uint32 liquidationRatio,
         uint32 interestRate,
         uint256 lastCollection
-    ) public;
+    ) external;
 }
 
 contract Loan is Ownable {
@@ -33,8 +33,8 @@ contract Loan is Ownable {
     uint256 public liability;
     uint32 public borrowingRatio;
     uint32 public liquidationRatio;
-    uint32 public rate;
-    uint256 public time;
+    uint32 public interestRate;
+    uint256 public lastCollection;
     uint8 precision;
 
     constructor (
@@ -45,7 +45,7 @@ contract Loan is Ownable {
         uint256 _liability,
         uint32 _borrowingRatio,
         uint32 _liquidationRatio,
-        uint32 _rate,
+        uint32 _interestRate,
         uint256 _time,
         uint8 _precision
     ) Ownable(owner) {
@@ -54,19 +54,19 @@ contract Loan is Ownable {
         liability = _liability;
         borrowingRatio = _borrowingRatio;
         liquidationRatio = _liquidationRatio;
-        rate = _rate;
-        time = _time;
+        interestRate = _interestRate;
+        lastCollection = _time;
         precision = _precision;
     }
 
-    function loanEvent() {
+    function loanEvent() private {
         window.loanEntityEvent(
             address(this),
             owner,
             address(this).balance,
             asset,
             liability,
-            dataFeedAddress,
+            assetDataFeedAddress,
             borrowingRatio,
             liquidationRatio,
             interestRate,
@@ -113,7 +113,7 @@ contract Loan is Ownable {
 
         if (payment > 0) {
             // Burn the payment. Owner needs to approve the token first.
-            // Will revert if Owner does not have sufficient funds.
+            // Will revert if Owner does not have sufficient funds and approval.
             asset.burnFrom(msg.sender, payment);
 
             // Update Loan Liability
@@ -145,7 +145,7 @@ contract Loan is Ownable {
         uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeedAddress), etherDataFeedAddress);
         
         // Calculate total liquidator payment redemption plus fee
-        uint256 liquidator = redemption + (redemption * params["liquidatorFee"]) / 10^precision;
+        uint256 liquidator = redemption + (redemption * window.getParam("liquidatorFee")) / 10^precision;
         payable(msg.sender).transfer(liquidator);
 
         // Calculate Dao fee
@@ -157,16 +157,12 @@ contract Loan is Ownable {
 
     // Collects interest in the form of Collateral (ETH)
     function collect() public {
-        require(collateral > 0, "Loan must be active");
+        require(address(this).balance > 0, "Loan must be active");
 
         // Calculate interest
         // Collateral * Interest Rate = Yearly Interest
         // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
-        window.transfer(address(this).balance * rate * (block.timestamp - time)) / (31536000 * 10^precision);
-        time = block.timestamp;
-
-        // Collect interest
-        uint256 interest = (address(this).balance * rate * (block.timestamp - time)) / (31536000 * 10^precision);
+        uint256 interest = (address(this).balance * interestRate * (block.timestamp - lastCollection)) / (31536000 * 10^precision);
         uint256 collector = (interest * window.getParam("collectorFee")) / 10^precision;
         
         // Pay window interest - collector fee
