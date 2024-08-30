@@ -40,29 +40,34 @@ contract Loan is Ownable {
     constructor (
         address owner,
         address _window,
-        uint256 _collateral,
         address _asset,
         uint256 _liability,
         uint32 _borrowingRatio,
         uint32 _liquidationRatio,
         uint32 _interestRate,
+        address _assetDataFeedAddress,
+        address _etherDataFeedAddress,
         uint256 _time,
         uint8 _precision
     ) Ownable(owner) {
-        window = Window(window);
+        window = Window(_window);
         asset = _asset;
         liability = _liability;
         borrowingRatio = _borrowingRatio;
         liquidationRatio = _liquidationRatio;
         interestRate = _interestRate;
+        assetDataFeedAddress = _assetDataFeedAddress;
+        etherDataFeedAddress = _etherDataFeedAddress;
         lastCollection = _time;
         precision = _precision;
+
+        loanEvent();
     }
 
     function loanEvent() private {
         window.loanEntityEvent(
             address(this),
-            owner,
+            owner(),
             address(this).balance,
             asset,
             liability,
@@ -87,12 +92,12 @@ contract Loan is Ownable {
         return uint256(price);
     }
 
-    function assetToUsd(uint256 amount, address dataFeed) public view returns (uint256) {
-        return dataFeedPrice(dataFeed)*amount/dataFeed.decimals();
+    function assetToUsd(uint256 amount, address dataFeedAddress) public view returns (uint256) {
+        return dataFeedPrice(dataFeedAddress)*amount/AggregatorV3Interface(dataFeedAddress).decimals();
     }
 
-    function usdToAsset(uint256 amount, address dataFeed) public view returns (uint256) {
-        return (amount * dataFeed.decimals()) / dataFeedPrice(dataFeed);
+    function usdToAsset(uint256 amount, address dataFeedAddress) public view returns (uint256) {
+        return (amount * AggregatorV3Interface(dataFeedAddress).decimals()) / dataFeedPrice(dataFeedAddress);
     }
 
     function withdrawalAmount() public view returns (uint256) {
@@ -114,7 +119,7 @@ contract Loan is Ownable {
         if (payment > 0) {
             // Burn the payment. Owner needs to approve the token first.
             // Will revert if Owner does not have sufficient funds and approval.
-            asset.burnFrom(msg.sender, payment);
+            IERC20Burnable(asset).burnFrom(msg.sender, payment);
 
             // Update Loan Liability
             liability = liability - payment;
@@ -139,7 +144,7 @@ contract Loan is Ownable {
         liability = liability - payment;
 
         // Burn the payment
-        IERC20Burnable(asset).burn(msg.sender, payment);
+        IERC20Burnable(asset).burnFrom(msg.sender, payment);
         
         // Calculate amount of ether redeemed for liquidation payment
         uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeedAddress), etherDataFeedAddress);

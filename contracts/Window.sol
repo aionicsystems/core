@@ -33,7 +33,7 @@ contract Window is Ownable {
         uint32 interestRate,
         uint256 lastCollection
     ) public {
-        require(loans[msg.sender].getTime() > 0, "loan does not exist");
+        require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
         emit LoanEntity(
             loanAddress, 
             owner,
@@ -106,7 +106,7 @@ contract Window is Ownable {
         params[param] = value;
     }
 
-    function getParam(bytes32 param) external returns (uint32) {
+    function getParam(bytes32 param) external view returns (uint32) {
         return params[param];
     }
 
@@ -143,21 +143,9 @@ contract Window is Ownable {
         return (amount * dataFeed.decimals()) / dataFeedPrice(dataFeed);
     }
 
-    function collateralizationRatio(Loan memory _loan) public view returns(uint256) {
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
-        return (assetToUsd(_loan.collateral, etherDataFeed)*10^precision)/assetToUsd(_loan.liability, assetDataFeed);
-    }
-
     function setEtherDataFeed(address _etherDataFeedAddress) public onlyOwner {
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorV3Interface(_etherDataFeedAddress);
-    }
-
-    function withdrawalAmount(Loan memory _loan) public view returns (uint256) {
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(_loan.dataFeed);
-        uint256 usdLiability = assetToUsd(_loan.liability, assetDataFeed);
-        uint256 usdCollateralNew = (usdLiability * params["borrowingRatio"]) / 10^precision;
-        return usdToAsset((assetToUsd(_loan.collateral, etherDataFeed) - usdCollateralNew), etherDataFeed);
     }
  
     // Issue loan by depositing collateral and receiving
@@ -168,7 +156,7 @@ contract Window is Ownable {
         require(msg.value > 0, "Amount ETH must be greater than zero");
         require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].assetDataFeedAddress);
+        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].assetDataFeedAddress());
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
@@ -178,35 +166,23 @@ contract Window is Ownable {
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
         // other loans or users.
         Loan loan = new Loan(
-            msg.sender,                                 // Loan owner
-            address(this),                              // Window Address
-            msg.value,                                  // Collateral Amount
-            assetAddress,                               // Asset Address
-            liability,                                  // Asset Amount
-            assets[assetAddress].assetDataFeedAddress,  // Asset Price Data Feed
-            block.timestamp,                            // Time
-            assets[assetAddress].borrowingRatio,        // Borrowing Ratio
-            assets[assetAddress].liquidationRatio,      // Liquidation Ratio
-            assets[assetAddress].getRate()              // Interest Rate
+            msg.sender,                                     // Loan owner
+            address(this),                                  // Window Address
+            assetAddress,                                   // Asset Address
+            liability,                                      // Asset Amount
+             params["borrowingRatio"],                      // Borrowing Ratio
+            assets[assetAddress].liquidationRatio(),        // Liquidation Ratio
+            assets[assetAddress].interestRate(),            // Interest Rate
+            assets[assetAddress].assetDataFeedAddress(),    // Asset Price Data Feed
+            etherDataFeedAddress,                           // Ether Price Data Feed
+            block.timestamp,                                // Time
+            precision                                       // Precision
         );
 
         // Transfer Ether to address of Loan Contract owned by Issuer
         payable(address(loan)).transfer(msg.value);
 
         loans[address(loan)] = loan;
-        emit LoanEntity(
-            address(loan), 
-            owner,
-            msg.value,
-            assetAddress,
-            liabilityAmount,
-            dataFeedAddress,
-            borrowingRatio,
-            liquidationRatio,
-            interestRate,
-            lastCollection
-        );
-
         assets[assetAddress].mint(msg.sender, liability);
 
         // Advance counter
