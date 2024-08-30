@@ -57,6 +57,8 @@ export function handleLoanEntity(event: LoanEntityEvent): void {
   loan.blockTimestamp = event.block.timestamp
   loan.transactionHash = event.transaction.hash
 
+  
+
   loan.save()
 }
 

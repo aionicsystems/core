@@ -12,15 +12,16 @@ type AssetEntity @entity {
 }
 
 type LoanEntity @entity(immutable: true) {
-  id: ID!
-  Window_id: BigInt! # uint256
+  id: Bytes! # Address of Loan
   owner: OwnerEntity!
   collateral: BigInt! # uint256
   asset: AssetEntity!
   liability: BigInt! # uint256
   dataFeed: Bytes! # address
-  rate: BigInt! # uint256
-  time: BigInt! # uint256
+  borrowingRatio: BigInt! #uint32
+  liquidationRatio: BigInt! #uint32
+  interestRate: BigInt! # uint32
+  lastCollection: BigInt! # uint256
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
