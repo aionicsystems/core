@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styles from "./LoanSelect.module.css";
 import { chevron } from "../../static/images.ts";
-import { SelectOption } from "../../types/dataTypes.ts";
+import { SelectOption } from "../../types/DataTypes.ts";
 
 export type LoanSelectProps = {
   options: SelectOption[];

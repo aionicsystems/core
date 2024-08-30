@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { AssetType } from "../../types/assetTypes.ts";
+import { AssetType } from "../../types/AssetTypes.ts";
 import { formatAssetLiquidationRatio, formatAssetLoanRate } from "../../utils";
 import styles from "./IssueAssetInfo.module.css";
 

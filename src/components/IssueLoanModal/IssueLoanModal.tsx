@@ -5,11 +5,14 @@ import styles from "../modalBaseComponents/Modal.module.css";
 import { ModalHeading } from "../modalBaseComponents/ModalHeading.tsx";
 import { IssueLoanModalFaq } from "./IssueLoanModalFaq.tsx";
 import { useQuery } from "@tanstack/react-query";
-import { assetEntities, client } from "../../repository/requests.ts";
-import { AssetType } from "../../types/assetTypes.ts";
+import { assetSingleEntity, client } from "../../repository/requests.ts";
+import { AssetType } from "../../types/AssetTypes.ts";
 import { IssueAssetInfo } from "./IssueAssetInfo.tsx";
 import { IssueLoanForm } from "./IssueLoanForm.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";
+import { Loader } from "../Loader/Loader.tsx";
+import { LoanAssetsModalFaq } from "../LoanAssetsModal/LoanAssetsModalFaq.tsx";
+import { REQUEST_ASSET_ENTITIES } from "../../repository/requestKeys.ts";
 
 export type IssueLoanModalProps = Modal & {
   selectedLoan?: string;
@@ -27,7 +30,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
     queryFn: async () => {
       try {
         const result = await client.query({
-          query: assetEntities,
+          query: assetSingleEntity,
           variables: { id: selectedLoan },
         });
         return result.data;
@@ -36,18 +39,35 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
         throw error;
       }
     },
-    queryKey: [`asset_entities_${selectedLoan}`],
+    queryKey: [`${REQUEST_ASSET_ENTITIES}_${selectedLoan}`],
   });
-
-  if (isLoading) {
-    return null;
-  }
-
-  const assets = (data.assetEntities as AssetType[]) ?? [];
 
   const toggleModalFaq = () => {
     setModalFaq(!modalFaq);
   };
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  if (error || isError) {
+    return (
+      <ModalOverlay onClose={onClose} size={size}>
+        <div className={styles.modalInner}>
+          <ModalHeading
+            toggleFaq={toggleModalFaq}
+            onClose={onClose}
+            modalTitle={modalTitle}
+          />
+          <div className={styles.modalContent}>
+            {modalFaq ? <LoanAssetsModalFaq /> : <ModalError />}
+          </div>
+        </div>
+      </ModalOverlay>
+    );
+  }
+
+  const asset: AssetType = data?.assetEntity ?? [];
 
   return (
     <ModalOverlay onClose={onClose} size={size}>
@@ -60,19 +80,10 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
         <div className={styles.modalContent}>
           {modalFaq ? (
             <IssueLoanModalFaq />
-          ) : error || isError ? (
-            <ModalError />
           ) : (
             <>
               <IssueLoanForm loanID={selectedLoan} />
-              <IssueAssetInfo
-                issue={
-                  assets &&
-                  (assets.find(
-                    (asset) => asset.id === selectedLoan
-                  ) as AssetType)
-                }
-              />
+              <IssueAssetInfo issue={asset as AssetType} />
             </>
           )}
         </div>

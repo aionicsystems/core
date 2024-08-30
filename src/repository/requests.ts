@@ -8,13 +8,43 @@ export const client = new ApolloClient({
 });
 
 export const assetEntities = gql(`
-  query MyQuery($id: Bytes) {
-    assetEntities(id: $id) {
+  query AssetEntitiesQuery {
+    assetEntities {
       id
       name
       symbol
       rate
       liquidationRatio
+      __typename
+    }
+  }
+`);
+
+export const assetSingleEntity = gql(`
+  query AssetEntitiesQuery($id: Bytes) {
+    assetEntity(id: $id) {
+      id
+      name
+      symbol
+      rate
+      liquidationRatio
+      __typename
+    }
+  }
+`);
+
+export const loanEntities = gql(`
+    query LoanEntitiesQuery($sort_by: String, $sort_order: String,) {
+    loanEntities(orderBy: $sort_by, orderDirection: $sort_order) {
+      id
+      asset {
+        id
+        name
+        symbol
+      }
+      liability
+      collateral
+      rate
       __typename
     }
   }

@@ -6,19 +6,88 @@ import { Card } from "../Card/Card.tsx";
 import { FC, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
+import { SortableTable } from "../Table/SortableTable.tsx";
+import {
+  SortableTableConfigType,
+  SortableTableHeadType,
+} from "../../types/TableTypes.ts";
+import { useQuery } from "@tanstack/react-query";
+import { client, loanEntities } from "../../repository/requests.ts";
+import { REQUEST_LOANS_ENTITIES } from "../../repository/requestKeys.ts";
+import { Loader } from "../Loader/Loader.tsx";
+import { LoanType } from "../../types/LoanTypes.ts";
 
+const loanTableTitles: SortableTableHeadType[] = [
+  {
+    title: "Loan ID",
+    key: "id",
+    sortable: true,
+  },
+  {
+    title: "Asset",
+    key: "asset",
+    sortable: true,
+  },
+  {
+    title: "Liability",
+    key: "liability",
+    sortable: true,
+  },
+  {
+    title: "Collateral",
+    key: "collateral",
+    sortable: true,
+  },
+  {
+    title: "C Ratio",
+    key: "c_ratio",
+    sortable: true,
+  },
+  {
+    title: "L Ratio",
+    key: "l_ratio",
+    sortable: true,
+  },
+];
 
 export const LoanSection: FC = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
-  const [loanModal, setLoanModal] = useState<boolean>(false);
+  const [tableConfig, setTableConfig] = useState<SortableTableConfigType>({
+    sort_order: null,
+    sort_by: "",
+    filters: {},
+    page_number: 1,
+  });
+  const [error, setError] = useState<boolean>(false);
+
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryFn: async () => {
+      try {
+        const result = await client.query({
+          query: loanEntities,
+          variables: {
+            sort_by: tableConfig.sort_by,
+            sort_order: tableConfig.sort_order,
+          },
+        });
+        return result.data;
+      } catch (error) {
+        setError(true);
+        throw error;
+      }
+    },
+    queryKey: [REQUEST_LOANS_ENTITIES],
+  });
 
   const toggleSelectAsset = () => {
     setSelectAssetModal(!selectAssetModal);
   };
 
-  const toggleLoanModal = () => {
-    setLoanModal(!loanModal);
-  };
+  if (isLoading) {
+    return <Loader />;
+  }
+
+  const tableData: LoanType[] = data?.loanEntities ?? [];
 
   return (
     <>
@@ -26,10 +95,23 @@ export const LoanSection: FC = () => {
         <h2 className={`${styles.sectionTitle} ${styles.overviewTitle}`}>
           Loan Overview
         </h2>
-        <Button size={"sm"} btnType={"primary"} onClick={() => toggleSelectAsset()}>
+        <Button
+          size={"sm"}
+          btnType={"primary"}
+          onClick={() => toggleSelectAsset()}
+        >
           Issue Loan
         </Button>
       </div>
+      <SortableTable<LoanType>
+        titles={loanTableTitles}
+        tableName={"loans"}
+        tableData={tableData}
+        tableConfig={tableConfig}
+        setTableConfig={setTableConfig}
+        isError={error || isError}
+        callRefetch={refetch}
+      />
       <div className={styles.overviewCardsWrapper}>
         {overviewCards.slice(0.2).map((item) => (
           <OverviewCard

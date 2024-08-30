@@ -1,7 +1,7 @@
 import { FC } from "react";
 import styles from "./LoanAsset.module.css";
 import { aionCoin } from "../../static/images.ts";
-import { AssetType } from "../../types/assetTypes.ts";
+import { AssetType } from "../../types/AssetTypes.ts";
 import { formatAssetLoanRate, formatAssetLiquidationRatio } from "../../utils/";
 
 export type LoanAssetProps = {
