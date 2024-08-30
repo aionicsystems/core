@@ -25,7 +25,7 @@ const loanTableTitles: SortableTableHeadType[] = [
   },
   {
     title: "Asset",
-    key: "asset",
+    key: "assetName",
     sortable: true,
   },
   {
@@ -40,12 +40,12 @@ const loanTableTitles: SortableTableHeadType[] = [
   },
   {
     title: "C Ratio",
-    key: "c_ratio",
+    key: "cRatio",
     sortable: true,
   },
   {
     title: "L Ratio",
-    key: "l_ratio",
+    key: "lRatio",
     sortable: true,
   },
 ];

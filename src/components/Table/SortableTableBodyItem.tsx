@@ -13,7 +13,7 @@ export const SortableTableBodyItem = <T,>({
   return (
     <td className={styles.sortableTableTBodyItem}>
       <div className={styles.sortableTableTBodyItemInner}>
-        {dataItem[dataKey]}
+        {dataKey === "assetName" ? dataItem["asset"].name : dataItem[dataKey]}
       </div>
     </td>
   );
