@@ -32,9 +32,9 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
 }
 
 export function handleLoanEntity(event: LoanEntityEvent): void {
-  let loan = LoanEntity.load(event.params.id.toString());
+  let loan = LoanEntity.load(event.params.loanAddress);
   if (loan == null) {
-    loan = new LoanEntity(event.params.id.toString())
+    loan = new LoanEntity(event.params.loanAddress)
   }
 
   let owner = OwnerEntity.load(event.params.owner); 
@@ -42,22 +42,20 @@ export function handleLoanEntity(event: LoanEntityEvent): void {
     owner = new OwnerEntity(event.params.owner)
   }
   
-  log.debug('The LoanID is: {} ', [event.params.id.toString()]);
+  log.debug('The LoanID is: {} ', [event.params.loanAddress.toString()]);
 
   loan.owner = event.params.owner
-  loan.collateral = event.params.collateral
-  
-  loan.asset = event.params.asset
-  loan.liability = event.params.liability
-  loan.dataFeed = event.params.dataFeed
-  loan.rate = event.params.rate
-  loan.time = event.params.time
-  
+  loan.asset = event.params.assetAddress
+  loan.collateralAmount = event.params.collateralAmount
+  loan.liabilityAmount = event.params.liabilityAmount
+  loan.dataFeedAddress = event.params.dataFeedAddress
+  loan.interestRate = event.params.interestRate
+  loan.borrowingRatio = event.params.borrowingRatio
+  loan.liquidationRatio = event.params.liquidationRatio
+  loan.lastCollection = event.params.lastCollection
   loan.blockNumber = event.block.number
   loan.blockTimestamp = event.block.timestamp
   loan.transactionHash = event.transaction.hash
-
-  
 
   loan.save()
 }

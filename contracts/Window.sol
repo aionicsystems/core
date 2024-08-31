@@ -9,7 +9,7 @@ import { Loan } from "./Loan.sol";
 
 contract Window is Ownable {
     event LoanEntity(
-        address loanAddress, 
+        address indexed loanAddress, 
         address owner,
         uint256 collateralAmount,
         address assetAddress,
@@ -33,7 +33,7 @@ contract Window is Ownable {
         uint32 interestRate,
         uint256 lastCollection
     ) public {
-        require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
+        // require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
         emit LoanEntity(
             loanAddress, 
             owner,
@@ -59,9 +59,6 @@ contract Window is Ownable {
  
     // Number of decimal precision used in ratios and rates
     uint8 precision;
-
-    // Counter is used for UID of each loan
-    uint256 counter;
 
     // Ether held by the contract earned through interest and liquidations
     uint256 contractEther;
@@ -89,8 +86,6 @@ contract Window is Ownable {
         uint32 collectorFee,
         address _etherDataFeedAddress
     ) Ownable(owner) {
-        
-        counter = 1;
         precision = _precision;
 
         params["borrowingRatio"] = borrowingRatio;
@@ -154,13 +149,14 @@ contract Window is Ownable {
         address assetAddress
     ) payable public returns (uint256) {
         require(msg.value > 0, "Amount ETH must be greater than zero");
-        require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
+        // require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
         AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].assetDataFeedAddress());
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
         uint256 liability = (usdLiability * assetDataFeed.decimals()) / dataFeedPrice(assetDataFeed);
+        
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
@@ -170,7 +166,7 @@ contract Window is Ownable {
             address(this),                                  // Window Address
             assetAddress,                                   // Asset Address
             liability,                                      // Asset Amount
-             params["borrowingRatio"],                      // Borrowing Ratio
+            params["borrowingRatio"],                       // Borrowing Ratio
             assets[assetAddress].liquidationRatio(),        // Liquidation Ratio
             assets[assetAddress].interestRate(),            // Interest Rate
             assets[assetAddress].assetDataFeedAddress(),    // Asset Price Data Feed
@@ -178,16 +174,13 @@ contract Window is Ownable {
             block.timestamp,                                // Time
             precision                                       // Precision
         );
-
+        
         // Transfer Ether to address of Loan Contract owned by Issuer
-        payable(address(loan)).transfer(msg.value);
+       // payable(address(loan)).transfer(msg.value);
 
         loans[address(loan)] = loan;
         assets[assetAddress].mint(msg.sender, liability);
-
-        // Advance counter
-        counter++;
-
+        
         return liability;
     }
 }

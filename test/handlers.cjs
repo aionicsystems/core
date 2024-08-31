@@ -106,8 +106,8 @@ describe('Basic event handlers', () => {
     const options = {value: ethers.parseEther("1.0")}
     let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     let result2 = await tx2.wait();
-    console.log(`Amount Asset Issued: ${result2.logs[0].args[4]} NVDA`);
-
+    // console.log(`Amount Asset Issued: ${result2.logs[0].args[4]} NVDA`);
+    console.log(`${result2.logs}`);
     // Create and deploy the subgraph
     await system.run(`npm run codegen`, { cwd: srcDir });
     await system.run(`npm run create-test`, { cwd: srcDir });

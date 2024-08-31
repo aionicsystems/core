@@ -2,13 +2,13 @@ specVersion: 1.0.0
 indexerHints:
   prune: auto
 schema:
-  file: ./schema.graphql
+  file: schema.graphql
 dataSources:
   - kind: ethereum/contract
     name: Window
     network: test
     source:
-      address: '0x1489aD1713C9FdA4908247Db6c1826f964C03e5A'
+      address: "0x1489aD1713C9FdA4908247Db6c1826f964C03e5A"
       abi: Window
       startBlock: 0
     mapping:
@@ -21,12 +21,13 @@ dataSources:
         - OwnerTransferred
       abis:
         - name: Window
-          file: ./artifacts/contracts/Window.sol/Window.json
+          file: Window/artifacts/contracts/Window.sol/Window.json
       eventHandlers:
         - event: AssetEntity(indexed address,string,string,address,uint32,uint32)
           handler: handleAssetEntity
-        - event: LoanEntity(indexed address,address,uint256,address,uint256,address,uint32,uint32,uint32,uint256)
+        - event: LoanEntity(indexed
+            address,address,uint256,address,uint256,address,uint32,uint32,uint32,uint256)
           handler: handleLoanEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-      file: ./src/mapping.ts
+      file: Window/Window.wasm

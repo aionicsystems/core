@@ -107,10 +107,22 @@ async function main() {
     let assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
 
+    let options = {value: ethers.parseEther("1.0")}
+    let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    let result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[1].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[1].args[4]} NVDA`);
+
     tx = await window.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
     result = await tx.wait();
     assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    options = {value: ethers.parseEther(".5")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[1].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[1].args[4]} AAMZN`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
     result = await tx.wait();
@@ -122,10 +134,13 @@ async function main() {
     assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
 
-    const options = {value: ethers.parseEther("1.0")}
-    let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    let result2 = await tx2.wait();
-    console.log(`Amount Asset Issued: ${result2.logs[0].args[4]} NVDA`);
+    
+
+    options = {value: ethers.parseEther("1.0")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[1].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[1].args[4]} NVDA`);
 
     // Create and deploy the subgraph
     await system.run(`npm run codegen`, { cwd: srcDir });

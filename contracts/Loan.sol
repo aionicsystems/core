@@ -9,8 +9,8 @@ interface IERC20Burnable is IERC20 {
     function burnFrom(address account, uint256 value) external;
 }
 
-interface Window {
-    function getParam(string calldata) external returns (uint32);
+interface WindowInterface {
+    function getParam(bytes32) external returns (uint32);
     function loanEntityEvent(
         address loanAddress, 
         address owner,
@@ -26,7 +26,7 @@ interface Window {
 }
 
 contract Loan is Ownable {
-    Window window;
+    WindowInterface window;
     address public asset;
     address public assetDataFeedAddress;
     address public etherDataFeedAddress;
@@ -50,7 +50,7 @@ contract Loan is Ownable {
         uint256 _time,
         uint8 _precision
     ) Ownable(owner) {
-        window = Window(_window);
+        window = WindowInterface(_window);
         asset = _asset;
         liability = _liability;
         borrowingRatio = _borrowingRatio;
@@ -177,5 +177,10 @@ contract Loan is Ownable {
         payable(msg.sender).transfer(collector);
 
         loanEvent();
+    }
+
+    event Received(address, uint);
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 }
