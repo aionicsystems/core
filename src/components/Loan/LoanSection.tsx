@@ -16,6 +16,7 @@ import { client, loanEntities } from "../../repository/requests.ts";
 import { REQUEST_LOANS_ENTITIES } from "../../repository/requestKeys.ts";
 import { Loader } from "../Loader/Loader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
+import { handleBodyScroll } from "../../utils";
 
 const loanTableTitles: SortableTableHeadType[] = [
   {
@@ -26,21 +27,21 @@ const loanTableTitles: SortableTableHeadType[] = [
   {
     title: "Asset",
     key: "assetName",
-    sortable: true,
+    sortable: false,
   },
   {
     title: "Liability",
-    key: "liability",
+    key: "liabilityAmount",
     sortable: true,
   },
   {
     title: "Collateral",
-    key: "collateral",
+    key: "collateralAmount",
     sortable: true,
   },
   {
     title: "C Ratio",
-    key: "cRatio",
+    key: "interestRate",
     sortable: true,
   },
   {
@@ -53,8 +54,8 @@ const loanTableTitles: SortableTableHeadType[] = [
 export const LoanSection: FC = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
   const [tableConfig, setTableConfig] = useState<SortableTableConfigType>({
-    sort_order: null,
-    sort_by: "",
+    sort_order: "asc",
+    sort_by: "id",
     filters: {},
     page_number: 1,
   });
@@ -81,6 +82,7 @@ export const LoanSection: FC = () => {
 
   const toggleSelectAsset = () => {
     setSelectAssetModal(!selectAssetModal);
+    handleBodyScroll();
   };
 
   if (isLoading) {
@@ -105,7 +107,6 @@ export const LoanSection: FC = () => {
       </div>
       <SortableTable<LoanType>
         titles={loanTableTitles}
-        tableName={"loans"}
         tableData={tableData}
         tableConfig={tableConfig}
         setTableConfig={setTableConfig}

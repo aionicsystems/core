@@ -42,9 +42,9 @@ export const loanEntities = gql(`
         name
         symbol
       }
-      liability
-      collateral
-      rate
+      liabilityAmount
+      collateralAmount
+      interestRate
       __typename
     }
   }

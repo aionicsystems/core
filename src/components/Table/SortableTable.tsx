@@ -6,12 +6,10 @@ import {
 import styles from "./SortableTable.module.css";
 import { SortableTableHead } from "./SortableTableHead.tsx";
 import { SortableTableBody } from "./SortableTableBody.tsx";
-import { useEffect } from "react";
 import { DefaultError, QueryObserverResult } from "@tanstack/react-query";
 
 export type SortableTableProps<T> = {
   titles: SortableTableHeadType[];
-  tableName: string;
   isError: boolean;
   tableData: SortableTableDataType<T>[];
   setTableConfig: ({
@@ -26,28 +24,12 @@ export type SortableTableProps<T> = {
 
 export const SortableTable = <T,>({
   titles,
-  tableName,
   tableData,
   setTableConfig,
   tableConfig,
   isError,
   callRefetch,
 }: SortableTableProps<T>) => {
-  useEffect(() => {
-    const localStorageParams = localStorage.getItem(
-      `localSortParams-${tableName}`,
-    );
-    if (localStorageParams) {
-      const parsedParams = JSON.parse(localStorageParams);
-
-      setTableConfig({ ...parsedParams });
-      localStorage.setItem(
-        `localSortParams-${tableName}`,
-        JSON.stringify(parsedParams),
-      );
-    }
-  }, [setTableConfig, tableName]);
-
   const handleSort = async (columnKey: string) => {
     const { sort_order } = tableConfig;
     const newSortOrder =
@@ -60,10 +42,6 @@ export const SortableTable = <T,>({
     };
 
     setTableConfig({ ...updatedConfig });
-    localStorage.setItem(
-      `localSortParams-${tableName}`,
-      JSON.stringify(updatedConfig),
-    );
     await callRefetch();
   };
 

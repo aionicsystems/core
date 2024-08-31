@@ -64,3 +64,7 @@ button {
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
 }
+
+._lock {
+  overflow: hidden;
+}

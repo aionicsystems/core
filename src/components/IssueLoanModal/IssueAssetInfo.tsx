@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { AssetType } from "../../types/AssetTypes.ts";
-import { formatAssetLiquidationRatio, formatAssetLoanRate } from "../../utils";
+import { formatRatio } from "../../utils";
 import styles from "./IssueAssetInfo.module.css";
 
 export type IssueAssetInfoProps = {
@@ -14,10 +14,10 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue }) => {
       <div className={styles.issueInfoValue}>1,000.90 {issue.symbol}</div>
       <div className={styles.issueInfoValue}>Borrowing Ratio 150%</div>
       <div className={styles.issueInfoValue}>
-        Liquidation Ratio {formatAssetLiquidationRatio(issue.liquidationRatio)}
+        Liquidation Ratio {formatRatio(issue.liquidationRatio)}
       </div>
       <div className={styles.issueInfoValue}>
-        Annual Interest Rate {formatAssetLoanRate(issue.rate)}
+        Annual Interest Rate {formatRatio(issue.rate)}
       </div>
     </div>
   );

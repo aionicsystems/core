@@ -11,10 +11,16 @@ export const formatAddress = (addr: string) => {
   return `${upperAfterLastTwo.substring(0, 5)}...${upperAfterLastTwo.substring(39)}`;
 };
 
-export const formatAssetLoanRate = (rate: string) => {
+export const formatRatio = (rate: string) => {
   return `${Number(rate) / 100}%`;
 };
 
-export const formatAssetLiquidationRatio = (rate: string) => {
-  return `${Number(rate) / 100}%`;
+export const handleBodyScroll = () => {
+  const body = document.body.classList;
+
+  if (body.contains("_lock")) {
+    body.remove("_lock");
+  } else {
+    body.add("_lock");
+  }
 };
