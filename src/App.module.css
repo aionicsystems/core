@@ -9,7 +9,7 @@
 }
 .overviewHeading {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
 }
 .overviewCardsWrapper {
@@ -128,9 +128,6 @@
         margin-top: 20px;
         gap: 20px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .overviewHeading {
-        justify-content: space-between;
     }
     .fundsSectionCard {
         width: 100%;

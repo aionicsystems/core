@@ -94,9 +94,6 @@ export const LoanSection: FC = () => {
   return (
     <>
       <div className={styles.overviewHeading}>
-        <h2 className={`${styles.sectionTitle} ${styles.overviewTitle}`}>
-          Loan Overview
-        </h2>
         <Button
           size={"sm"}
           btnType={"primary"}
