@@ -29,7 +29,6 @@ function App() {
           <section
             className={`${styles.mainSection} ${styles.positionsSection}`}
           >
-            <h2 className={styles.sectionTitle}>Your Positions</h2>
             <div className={styles.positionsCardsWrapper}>
               {positionsCards.slice(0, 2).map((item) => (
                 <PositionsCard
