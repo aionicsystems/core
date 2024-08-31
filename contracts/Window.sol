@@ -33,7 +33,7 @@ contract Window is Ownable {
         uint32 interestRate,
         uint256 lastCollection
     ) public {
-        // require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
+        require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
         emit LoanEntity(
             loanAddress, 
             owner,
@@ -149,13 +149,13 @@ contract Window is Ownable {
         address assetAddress
     ) payable public returns (uint256) {
         require(msg.value > 0, "Amount ETH must be greater than zero");
-        // require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
+        require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
         AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].assetDataFeedAddress());
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
-        uint256 liability = (usdLiability * assetDataFeed.decimals()) / dataFeedPrice(assetDataFeed);
+        uint256 liabilityAmount = (usdLiability * assetDataFeed.decimals()) / dataFeedPrice(assetDataFeed);
         
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
@@ -165,7 +165,7 @@ contract Window is Ownable {
             msg.sender,                                     // Loan owner
             address(this),                                  // Window Address
             assetAddress,                                   // Asset Address
-            liability,                                      // Asset Amount
+            liabilityAmount,                                // Asset Amount
             params["borrowingRatio"],                       // Borrowing Ratio
             assets[assetAddress].liquidationRatio(),        // Liquidation Ratio
             assets[assetAddress].interestRate(),            // Interest Rate
@@ -176,11 +176,24 @@ contract Window is Ownable {
         );
         
         // Transfer Ether to address of Loan Contract owned by Issuer
-       // payable(address(loan)).transfer(msg.value);
+        payable(address(loan)).transfer(msg.value);
 
         loans[address(loan)] = loan;
-        assets[assetAddress].mint(msg.sender, liability);
+        assets[assetAddress].mint(msg.sender, liabilityAmount);
+
+        emit LoanEntity(
+            address(loan), 
+            msg.sender,
+            address(loan).balance,
+            assetAddress,
+            liabilityAmount,
+            loan.assetDataFeedAddress(),
+            params["borrowingRatio"],
+            loan.liquidationRatio(),
+            loan.interestRate(),
+            block.timestamp
+        );
         
-        return liability;
+        return liabilityAmount;
     }
 }

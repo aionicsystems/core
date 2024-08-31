@@ -30,7 +30,7 @@ contract Loan is Ownable {
     address public asset;
     address public assetDataFeedAddress;
     address public etherDataFeedAddress;
-    uint256 public liability;
+    uint256 public liabilityAmount;
     uint32 public borrowingRatio;
     uint32 public liquidationRatio;
     uint32 public interestRate;
@@ -41,7 +41,7 @@ contract Loan is Ownable {
         address owner,
         address _window,
         address _asset,
-        uint256 _liability,
+        uint256 _liabilityAmount,
         uint32 _borrowingRatio,
         uint32 _liquidationRatio,
         uint32 _interestRate,
@@ -52,7 +52,7 @@ contract Loan is Ownable {
     ) Ownable(owner) {
         window = WindowInterface(_window);
         asset = _asset;
-        liability = _liability;
+        liabilityAmount = _liabilityAmount;
         borrowingRatio = _borrowingRatio;
         liquidationRatio = _liquidationRatio;
         interestRate = _interestRate;
@@ -60,17 +60,16 @@ contract Loan is Ownable {
         etherDataFeedAddress = _etherDataFeedAddress;
         lastCollection = _time;
         precision = _precision;
-
-        loanEvent();
+        // loanEvent();
     }
 
-    function loanEvent() private {
+    function loanEvent() internal {
         window.loanEntityEvent(
             address(this),
             owner(),
             address(this).balance,
             asset,
-            liability,
+            liabilityAmount,
             assetDataFeedAddress,
             borrowingRatio,
             liquidationRatio,
@@ -101,20 +100,20 @@ contract Loan is Ownable {
     }
 
     function withdrawalAmount() public view returns (uint256) {
-        uint256 usdLiability = assetToUsd(liability, assetDataFeedAddress);
+        uint256 usdLiability = assetToUsd(liabilityAmount, assetDataFeedAddress);
         uint256 usdCollateralNew = (usdLiability * borrowingRatio) / 10^precision;
         return usdToAsset((assetToUsd(address(this).balance, etherDataFeedAddress) - usdCollateralNew), etherDataFeedAddress);
     }
 
     function collateralizationRatio() public view returns(uint256) {
-        return (assetToUsd(address(this).balance, etherDataFeedAddress)*10^precision)/assetToUsd(liability, assetDataFeedAddress);
+        return (assetToUsd(address(this).balance, etherDataFeedAddress)*10^precision)/assetToUsd(liabilityAmount, assetDataFeedAddress);
     }
 
     // Payback loan with borrowed assets
     // Payback can be called with zero payment and be just a withdrawal
     function payback(uint256 payment) public onlyOwner {
         require(this.owner() == msg.sender);
-        require(liability >= payment);
+        require(liabilityAmount >= payment);
 
         if (payment > 0) {
             // Burn the payment. Owner needs to approve the token first.
@@ -122,7 +121,7 @@ contract Loan is Ownable {
             IERC20Burnable(asset).burnFrom(msg.sender, payment);
 
             // Update Loan Liability
-            liability = liability - payment;
+            liabilityAmount = liabilityAmount - payment;
         }
         
         if (collateralizationRatio() > borrowingRatio) {
@@ -137,11 +136,11 @@ contract Loan is Ownable {
     function liquidate(uint256 payment) public {
         require(payment > 0, "payment must be greater than zero");
         
-        require(liability >= payment);
+        require(liabilityAmount >= payment);
         require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
-        liability = liability - payment;
+        liabilityAmount = liabilityAmount - payment;
 
         // Burn the payment
         IERC20Burnable(asset).burnFrom(msg.sender, payment);
@@ -181,6 +180,7 @@ contract Loan is Ownable {
 
     event Received(address, uint);
     receive() external payable {
+        //loanEvent();
         emit Received(msg.sender, msg.value);
     }
 }

@@ -110,8 +110,8 @@ async function main() {
     let options = {value: ethers.parseEther("1.0")}
     let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     let result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[1].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[1].args[4]} NVDA`);
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} ANVDA`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
     result = await tx.wait();
@@ -121,8 +121,8 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[1].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[1].args[4]} AAMZN`);
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AAMZN`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
     result = await tx.wait();
@@ -139,8 +139,8 @@ async function main() {
     options = {value: ethers.parseEther("1.0")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[1].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[1].args[4]} NVDA`);
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AGOOG`);
 
     // Create and deploy the subgraph
     await system.run(`npm run codegen`, { cwd: srcDir });
