@@ -1,11 +1,15 @@
 .sortableTableWrapper {
-    margin: 14px 0;
+    margin: 14px 0 7px;
     width: 100%;
     overflow: auto;
-    max-height: 180px;
+    height: 180px;
+    min-height: 180px;
+    border-right: 8px;
+    position: relative;
 }
 .sortableTable {
     width: 100%;
+    margin-top: -10px;
     border-collapse: separate;
     border-spacing: 0 10px;
 }
@@ -14,12 +18,15 @@
     font-family: "Nunito", sans-serif;
 }
 
+.sortableTableTHead {
+    position: sticky;
+    top: 0;
+    width: 100%;
+}
+
 .sortableTableTHead tr th:first-child {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
-}
-.sortableTable tr:not(:first-child) {
-    margin-top: 10px;
 }
 .sortableTableTHead tr th:last-child {
     border-top-right-radius: 8px;
@@ -84,6 +91,33 @@
     cursor: pointer;
 }
 
+.sortableTableTHead tr .sortableTableTHeadItem:first-child, .sortableTableTHead tr .sortableTableTHeadItem:last-child {
+    position: relative;
+}
+
+.sortableTableTHead tr .sortableTableTHeadItem:last-child:after {
+    position: absolute;
+    content: '';
+    top: 0;
+    right: 0;
+    background-color: #08101B;
+    width: 6px;
+    height: 6px;
+    display: block;
+    z-index: -1;
+}
+.sortableTableTHead tr .sortableTableTHeadItem:first-child:before {
+    position: absolute;
+    content: '';
+    top: 0;
+    left: 0;
+    background-color: #08101B;
+    width: 6px;
+    height: 6px;
+    display: block;
+    z-index: -1;
+}
+
 .sortableTableTBody tr:hover .sortableTableTBodyItem {
     background-color: #16588c;
 }
@@ -92,8 +126,15 @@
     background-color: #104469;
 }
 
+.sortableTableResize {
+    height: 1.5px;
+    width: 100%;
+    cursor: row-resize;
+    background-color: #273D4C;
+}
+
 @media (min-width: 768px) {
     .sortableTableWrapper {
-        margin: 26px 0;
+        margin: 26px 0 13px;
     }
 }

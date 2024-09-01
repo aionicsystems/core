@@ -1,6 +1,3 @@
-import styles from "../../App.module.css";
-import { iIcon } from "../../static/images.ts";
-import { Card } from "../Card/Card.tsx";
 import { FC, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
