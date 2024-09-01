@@ -115,6 +115,7 @@ export const LoanSection: FC = () => {
         isError={error || isError}
         callRefetch={refetch}
         selectLoan={selectLoan}
+        selectedID={selectedLoan}
       />
       <LoanOverview loanID={selectedLoan} />
       {/*<div className={styles.fundsSection}>*/}

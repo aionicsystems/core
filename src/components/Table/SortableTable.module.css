@@ -57,6 +57,7 @@
     font-size: 10px;
     line-height: 13px;
     font-weight: 700;
+    transition: 0.3s all ease-in-out;
 }
 .sortableTableTBodyItemInner {
     display: flex;
@@ -77,6 +78,18 @@
 }
 .sortableTableSortButton img:last-child {
     transform: rotate(180deg);
+}
+
+.sortableTableTBody tr {
+    cursor: pointer;
+}
+
+.sortableTableTBody tr:hover .sortableTableTBodyItem {
+    background-color: #16588c;
+}
+
+.selectedRow .sortableTableTBodyItem {
+    background-color: #104469;
 }
 
 @media (min-width: 768px) {
