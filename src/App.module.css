@@ -7,24 +7,6 @@
 .mainSection {
     margin-top: 12px;
 }
-.overviewHeading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.overviewCardsWrapper {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-    gap: 10px;
-    margin-top: 16px;
-}
-.overviewTitle {
-    padding-left: 5px;
-    display: none;
-}
 .sectionTitle {
     color: #ffffff;
     font-size: 20px;
@@ -138,14 +120,6 @@
     }
     .mainSection {
         margin-top: 56px;
-    }
-    .overviewTitle {
-        display: block;
-    }
-    .overviewCardsWrapper {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
-        margin-top: 40px;
     }
     .sectionTitle {
         font-size: 24px;

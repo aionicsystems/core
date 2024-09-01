@@ -49,3 +49,22 @@ export const loanEntities = gql(`
     }
   }
 `);
+
+export const loanSingleEntity = gql(
+  `query LoanSingleEntity ($id: Bytes) {
+  loanEntity(id: $id) {
+    id
+    liabilityAmount
+    collateralAmount
+    asset {
+      id
+      name
+      rate
+      symbol
+    }
+    borrowingRatio
+    liquidationRatio
+    interestRate
+  }
+}`,
+);

@@ -11,3 +11,10 @@
     background-color: #0c0c0cbf;
     z-index: 1001;
 }
+
+.smallLoaderWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}

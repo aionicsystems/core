@@ -26,12 +26,3 @@ export type SelectOption = {
   label: string | number;
   value: string | number;
 };
-
-export type TempTableDataType = {
-  id: number;
-  asset: string;
-  liability: string;
-  collateral: string;
-  c_ratio: string;
-  l_ratio: string;
-};

@@ -12,6 +12,7 @@ export type SortableTableBodyProps<T> = {
   sortOrder?: "asc" | "desc" | null;
   sortBy?: string;
   isError: boolean;
+  selectLoan?: (itemID: string) => void;
 };
 
 export const SortableTableBody = <T,>({
@@ -20,6 +21,7 @@ export const SortableTableBody = <T,>({
   sortBy,
   sortOrder,
   isError,
+  selectLoan,
 }: SortableTableBodyProps<T>) => {
   const sortedData = useMemo(() => {
     return tableData.slice().sort((a, b) => {
@@ -46,7 +48,10 @@ export const SortableTableBody = <T,>({
     <tbody className={styles.sortableTableTBody}>
       {sortedData.length > 0 || !isError ? (
         sortedData.map((dataItem) => (
-          <tr key={dataItem.id}>
+          <tr
+            onClick={() => (selectLoan ? selectLoan(dataItem.id) : null)}
+            key={dataItem.id}
+          >
             {titles.map((title) => (
               <SortableTableBodyItem
                 key={title.key}

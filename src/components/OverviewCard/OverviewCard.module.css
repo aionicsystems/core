@@ -2,9 +2,17 @@
     min-width: 256px;
 }
 .overviewCardInner {
+    display: grid;
+    grid-template-columns: 1fr 40px;
+}
+.overviewCardSmallInner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    flex-direction: column;
+}
+.overviewCardContentWrapper {
+    overflow: hidden;
 }
 .overviewCardTitle {
     color: #ffffff;
@@ -12,6 +20,9 @@
     font-weight: 500;
     letter-spacing: -0.639px;
     margin-bottom: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .overviewCardLabel {
     color: #475467;

@@ -20,6 +20,7 @@ export type SortableTableProps<T> = {
   }: SortableTableConfigType) => void;
   tableConfig: SortableTableConfigType;
   callRefetch: () => Promise<QueryObserverResult<unknown, DefaultError>>;
+  selectLoan?: (itemID: string) => void;
 };
 
 export const SortableTable = <T,>({
@@ -29,6 +30,7 @@ export const SortableTable = <T,>({
   tableConfig,
   isError,
   callRefetch,
+  selectLoan,
 }: SortableTableProps<T>) => {
   const handleSort = async (columnKey: string) => {
     const { sort_order } = tableConfig;
@@ -59,6 +61,7 @@ export const SortableTable = <T,>({
           tableData={tableData}
           titles={titles}
           isError={isError}
+          selectLoan={selectLoan}
         />
       </table>
     </div>

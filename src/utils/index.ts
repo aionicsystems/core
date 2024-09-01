@@ -12,7 +12,7 @@ export const formatAddress = (addr: string) => {
 };
 
 export const formatRatio = (rate: string) => {
-  return `${Number(rate) / 100}%`;
+  return `${Number(rate).toFixed(2) / 100}%`;
 };
 
 export const handleBodyScroll = () => {
