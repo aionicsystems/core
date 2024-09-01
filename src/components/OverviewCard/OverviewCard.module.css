@@ -40,7 +40,7 @@
 
 @media (min-width: 768px) {
     .overviewCard {
-        width: auto;
+        min-width: auto;
     }
     .overviewCardIconWrapper {
         margin-right: 24px;
