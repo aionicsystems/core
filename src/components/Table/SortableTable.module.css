@@ -1,5 +1,5 @@
 .sortableTableWrapper {
-    margin: 14px 0 7px;
+    margin: 14px 0 0;
     width: 100%;
     overflow: auto;
     height: 230px;
@@ -127,14 +127,14 @@
 }
 
 .sortableTableResize {
-    height: 1.5px;
+    height: 13px;
     width: 100%;
     cursor: row-resize;
-    background-color: #273D4C;
+    border-bottom: 1px solid #273D4C;
 }
 
 @media (min-width: 768px) {
     .sortableTableWrapper {
-        margin: 26px 0 13px;
+        margin: 26px 0 0;
     }
 }
