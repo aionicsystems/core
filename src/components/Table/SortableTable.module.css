@@ -2,12 +2,12 @@
     margin: 14px 0;
     width: 100%;
     overflow: auto;
+    max-height: 180px;
 }
 .sortableTable {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0 10px;
-    max-height: 180px;
 }
 
 .sortableTable * {
