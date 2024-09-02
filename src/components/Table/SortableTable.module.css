@@ -20,7 +20,7 @@
 
 .sortableTableTHead {
     position: sticky;
-    top: 0;
+    top: -1px;
     width: 100%;
 }
 

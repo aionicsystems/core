@@ -60,6 +60,7 @@ export const SortableTable = <T,>({
     if ("offsetHeight" in tableWrapper.current) {
       setStartHeight(tableWrapper.current.offsetHeight);
     }
+    document.body.classList.add("no-select");
   }, []);
 
   const handleMouseMove = useCallback(
@@ -76,6 +77,7 @@ export const SortableTable = <T,>({
 
   const stopResizing = useCallback(() => {
     setIsResizing(false);
+    document.body.classList.remove("no-select");
   }, []);
 
   useEffect(() => {

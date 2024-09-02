@@ -68,3 +68,9 @@ button {
 ._lock {
   overflow: hidden;
 }
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
