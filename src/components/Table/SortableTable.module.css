@@ -10,6 +10,7 @@
 .sortableTable {
     width: 100%;
     border-collapse: separate;
+    margin-top: -10px;
     border-spacing: 0 10px;
 }
 
@@ -19,7 +20,7 @@
 
 .sortableTableTHead {
     position: sticky;
-    top: 0;
+    top: 0px;
     width: 100%;
 }
 
