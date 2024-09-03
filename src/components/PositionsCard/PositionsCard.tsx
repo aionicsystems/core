@@ -48,14 +48,7 @@ export const PositionsCard: FC<PositionsCardProps> = ({
           className={styles.positionsCardActionButton}
           size={"lg"}
         >
-          Supply
-        </Button>
-        <Button
-          btnType={"primary"}
-          className={styles.positionsCardActionButton}
-          size={"lg"}
-        >
-          Withdraw
+          {badgeText === "Debt" ? "Pay-Back" : "Withdraw"}
         </Button>
       </div>
     </Card>

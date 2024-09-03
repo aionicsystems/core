@@ -3,14 +3,14 @@ import { Card } from "../Card/Card.tsx";
 import styles from "./OverviewCard.module.css";
 
 type OverviewCardProps = {
-  title: string;
+  value: string | number;
   label: string;
   icon: string;
   color: string;
 };
 
 export const OverviewCard: FC<OverviewCardProps> = ({
-  title,
+  value,
   label,
   icon,
   color,
@@ -18,8 +18,8 @@ export const OverviewCard: FC<OverviewCardProps> = ({
   return (
     <Card className={styles.overviewCard}>
       <div className={styles.overviewCardInner}>
-        <div>
-          <h5 className={styles.overviewCardTitle}>{title}</h5>
+        <div className={styles.overviewCardContentWrapper}>
+          <h5 className={styles.overviewCardTitle}>{value}</h5>
           <p className={styles.overviewCardLabel}>{label}</p>
         </div>
         <div
