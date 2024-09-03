@@ -1,11 +1,13 @@
+import { AssetType } from "./AssetTypes";
+
 export type SortableTableHeadType = {
   title: string;
   sortable?: boolean;
   key: string;
 };
 
-export type SortableTableConfigType = {
-  sort_by?: string;
+export type SortableTableConfigType<T> = {
+  sort_by?: keyof T;
   sort_order?: "asc" | "desc" | null;
   filters?: Record<string, string>;
   page_number?: number;
@@ -13,7 +15,7 @@ export type SortableTableConfigType = {
 
 export type SortableTableDataType<T> = {
   [K in keyof T]: T[K];
-};
+} & { id: string; asset?: AssetType };
 
 export type SortableTableMetaType = {
   current_page: number;

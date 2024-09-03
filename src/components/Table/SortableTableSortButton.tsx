@@ -1,23 +1,22 @@
-import { FC } from "react";
 import styles from "./SortableTable.module.css";
 import { sort } from "../../static/images.ts";
 
-export type SortableTableSortButtonProps = {
-  sortBy?: string;
+export type SortableTableSortButtonProps<T> = {
+  sortBy?: keyof T;
   sortOrder?: "asc" | "desc" | null;
   titleKey: string;
-  onSort: (key: string) => void;
+  onSort: (key: keyof T) => void;
 };
 
-export const SortableTableSortButton: FC<SortableTableSortButtonProps> = ({
+export const SortableTableSortButton = <T,>({
   sortOrder,
   sortBy,
   titleKey,
   onSort,
-}) => {
+}: SortableTableSortButtonProps<T>) => {
   return (
     <button
-      onClick={() => onSort(titleKey)}
+      onClick={() => onSort(titleKey as keyof T)}
       className={styles.sortableTableSortButton}
     >
       <img

@@ -1,4 +1,3 @@
-import { FC } from "react";
 import {
   SortableTableConfigType,
   SortableTableHeadType,
@@ -6,17 +5,17 @@ import {
 import styles from "./SortableTable.module.css";
 import { SortableTableSortButton } from "./SortableTableSortButton.tsx";
 
-export type SortableTableHeadItemProps = {
+export type SortableTableHeadItemProps<T> = {
   title: SortableTableHeadType;
-  tableConfig: SortableTableConfigType;
-  onSort: (key: string) => void;
+  tableConfig: SortableTableConfigType<T>;
+  onSort: (key: keyof T) => void;
 };
 
-export const SortableTableHeadItem: FC<SortableTableHeadItemProps> = ({
+export const SortableTableHeadItem = <T,>({
   tableConfig,
   title,
   onSort,
-}) => {
+}: SortableTableHeadItemProps<T>) => {
   return (
     <th className={styles.sortableTableTHeadItem}>
       <div className={styles.sortableTableTHeadItemInner}>

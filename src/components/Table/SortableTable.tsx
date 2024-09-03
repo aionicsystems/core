@@ -18,8 +18,8 @@ export type SortableTableProps<T> = {
     sort_order,
     filters,
     page_number,
-  }: SortableTableConfigType) => void;
-  tableConfig: SortableTableConfigType;
+  }: SortableTableConfigType<T>) => void;
+  tableConfig: SortableTableConfigType<T>;
   callRefetch: () => Promise<QueryObserverResult<unknown, DefaultError>>;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
@@ -39,12 +39,12 @@ export const SortableTable = <T,>({
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [startY, setStartY] = useState<number>(0);
   const [startHeight, setStartHeight] = useState<number>(0);
-  const handleSort = async (columnKey: string) => {
+  const handleSort = async (columnKey: keyof T) => {
     const { sort_order } = tableConfig;
     const newSortOrder =
       sort_order === "asc" || sort_order === null ? "desc" : "asc";
 
-    const updatedConfig: SortableTableConfigType = {
+    const updatedConfig: SortableTableConfigType<T> = {
       ...tableConfig,
       sort_order: newSortOrder,
       sort_by: columnKey,
@@ -57,7 +57,10 @@ export const SortableTable = <T,>({
   const startResizing = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     setIsResizing(true);
     setStartY(e.clientY);
-    if ("offsetHeight" in tableWrapper.current) {
+    if (
+      tableWrapper.current !== null &&
+      "offsetHeight" in tableWrapper.current
+    ) {
       setStartHeight(tableWrapper.current.offsetHeight);
     }
     document.body.classList.add("no-select");
@@ -67,12 +70,12 @@ export const SortableTable = <T,>({
     (e: MouseEvent) => {
       if (isResizing || tableWrapper.current) {
         const newHeight = startHeight + (e.clientY - startY);
-        if ("style" in tableWrapper.current) {
+        if (tableWrapper.current !== null && "style" in tableWrapper.current) {
           tableWrapper.current.style.height = `${newHeight}px`;
         }
       }
     },
-    [isResizing, startY, startHeight],
+    [isResizing, startY, startHeight]
   );
 
   const stopResizing = useCallback(() => {
@@ -96,7 +99,10 @@ export const SortableTable = <T,>({
   }, [isResizing, handleMouseMove, stopResizing]);
 
   useEffect(() => {
-    if ("scrollHeight" in tableWrapper.current) {
+    if (
+      tableWrapper.current !== null &&
+      "scrollHeight" in tableWrapper.current
+    ) {
       const maxAvailableScreenHeight = screen.height * 0.56;
       const newMaxHeight =
         tableWrapper.current.scrollHeight > maxAvailableScreenHeight

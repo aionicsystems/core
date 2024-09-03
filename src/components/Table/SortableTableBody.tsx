@@ -10,7 +10,7 @@ export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
   titles: SortableTableHeadType[];
   sortOrder?: "asc" | "desc" | null;
-  sortBy?: string;
+  sortBy?: keyof T;
   isError: boolean;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
@@ -49,20 +49,27 @@ export const SortableTableBody = <T,>({
   return (
     <tbody className={styles.sortableTableTBody}>
       {sortedData.length > 0 || !isError ? (
-        sortedData.map((dataItem) => (
-          <tr
-            onClick={() => (selectLoan ? selectLoan(dataItem.id) : null)}
-            key={dataItem.id}
-            className={`${selectedID === dataItem.id ? styles.selectedRow : ""}`}
-          >
-            {titles.map((title) => (
-              <SortableTableBodyItem
-                key={title.key}
-                dataItem={dataItem}
-                dataKey={title.key}
-              />
-            ))}
-          </tr>
+        sortedData.map((dataItem, index) => (
+          <>
+            <tr
+              onClick={() => (selectLoan ? selectLoan(dataItem.id) : null)}
+              key={dataItem.id}
+              className={`${selectedID === dataItem.id ? styles.selectedRow : ""}`}
+            >
+              {titles.map((title) => (
+                <SortableTableBodyItem
+                  key={title.key}
+                  dataItem={dataItem}
+                  dataKey={title.key}
+                />
+              ))}
+            </tr>
+            {sortedData.length !== index + 1 && (
+              <tr className={styles.separatorRow}>
+                <td colSpan={titles.length}></td>
+              </tr>
+            )}
+          </>
         ))
       ) : (
         <tr>

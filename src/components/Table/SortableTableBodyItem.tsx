@@ -13,7 +13,9 @@ export const SortableTableBodyItem = <T,>({
   return (
     <td className={styles.sortableTableTBodyItem}>
       <div className={styles.sortableTableTBodyItemInner}>
-        {dataKey === "assetName" ? dataItem["asset"].name : dataItem[dataKey]}
+        {dataKey === "assetName"
+          ? dataItem["asset"]?.name
+          : (dataItem as any)[dataKey]}
       </div>
     </td>
   );

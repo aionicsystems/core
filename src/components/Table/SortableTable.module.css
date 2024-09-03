@@ -1,140 +1,144 @@
 .sortableTableWrapper {
-    margin: 14px 0 0;
-    width: 100%;
-    overflow: auto;
-    height: 230px;
-    min-height: 180px;
-    border-right: 8px;
-    position: relative;
+  margin: 14px 0 0;
+  width: 100%;
+  overflow: auto;
+  height: 230px;
+  min-height: 180px;
+  border-right: 8px;
+  position: relative;
 }
 .sortableTable {
-    width: 100%;
-    border-collapse: separate;
-    margin-top: -10px;
-    border-spacing: 0 10px;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .sortableTable * {
-    font-family: "Nunito", sans-serif;
+  font-family: "Nunito", sans-serif;
 }
 
 .sortableTableTHead {
-    position: sticky;
-    top: 0px;
-    width: 100%;
+  position: sticky;
+  top: 0px;
+  width: 100%;
 }
 
 .sortableTableTHead tr th:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 .sortableTableTHead tr th:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 .sortableTableTHeadItem {
-    padding: 13px;
-    background-color: #091623;
-    color: #00ADEE;
-    font-size: 10px;
-    line-height: 13px;
-    font-weight: 700;
-    min-width: 62px;
-    white-space: nowrap;
+  padding: 13px;
+  background-color: #091623;
+  color: #00adee;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 700;
+  min-width: 62px;
+  white-space: nowrap;
 }
 .sortableTableTHeadItemInner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .sortableTableTBody tr td:first-child {
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 .sortableTableTBody tr td:last-child {
-    border-top-right-radius: 8px;
-    border-bottom-right-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 .sortableTableTBodyItem {
-    padding: 12px;
-    background-color: #092537;
-    color: #00ADEE;
-    font-size: 10px;
-    line-height: 13px;
-    font-weight: 700;
-    transition: 0.3s all ease-in-out;
+  padding: 12px;
+  background-color: #092537;
+  color: #00adee;
+  font-size: 10px;
+  line-height: 13px;
+  font-weight: 700;
+  transition: 0.3s all ease-in-out;
 }
 .sortableTableTBodyItemInner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .sortableTableSortButton {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2.5px;
-    background-color: transparent;
-    border: transparent;
-    transition: 0.3s all ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5px;
+  background-color: transparent;
+  border: transparent;
+  transition: 0.3s all ease-in-out;
 }
 .sortableTableSortButton img:last-child {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .sortableTableTBody tr {
-    cursor: pointer;
+  cursor: pointer;
 }
 
-.sortableTableTHead tr .sortableTableTHeadItem:first-child, .sortableTableTHead tr .sortableTableTHeadItem:last-child {
-    position: relative;
+.sortableTableTHead tr .sortableTableTHeadItem:first-child,
+.sortableTableTHead tr .sortableTableTHeadItem:last-child {
+  position: relative;
 }
 
 .sortableTableTHead tr .sortableTableTHeadItem:last-child:after {
-    position: absolute;
-    content: '';
-    top: 0;
-    right: 0;
-    background-color: #08101B;
-    width: 6px;
-    height: 6px;
-    display: block;
-    z-index: -1;
+  position: absolute;
+  content: "";
+  top: 0;
+  right: 0;
+  background-color: #08101b;
+  width: 6px;
+  height: 6px;
+  display: block;
+  z-index: -1;
 }
 .sortableTableTHead tr .sortableTableTHeadItem:first-child:before {
-    position: absolute;
-    content: '';
-    top: 0;
-    left: 0;
-    background-color: #08101B;
-    width: 6px;
-    height: 6px;
-    display: block;
-    z-index: -1;
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  background-color: #08101b;
+  width: 6px;
+  height: 6px;
+  display: block;
+  z-index: -1;
 }
 
 .sortableTableTBody tr:hover .sortableTableTBodyItem {
-    background-color: #16588c;
+  background-color: #16588c;
 }
 
 .selectedRow .sortableTableTBodyItem {
-    background-color: #104469;
+  background-color: #104469;
 }
 
 .sortableTableResize {
-    height: 13px;
-    width: 100%;
-    cursor: row-resize;
-    border-bottom: 1px solid #273D4C;
+  height: 13px;
+  width: 100%;
+  cursor: row-resize;
+  border-bottom: 1px solid #273d4c;
+}
+
+.separatorRow td,
+.separatorRow th {
+  height: 10px;
 }
 
 @media (min-width: 768px) {
-    .sortableTableWrapper {
-        margin: 26px 0 0;
-    }
+  .sortableTableWrapper {
+    margin: 26px 0 0;
+  }
 }

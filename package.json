@@ -23,6 +23,9 @@
     "create-test": "graph create AionCoreSubgraph --node http://localhost:8020/",
     "deploy-test": "graph deploy AionCoreSubgraph --version-label v0.0.1 --ipfs http://localhost:5001 --node http://localhost:8020/",
     "test": "docker compose up -d && sleep 30 && hardhat test --network localhost && docker compose down",
+    "test:chrome": "npx playwright test --headed --project=chromium",
+    "test:firefox": "npx playwright test --headed --project=firefox",
+    "test:safari": "npx playwright test --headed --project=webkit",
     "graph-test": "graph test"
   },
   "dependencies": {
@@ -44,6 +47,8 @@
     "@graphprotocol/graph-ts": "0.35.1",
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.0.2",
+    "@playwright/test": "^1.46.1",
+    "@types/node": "^22.5.2",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.15.0",
