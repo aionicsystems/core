@@ -8,9 +8,9 @@ import {
 } from "matchstick-as/assembly/index"
 import { Address, BigInt } from "@graphprotocol/graph-ts"
 import { AssetEvent } from "../generated/schema"
-import { AssetEvent as AssetEventEvent } from "../generated/Brokerage/Brokerage"
-import { handleAssetEvent } from "../src/brokerage"
-import { createAssetEventEvent } from "./brokerage-utils"
+import { AssetEvent as AssetEventEvent } from "../generated/Window/Window"
+import { handleAssetEvent } from "../src/window"
+import { createAssetEventEvent } from "./window-utils"
 
 // Tests structure (matchstick-as >=0.5.0)
 // https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0

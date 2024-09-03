@@ -110,9 +110,9 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "loanAddress",
+        "type": "address"
       },
       {
         "indexed": false,
@@ -123,37 +123,49 @@
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "collateral",
+        "name": "collateralAmount",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "asset",
+        "name": "assetAddress",
         "type": "address"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "liability",
+        "name": "liabilityAmount",
         "type": "uint256"
       },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "dataFeed",
+        "name": "dataFeedAddress",
         "type": "address"
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "rate",
-        "type": "uint256"
+        "internalType": "uint32",
+        "name": "borrowingRatio",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "liquidationRatio",
+        "type": "uint32"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint32",
+        "name": "interestRate",
+        "type": "uint32"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "time",
+        "name": "lastCollection",
         "type": "uint256"
       }
     ],
@@ -178,67 +190,6 @@
     ],
     "name": "OwnershipTransferred",
     "type": "event"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "collateral",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "asset",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "liability",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "dataFeed",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "rate",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "time",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Brokerage.Loan",
-        "name": "_loan",
-        "type": "tuple"
-      }
-    ],
-    "name": "accruedInterest",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [
@@ -325,80 +276,6 @@
   {
     "inputs": [
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "collateral",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "asset",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "liability",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "dataFeed",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "rate",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "time",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Brokerage.Loan",
-        "name": "_loan",
-        "type": "tuple"
-      }
-    ],
-    "name": "collateralizationRatio",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_loanId",
-        "type": "uint256"
-      }
-    ],
-    "name": "collect",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "contract AggregatorV3Interface",
         "name": "dataFeed",
         "type": "address"
@@ -416,16 +293,16 @@
     "type": "function"
   },
   {
-    "inputs": [
+    "inputs": [],
+    "name": "etherDataFeedAddress",
+    "outputs": [
       {
-        "internalType": "uint256",
-        "name": "_loanId",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
-    "name": "deposit",
-    "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -450,59 +327,17 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_uid",
-        "type": "uint256"
+        "internalType": "bytes32",
+        "name": "param",
+        "type": "bytes32"
       }
     ],
-    "name": "getLoan",
+    "name": "getParam",
     "outputs": [
       {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "collateral",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "asset",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "liability",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "dataFeed",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "rate",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "time",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Brokerage.Loan",
+        "internalType": "uint32",
         "name": "",
-        "type": "tuple"
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -530,35 +365,9 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_loanId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "payment",
-        "type": "uint256"
-      }
-    ],
-    "name": "liquidate",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "loan",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
+        "internalType": "address",
+        "name": "loanAddress",
+        "type": "address"
       },
       {
         "internalType": "address",
@@ -567,33 +376,64 @@
       },
       {
         "internalType": "uint256",
-        "name": "collateral",
+        "name": "collateralAmount",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "asset",
+        "name": "assetAddress",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "liability",
+        "name": "liabilityAmount",
         "type": "uint256"
       },
       {
         "internalType": "address",
-        "name": "dataFeed",
+        "name": "dataFeedAddress",
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "rate",
-        "type": "uint256"
+        "internalType": "uint32",
+        "name": "borrowingRatio",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "liquidationRatio",
+        "type": "uint32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "interestRate",
+        "type": "uint32"
       },
       {
         "internalType": "uint256",
-        "name": "time",
+        "name": "lastCollection",
         "type": "uint256"
+      }
+    ],
+    "name": "loanEntityEvent",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "loans",
+    "outputs": [
+      {
+        "internalType": "contract Loan",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -616,24 +456,6 @@
     "inputs": [
       {
         "internalType": "bytes32",
-        "name": "param",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint32",
-        "name": "value",
-        "type": "uint32"
-      }
-    ],
-    "name": "paramSetter",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "bytes32",
         "name": "",
         "type": "bytes32"
       }
@@ -647,24 +469,6 @@
       }
     ],
     "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_loanId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "payment",
-        "type": "uint256"
-      }
-    ],
-    "name": "payback",
-    "outputs": [],
-    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -683,6 +487,24 @@
       }
     ],
     "name": "setEtherDataFeed",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "param",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "uint32",
+        "name": "value",
+        "type": "uint32"
+      }
+    ],
+    "name": "setParam",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -714,80 +536,6 @@
       }
     ],
     "name": "usdToAsset",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_loanId",
-        "type": "uint256"
-      }
-    ],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "components": [
-          {
-            "internalType": "uint256",
-            "name": "id",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "owner",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "collateral",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "asset",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "liability",
-            "type": "uint256"
-          },
-          {
-            "internalType": "address",
-            "name": "dataFeed",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "rate",
-            "type": "uint256"
-          },
-          {
-            "internalType": "uint256",
-            "name": "time",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct Brokerage.Loan",
-        "name": "_loan",
-        "type": "tuple"
-      }
-    ],
-    "name": "withdrawalAmount",
     "outputs": [
       {
         "internalType": "uint256",

@@ -5,11 +5,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Brokerage
+    name: Window
     network: test
     source:
       address: 'DEPLOYED_CONTRACT_ADDRESS'
-      abi: Brokerage
+      abi: Window
       startBlock: 0
     mapping:
       kind: ethereum/events
@@ -20,12 +20,12 @@ dataSources:
         - LoanEntity
         - OwnerTransferred
       abis:
-        - name: Brokerage
-          file: ./artifacts/contracts/Brokerage.sol/Brokerage.json
+        - name: Window
+          file: ./artifacts/contracts/Window.sol/Window.json
       eventHandlers:
         - event: AssetEntity(indexed address,string,string,address,uint32,uint32)
           handler: handleAssetEntity
-        - event: LoanEntity(indexed uint256,address,uint256,address,uint256,address,uint256,uint256)
+        - event: LoanEntity(indexed address,address,uint256,address,uint256,address,uint32,uint32,uint32,uint256)
           handler: handleLoanEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred

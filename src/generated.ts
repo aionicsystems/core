@@ -2193,10 +2193,10 @@ export const assetAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Brokerage
+// Window
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-export const brokerageAbi = [
+export const windowAbi = [
   {
     type: 'constructor',
     inputs: [
@@ -2325,7 +2325,7 @@ export const brokerageAbi = [
     inputs: [
       {
         name: '_loan',
-        internalType: 'struct Brokerage.Loan',
+        internalType: 'struct Window.Loan',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -2385,7 +2385,7 @@ export const brokerageAbi = [
     inputs: [
       {
         name: '_loan',
-        internalType: 'struct Brokerage.Loan',
+        internalType: 'struct Window.Loan',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -2450,7 +2450,7 @@ export const brokerageAbi = [
     outputs: [
       {
         name: '',
-        internalType: 'struct Brokerage.Loan',
+        internalType: 'struct Window.Loan',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -2588,7 +2588,7 @@ export const brokerageAbi = [
     inputs: [
       {
         name: '_loan',
-        internalType: 'struct Brokerage.Loan',
+        internalType: 'struct Window.Loan',
         type: 'tuple',
         components: [
           { name: 'id', internalType: 'uint256', type: 'uint256' },
@@ -11292,350 +11292,350 @@ export const useWatchAssetTransferEvent =
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__
  */
-export const useReadBrokerage = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindow = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"accruedInterest"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"accruedInterest"`
  */
-export const useReadBrokerageAccruedInterest =
+export const useReadWindowAccruedInterest =
   /*#__PURE__*/ createUseReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'accruedInterest',
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"assetToUsd"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assetToUsd"`
  */
-export const useReadBrokerageAssetToUsd = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowAssetToUsd = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'assetToUsd',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"assets"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assets"`
  */
-export const useReadBrokerageAssets = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowAssets = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'assets',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"collateralizationRatio"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collateralizationRatio"`
  */
-export const useReadBrokerageCollateralizationRatio =
+export const useReadWindowCollateralizationRatio =
   /*#__PURE__*/ createUseReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'collateralizationRatio',
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"dataFeedPrice"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"dataFeedPrice"`
  */
-export const useReadBrokerageDataFeedPrice =
+export const useReadWindowDataFeedPrice =
   /*#__PURE__*/ createUseReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'dataFeedPrice',
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
  */
-export const useReadBrokerageGetChainlinkDataFeedLatestAnswer =
+export const useReadWindowGetChainlinkDataFeedLatestAnswer =
   /*#__PURE__*/ createUseReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'getChainlinkDataFeedLatestAnswer',
   })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"getLoan"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getLoan"`
  */
-export const useReadBrokerageGetLoan = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowGetLoan = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'getLoan',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"loan"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loan"`
  */
-export const useReadBrokerageLoan = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowLoan = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'loan',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"owner"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"owner"`
  */
-export const useReadBrokerageOwner = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowOwner = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'owner',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"params"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"params"`
  */
-export const useReadBrokerageParams = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowParams = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'params',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"usdToAsset"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"usdToAsset"`
  */
-export const useReadBrokerageUsdToAsset = /*#__PURE__*/ createUseReadContract({
-  abi: brokerageAbi,
+export const useReadWindowUsdToAsset = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
   functionName: 'usdToAsset',
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"withdrawalAmount"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdrawalAmount"`
  */
-export const useReadBrokerageWithdrawalAmount =
+export const useReadWindowWithdrawalAmount =
   /*#__PURE__*/ createUseReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'withdrawalAmount',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__
  */
-export const useWriteBrokerage = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindow = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"approveAsset"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
  */
-export const useWriteBrokerageApproveAsset =
+export const useWriteWindowApproveAsset =
   /*#__PURE__*/ createUseWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'approveAsset',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"collect"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
  */
-export const useWriteBrokerageCollect = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindowCollect = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
   functionName: 'collect',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
  */
-export const useWriteBrokerageDeposit = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindowDeposit = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
  */
-export const useWriteBrokerageIssue = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindowIssue = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
   functionName: 'issue',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"liquidate"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
  */
-export const useWriteBrokerageLiquidate = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindowLiquidate = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
   functionName: 'liquidate',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"paramSetter"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
  */
-export const useWriteBrokerageParamSetter =
+export const useWriteWindowParamSetter =
   /*#__PURE__*/ createUseWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'paramSetter',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"payback"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
  */
-export const useWriteBrokeragePayback = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindowPayback = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
   functionName: 'payback',
 })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const useWriteBrokerageRenounceOwnership =
+export const useWriteWindowRenounceOwnership =
   /*#__PURE__*/ createUseWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'renounceOwnership',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
  */
-export const useWriteBrokerageSetEtherDataFeed =
+export const useWriteWindowSetEtherDataFeed =
   /*#__PURE__*/ createUseWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'setEtherDataFeed',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
  */
-export const useWriteBrokerageTransferOwnership =
+export const useWriteWindowTransferOwnership =
   /*#__PURE__*/ createUseWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'transferOwnership',
   })
 
 /**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"withdraw"`
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
  */
-export const useWriteBrokerageWithdraw = /*#__PURE__*/ createUseWriteContract({
-  abi: brokerageAbi,
+export const useWriteWindowWithdraw = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
   functionName: 'withdraw',
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__
  */
-export const useSimulateBrokerage = /*#__PURE__*/ createUseSimulateContract({
-  abi: brokerageAbi,
+export const useSimulateWindow = /*#__PURE__*/ createUseSimulateContract({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"approveAsset"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
  */
-export const useSimulateBrokerageApproveAsset =
+export const useSimulateWindowApproveAsset =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'approveAsset',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"collect"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
  */
-export const useSimulateBrokerageCollect =
+export const useSimulateWindowCollect =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'collect',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
  */
-export const useSimulateBrokerageDeposit =
+export const useSimulateWindowDeposit =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'deposit',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
  */
-export const useSimulateBrokerageIssue =
+export const useSimulateWindowIssue =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'issue',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"liquidate"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
  */
-export const useSimulateBrokerageLiquidate =
+export const useSimulateWindowLiquidate =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'liquidate',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"paramSetter"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
  */
-export const useSimulateBrokerageParamSetter =
+export const useSimulateWindowParamSetter =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'paramSetter',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"payback"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
  */
-export const useSimulateBrokeragePayback =
+export const useSimulateWindowPayback =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'payback',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const useSimulateBrokerageRenounceOwnership =
+export const useSimulateWindowRenounceOwnership =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'renounceOwnership',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
  */
-export const useSimulateBrokerageSetEtherDataFeed =
+export const useSimulateWindowSetEtherDataFeed =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'setEtherDataFeed',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
  */
-export const useSimulateBrokerageTransferOwnership =
+export const useSimulateWindowTransferOwnership =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'transferOwnership',
   })
 
 /**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"withdraw"`
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
  */
-export const useSimulateBrokerageWithdraw =
+export const useSimulateWindowWithdraw =
   /*#__PURE__*/ createUseSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'withdraw',
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__
  */
-export const useWatchBrokerageEvent = /*#__PURE__*/ createUseWatchContractEvent(
-  { abi: brokerageAbi },
+export const useWatchWindowEvent = /*#__PURE__*/ createUseWatchContractEvent(
+  { abi: windowAbi },
 )
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEntity"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"AssetEntity"`
  */
-export const useWatchBrokerageAssetEntityEvent =
+export const useWatchWindowAssetEntityEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: brokerageAbi,
+    abi: windowAbi,
     eventName: 'AssetEntity',
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEntity"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"LoanEntity"`
  */
-export const useWatchBrokerageLoanEntityEvent =
+export const useWatchWindowLoanEntityEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: brokerageAbi,
+    abi: windowAbi,
     eventName: 'LoanEntity',
   })
 
 /**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"OwnershipTransferred"`
  */
-export const useWatchBrokerageOwnershipTransferredEvent =
+export const useWatchWindowOwnershipTransferredEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
-    abi: brokerageAbi,
+    abi: windowAbi,
     eventName: 'OwnershipTransferred',
   })
 
@@ -19323,337 +19323,337 @@ export const watchAssetTransferEvent = /*#__PURE__*/ createWatchContractEvent({
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__
  */
-export const readBrokerage = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindow = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"accruedInterest"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"accruedInterest"`
  */
-export const readBrokerageAccruedInterest = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowAccruedInterest = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'accruedInterest',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"assetToUsd"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assetToUsd"`
  */
-export const readBrokerageAssetToUsd = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowAssetToUsd = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'assetToUsd',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"assets"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assets"`
  */
-export const readBrokerageAssets = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowAssets = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'assets',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"collateralizationRatio"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collateralizationRatio"`
  */
-export const readBrokerageCollateralizationRatio =
+export const readWindowCollateralizationRatio =
   /*#__PURE__*/ createReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'collateralizationRatio',
   })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"dataFeedPrice"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"dataFeedPrice"`
  */
-export const readBrokerageDataFeedPrice = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowDataFeedPrice = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'dataFeedPrice',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
  */
-export const readBrokerageGetChainlinkDataFeedLatestAnswer =
+export const readWindowGetChainlinkDataFeedLatestAnswer =
   /*#__PURE__*/ createReadContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'getChainlinkDataFeedLatestAnswer',
   })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"getLoan"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getLoan"`
  */
-export const readBrokerageGetLoan = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowGetLoan = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'getLoan',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"loan"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loan"`
  */
-export const readBrokerageLoan = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowLoan = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'loan',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"owner"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"owner"`
  */
-export const readBrokerageOwner = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowOwner = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'owner',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"params"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"params"`
  */
-export const readBrokerageParams = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowParams = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'params',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"usdToAsset"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"usdToAsset"`
  */
-export const readBrokerageUsdToAsset = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowUsdToAsset = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'usdToAsset',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"withdrawalAmount"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdrawalAmount"`
  */
-export const readBrokerageWithdrawalAmount = /*#__PURE__*/ createReadContract({
-  abi: brokerageAbi,
+export const readWindowWithdrawalAmount = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
   functionName: 'withdrawalAmount',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__
  */
-export const writeBrokerage = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindow = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"approveAsset"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
  */
-export const writeBrokerageApproveAsset = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowApproveAsset = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'approveAsset',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"collect"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
  */
-export const writeBrokerageCollect = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowCollect = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'collect',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
  */
-export const writeBrokerageDeposit = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowDeposit = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
  */
-export const writeBrokerageIssue = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowIssue = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'issue',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"liquidate"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
  */
-export const writeBrokerageLiquidate = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowLiquidate = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'liquidate',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"paramSetter"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
  */
-export const writeBrokerageParamSetter = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowParamSetter = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'paramSetter',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"payback"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
  */
-export const writeBrokeragePayback = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowPayback = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'payback',
 })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const writeBrokerageRenounceOwnership =
+export const writeWindowRenounceOwnership =
   /*#__PURE__*/ createWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'renounceOwnership',
   })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
  */
-export const writeBrokerageSetEtherDataFeed = /*#__PURE__*/ createWriteContract(
-  { abi: brokerageAbi, functionName: 'setEtherDataFeed' },
+export const writeWindowSetEtherDataFeed = /*#__PURE__*/ createWriteContract(
+  { abi: windowAbi, functionName: 'setEtherDataFeed' },
 )
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
  */
-export const writeBrokerageTransferOwnership =
+export const writeWindowTransferOwnership =
   /*#__PURE__*/ createWriteContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'transferOwnership',
   })
 
 /**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"withdraw"`
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
  */
-export const writeBrokerageWithdraw = /*#__PURE__*/ createWriteContract({
-  abi: brokerageAbi,
+export const writeWindowWithdraw = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
   functionName: 'withdraw',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__
  */
-export const simulateBrokerage = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindow = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"approveAsset"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
  */
-export const simulateBrokerageApproveAsset =
+export const simulateWindowApproveAsset =
   /*#__PURE__*/ createSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'approveAsset',
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"collect"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
  */
-export const simulateBrokerageCollect = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindowCollect = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
   functionName: 'collect',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"deposit"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
  */
-export const simulateBrokerageDeposit = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindowDeposit = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
   functionName: 'deposit',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"issue"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
  */
-export const simulateBrokerageIssue = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindowIssue = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
   functionName: 'issue',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"liquidate"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
  */
-export const simulateBrokerageLiquidate = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindowLiquidate = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
   functionName: 'liquidate',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"paramSetter"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
  */
-export const simulateBrokerageParamSetter =
+export const simulateWindowParamSetter =
   /*#__PURE__*/ createSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'paramSetter',
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"payback"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
  */
-export const simulateBrokeragePayback = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindowPayback = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
   functionName: 'payback',
 })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"renounceOwnership"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
  */
-export const simulateBrokerageRenounceOwnership =
+export const simulateWindowRenounceOwnership =
   /*#__PURE__*/ createSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'renounceOwnership',
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
  */
-export const simulateBrokerageSetEtherDataFeed =
+export const simulateWindowSetEtherDataFeed =
   /*#__PURE__*/ createSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'setEtherDataFeed',
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"transferOwnership"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
  */
-export const simulateBrokerageTransferOwnership =
+export const simulateWindowTransferOwnership =
   /*#__PURE__*/ createSimulateContract({
-    abi: brokerageAbi,
+    abi: windowAbi,
     functionName: 'transferOwnership',
   })
 
 /**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link brokerageAbi}__ and `functionName` set to `"withdraw"`
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
  */
-export const simulateBrokerageWithdraw = /*#__PURE__*/ createSimulateContract({
-  abi: brokerageAbi,
+export const simulateWindowWithdraw = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
   functionName: 'withdraw',
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__
  */
-export const watchBrokerageEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: brokerageAbi,
+export const watchWindowEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: windowAbi,
 })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"AssetEntity"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"AssetEntity"`
  */
-export const watchBrokerageAssetEntityEvent =
+export const watchWindowAssetEntityEvent =
   /*#__PURE__*/ createWatchContractEvent({
-    abi: brokerageAbi,
+    abi: windowAbi,
     eventName: 'AssetEntity',
   })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"LoanEntity"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"LoanEntity"`
  */
-export const watchBrokerageLoanEntityEvent =
+export const watchWindowLoanEntityEvent =
   /*#__PURE__*/ createWatchContractEvent({
-    abi: brokerageAbi,
+    abi: windowAbi,
     eventName: 'LoanEntity',
   })
 
 /**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link brokerageAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"OwnershipTransferred"`
  */
-export const watchBrokerageOwnershipTransferredEvent =
+export const watchWindowOwnershipTransferredEvent =
   /*#__PURE__*/ createWatchContractEvent({
-    abi: brokerageAbi,
+    abi: windowAbi,
     eventName: 'OwnershipTransferred',
   })
 
