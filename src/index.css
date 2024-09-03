@@ -47,6 +47,7 @@ button {
 
 ::-webkit-scrollbar {
   width: 1px;
+  height: 1px;
 }
 
 /* Track */
@@ -62,4 +63,14 @@ button {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #9ca3af;
+}
+
+._lock {
+  overflow: hidden;
+}
+
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
