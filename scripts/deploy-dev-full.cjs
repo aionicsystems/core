@@ -129,10 +129,55 @@ async function main() {
     assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
 
+    options = {value: ethers.parseEther(".5")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AAPL`);
+
     tx = await window.approveAsset(assetDataFeedAddress, "Google", "AGOOG", 500, 13000);
     result = await tx.wait();
     assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    options = {value: ethers.parseEther(".5")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AGOOG`);
+
+    tx = await window.approveAsset(assetDataFeedAddress, "Microsoft", "AMCST", 400, 11000);
+    result = await tx.wait();
+    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    options = {value: ethers.parseEther(".5")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AMCST`);
+
+    tx = await window.approveAsset(assetDataFeedAddress, "ConocoPhillips", "ACOP", 500, 13000);
+    result = await tx.wait();
+    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    options = {value: ethers.parseEther(".5")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} ACOP`);
+
+    tx = await window.approveAsset(assetDataFeedAddress, "AMD", "AAMD", 500, 13000);
+    result = await tx.wait();
+    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+
+    options = {value: ethers.parseEther(".5")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AAMD`);
 
     
 
