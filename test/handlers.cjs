@@ -63,8 +63,8 @@ describe('Basic event handlers', () => {
     const EthDataFeed = await ethers.getContractFactory("MockAggregatorV3Interface");
     const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice);
 
-    const Brokerage = await ethers.getContractFactory("Brokerage");
-    const brokerage = await Brokerage.deploy(
+    const Window = await ethers.getContractFactory("Window");
+    const window = await Window.deploy(
       owner,
       precision,
       borrowingRatio,
@@ -81,10 +81,10 @@ describe('Basic event handlers', () => {
     await patching.replace(
       path.join(srcDir, 'subgraph.yaml'),
       'DEPLOYED_CONTRACT_ADDRESS',
-      brokerage.target,
+      window.target,
     );
 
-    console.log(`Brokerage deployed to: ${await brokerage.getAddress()}`);
+    console.log(`Window deployed to: ${await window.getAddress()}`);
 
     const latestRoundData = await ethDataFeed.latestRoundData();
 
@@ -98,16 +98,16 @@ describe('Basic event handlers', () => {
     const assetDataFeedAddress = await assetDataFeed.getAddress();
     console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
 
-    let tx = await brokerage.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400, 12500);
+    let tx = await window.approveAsset(assetDataFeedAddress, "Nvidia", "NVDA", 400, 12500);
     let result = await tx.wait();
     let assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
     console.log('Asset Address: ', assetEntityEvents[0].args[0]);
 
     const options = {value: ethers.parseEther("1.0")}
-    let tx2 = await brokerage.issue(assetEntityEvents[0].args[0], options);
+    let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     let result2 = await tx2.wait();
-    console.log(`Amount Asset Issued: ${result2.logs[0].args[4]} NVDA`);
-
+    // console.log(`Amount Asset Issued: ${result2.logs[0].args[4]} NVDA`);
+    console.log(`${result2.logs}`);
     // Create and deploy the subgraph
     await system.run(`npm run codegen`, { cwd: srcDir });
     await system.run(`npm run create-test`, { cwd: srcDir });
