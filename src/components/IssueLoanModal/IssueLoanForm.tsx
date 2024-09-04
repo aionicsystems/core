@@ -1,6 +1,8 @@
 import { FC, useState } from "react";
 import { Button } from "../Button/Button.tsx";
 import styles from "./IssueLoanForm.module.css";
+import { contractAddress } from "../../repository/contracts.ts";
+import { useAccount, useWriteContract } from 'wagmi';
 
 export type IssueLoanFormProps = {
   loanID?: string;
@@ -8,6 +10,8 @@ export type IssueLoanFormProps = {
 
 export const IssueLoanForm: FC<IssueLoanFormProps> = ({ loanID }) => {
   const [collateral, setCollateral] = useState<string>("0.00 ETH");
+  const { data: hash, writeContract } = useWriteContract()
+  const { chain } = useAccount();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -17,9 +21,21 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ loanID }) => {
     }
   };
 
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const tokenId = formData.get('tokenId') as string
+    writeContract({
+      address: contractAddress("window", chain?.name),
+      abi,
+      functionName: 'mint',
+      args: [BigInt(tokenId)],
+    })
+  }
+
   return (
     <form
-      onSubmit={(event) => event.preventDefault()}
+      onSubmit={submit}
       id={loanID}
       className={styles.issueLoanForm}
     >
