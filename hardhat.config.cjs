@@ -21,8 +21,7 @@ module.exports = {
     hardhat: {
       accounts: {
         mnemonic: SEED_PHRASE,
-      },
-      chainId: 1337,
+      }
     },
     arbitrumOne: {
       url: 'https://arb1.arbitrum.io/rpc',

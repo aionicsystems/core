@@ -12,7 +12,7 @@ export type IssueLoanFormProps = {
 
 export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
   const [collateral, setCollateral] = useState<string>("");
-  const { data: hash, writeContractAsync } = useWriteContract();
+  const { data: hash, isPending, writeContractAsync } = useWriteContract();
   const { chain } = useAccount();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,8 +26,9 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     // Add error handling
+    console.log(assetID);
     writeContractAsync({
-      address: contractAddress("window", chain?.name) as Address,
+      address: contractAddress("window", chain?.id) as Address,
       abi,
       functionName: 'issue',
       args: [assetID],
@@ -51,9 +52,11 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
         onChange={handleChange}
         placeholder="0.00"
       />
-      <Button size={"sm"} type={"submit"} btnType={"primary"}>
+      <Button size={"sm"} type={"submit"} btnType={"primary"} disabled={isPending}>
         Submit
       </Button>
+      {isPending ? 'Confirming...' : 'Issue'}
+      {hash && <div>Transaction Hash: {hash}</div>}
     </form>
   );
 };

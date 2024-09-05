@@ -20,8 +20,7 @@ module.exports = {
     hardhat: {
       accounts: {
         mnemonic: SEED_PHRASE,
-      },
-      chainId: 1337,
+      }
     }
   }
 };

@@ -1,5 +1,6 @@
 import { createWeb3Modal } from "@web3modal/wagmi/react";
 import { WagmiProvider, createConfig, http } from "wagmi";
+import { injected, metaMask, safe, walletConnect } from 'wagmi/connectors'
 import { arbitrum, arbitrumSepolia, hardhat } from "wagmi/chains";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren } from "react";
@@ -19,14 +20,18 @@ const metadata = {
 
 const config = createConfig({
   chains: [arbitrum, arbitrumSepolia, hardhat],
+  connectors: [
+    injected(),
+    walletConnect({ projectId }),
+    metaMask(),
+    safe(),
+  ],
   transports: {
     [arbitrum.id]: http(),
     [arbitrumSepolia.id]: http(),
-    [hardhat.id]: http(http://34.30.203.81:8545)
+    [hardhat.id]: http('http://34.30.203.81:8545'),
   },
 })
-
-
 
 createWeb3Modal({
   metadata,
