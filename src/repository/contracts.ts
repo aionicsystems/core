@@ -1,5 +1,3 @@
-import { Chain } from "viem";
-
 export function contractAddress(contract: string, chainName: string | undefined) {
     if (contract == "window") {
         switch (chainName) {

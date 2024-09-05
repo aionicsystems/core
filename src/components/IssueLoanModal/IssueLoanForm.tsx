@@ -11,13 +11,13 @@ export type IssueLoanFormProps = {
 };
 
 export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
-  const [collateral, setCollateral] = useState<string>("0.00 ETH");
-  const { data: hash, writeContract } = useWriteContract()
+  const [collateral, setCollateral] = useState<string>("");
+  const { data: hash, writeContractAsync } = useWriteContract();
   const { chain } = useAccount();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    const regex = /^\d+(\.\d{0,2})? ETH$/;
+    const regex = /^\d*\.?\d*$/;
     if (regex.test(value) || value === "") {
       setCollateral(value);
     }
@@ -25,10 +25,8 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-
     // Add error handling
-
-    writeContract({
+    writeContractAsync({
       address: contractAddress("window", chain?.name) as Address,
       abi,
       functionName: 'issue',
@@ -39,7 +37,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
 
   return (
     <form
-      onSubmit={submit}
+      onSubmit={() => submit}
       id={assetID}
       className={styles.issueLoanForm}
     >
@@ -51,7 +49,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
         className={styles.collateralInput}
         value={collateral}
         onChange={handleChange}
-        placeholder="0.00 ETH"
+        placeholder="0.00"
       />
       <Button size={"sm"} type={"submit"} btnType={"primary"}>
         Submit
