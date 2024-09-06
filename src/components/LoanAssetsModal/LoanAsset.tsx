@@ -6,12 +6,12 @@ import { formatRatio } from "../../utils/";
 
 export type LoanAssetProps = {
   item: AssetType;
-  selectLoan: (loan: AssetType) => void;
+  selectAsset: (loan: AssetType) => void;
 };
 
-export const LoanAsset: FC<LoanAssetProps> = ({ item, selectLoan }) => {
+export const LoanAsset: FC<LoanAssetProps> = ({ item, selectAsset }) => {
   return (
-    <div onClick={() => selectLoan(item)} className={styles.loanAssetItem}>
+    <div onClick={() => selectAsset(item)} className={styles.loanAssetItem}>
       <div>
         <p className={styles.loanAssetSymbol}>{item.symbol}</p>
         <p className={styles.loanAssetValue}>

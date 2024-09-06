@@ -18,7 +18,7 @@ import { REQUEST_ASSET_ENTITIES } from "../../repository/requestKeys.ts";
 export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [loanIssueModal, setLoanIssueModal] = useState<boolean>(false);
-  const [selectedLoan, setSelectedLoan] = useState<AssetType | undefined>(
+  const [selectedAsset, setSelectedAsset] = useState<AssetType | undefined>(
     undefined,
   );
   const [error, setError] = useState<boolean>(false);
@@ -46,8 +46,8 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
     setLoanIssueModal(!loanIssueModal);
   };
 
-  const selectLoan = (loan: AssetType) => {
-    setSelectedLoan(loan);
+  const selectAsset = (loan: AssetType) => {
+    setSelectedAsset(loan);
     toggleLoanIssue();
   };
 
@@ -91,7 +91,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
               <div className={modalStyles.loanAssetsList}>
                 {assets.map((asset) => (
                   <LoanAsset
-                    selectLoan={selectLoan}
+                    selectAsset={selectAsset}
                     key={asset.id}
                     item={asset}
                   />
@@ -105,7 +105,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
         <IssueLoanModal
           onClose={toggleLoanIssue}
           size={size}
-          selectedLoan={selectedLoan && selectedLoan.id}
+          selectedAsset={selectedAsset && selectedAsset.id}
           modalTitle={"Issue Loan"}
         />
       )}
