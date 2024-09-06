@@ -15,14 +15,14 @@ import { LoanAssetsModalFaq } from "../LoanAssetsModal/LoanAssetsModalFaq.tsx";
 import { REQUEST_ASSET_ENTITIES } from "../../repository/requestKeys.ts";
 
 export type IssueLoanModalProps = Modal & {
-  selectedLoan?: string;
+  selectedAsset?: string;
 };
 
 export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   modalTitle,
   onClose,
   size,
-  selectedLoan,
+  selectedAsset,
 }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
@@ -31,7 +31,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
       try {
         const result = await client.query({
           query: assetSingleEntity,
-          variables: { id: selectedLoan },
+          variables: { id: selectedAsset },
         });
         return result.data;
       } catch (error) {
@@ -39,7 +39,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
         throw error;
       }
     },
-    queryKey: [`${REQUEST_ASSET_ENTITIES}_${selectedLoan}`],
+    queryKey: [`${REQUEST_ASSET_ENTITIES}_${selectedAsset}`],
   });
 
   const toggleModalFaq = () => {
@@ -82,7 +82,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
             <IssueLoanModalFaq />
           ) : (
             <>
-              <IssueLoanForm loanID={selectedLoan} />
+              <IssueLoanForm assetID={selectedAsset} />
               <IssueAssetInfo issue={asset as AssetType} />
             </>
           )}

@@ -1913,9 +1913,14 @@ export const assetAbi = [
     inputs: [
       { name: 'name', internalType: 'string', type: 'string' },
       { name: 'symbol', internalType: 'string', type: 'string' },
-      { name: '_rate', internalType: 'uint32', type: 'uint32' },
+      { name: '_interestRate', internalType: 'uint32', type: 'uint32' },
+      { name: '_liquidationRatio', internalType: 'uint32', type: 'uint32' },
       { name: 'owner', internalType: 'address', type: 'address' },
-      { name: '_dataFeedAddress', internalType: 'address', type: 'address' },
+      {
+        name: '_assetDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
     ],
     stateMutability: 'nonpayable',
   },
@@ -2048,6 +2053,13 @@ export const assetAbi = [
   },
   {
     type: 'function',
+    inputs: [],
+    name: 'assetDataFeedAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
     inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
     name: 'balanceOf',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
@@ -2056,16 +2068,6 @@ export const assetAbi = [
   {
     type: 'function',
     inputs: [{ name: 'value', internalType: 'uint256', type: 'uint256' }],
-    name: 'burn',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'account', internalType: 'address', type: 'address' },
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-    ],
     name: 'burn',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -2090,14 +2092,14 @@ export const assetAbi = [
   {
     type: 'function',
     inputs: [],
-    name: 'getDataFeedAddress',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'interestRate',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
     stateMutability: 'view',
   },
   {
     type: 'function',
     inputs: [],
-    name: 'getRate',
+    name: 'liquidationRatio',
     outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
     stateMutability: 'view',
   },
@@ -2135,7 +2137,11 @@ export const assetAbi = [
   {
     type: 'function',
     inputs: [
-      { name: '_dataFeedAddress', internalType: 'address', type: 'address' },
+      {
+        name: '_assetDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
     ],
     name: 'setDataFeedAddress',
     outputs: [],
@@ -2143,7 +2149,16 @@ export const assetAbi = [
   },
   {
     type: 'function',
-    inputs: [{ name: '_rate', internalType: 'uint32', type: 'uint32' }],
+    inputs: [
+      { name: '_liquidationRatio', internalType: 'uint32', type: 'uint32' },
+    ],
+    name: 'setLiquidationRatio',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '_interestRate', internalType: 'uint32', type: 'uint32' }],
     name: 'setRate',
     outputs: [],
     stateMutability: 'nonpayable',
@@ -2189,422 +2204,6 @@ export const assetAbi = [
     name: 'transferOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
-  },
-] as const
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Window
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export const windowAbi = [
-  {
-    type: 'constructor',
-    inputs: [
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: '_precision', internalType: 'uint8', type: 'uint8' },
-      { name: 'borrowingRatio', internalType: 'uint32', type: 'uint32' },
-      { name: 'liquidationRatio', internalType: 'uint32', type: 'uint32' },
-      { name: 'daoFee', internalType: 'uint32', type: 'uint32' },
-      { name: 'liquidatorFee', internalType: 'uint32', type: 'uint32' },
-      { name: 'collectorFee', internalType: 'uint32', type: 'uint32' },
-      {
-        name: '_etherDataFeedAddress',
-        internalType: 'address',
-        type: 'address',
-      },
-    ],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
-    name: 'OwnableInvalidOwner',
-  },
-  {
-    type: 'error',
-    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
-    name: 'OwnableUnauthorizedAccount',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'token',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-      { name: 'name', internalType: 'string', type: 'string', indexed: false },
-      {
-        name: 'symbol',
-        internalType: 'string',
-        type: 'string',
-        indexed: false,
-      },
-      {
-        name: 'dataFeedAddress',
-        internalType: 'address',
-        type: 'address',
-        indexed: false,
-      },
-    ],
-    name: 'AssetEntity',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      { name: 'id', internalType: 'uint256', type: 'uint256', indexed: true },
-      {
-        name: 'owner',
-        internalType: 'address',
-        type: 'address',
-        indexed: false,
-      },
-      {
-        name: 'collateral',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'asset',
-        internalType: 'address',
-        type: 'address',
-        indexed: false,
-      },
-      {
-        name: 'liability',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'dataFeed',
-        internalType: 'address',
-        type: 'address',
-        indexed: false,
-      },
-      {
-        name: 'rate',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-      {
-        name: 'time',
-        internalType: 'uint256',
-        type: 'uint256',
-        indexed: false,
-      },
-    ],
-    name: 'LoanEntity',
-  },
-  {
-    type: 'event',
-    anonymous: false,
-    inputs: [
-      {
-        name: 'previousOwner',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-      {
-        name: 'newOwner',
-        internalType: 'address',
-        type: 'address',
-        indexed: true,
-      },
-    ],
-    name: 'OwnershipTransferred',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_loan',
-        internalType: 'struct Window.Loan',
-        type: 'tuple',
-        components: [
-          { name: 'id', internalType: 'uint256', type: 'uint256' },
-          { name: 'owner', internalType: 'address', type: 'address' },
-          { name: 'collateral', internalType: 'uint256', type: 'uint256' },
-          { name: 'asset', internalType: 'address', type: 'address' },
-          { name: 'liability', internalType: 'uint256', type: 'uint256' },
-          { name: 'dataFeed', internalType: 'address', type: 'address' },
-          { name: 'rate', internalType: 'uint256', type: 'uint256' },
-          { name: 'time', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-    ],
-    name: 'accruedInterest',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'assetDataFeedAddress',
-        internalType: 'address',
-        type: 'address',
-      },
-      { name: 'name', internalType: 'string', type: 'string' },
-      { name: 'symbol', internalType: 'string', type: 'string' },
-      { name: 'rate', internalType: 'uint32', type: 'uint32' },
-    ],
-    name: 'approveAsset',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'dataFeed',
-        internalType: 'contract AggregatorV3Interface',
-        type: 'address',
-      },
-    ],
-    name: 'assetToUsd',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'address', type: 'address' }],
-    name: 'assets',
-    outputs: [{ name: '', internalType: 'contract Asset', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_loan',
-        internalType: 'struct Window.Loan',
-        type: 'tuple',
-        components: [
-          { name: 'id', internalType: 'uint256', type: 'uint256' },
-          { name: 'owner', internalType: 'address', type: 'address' },
-          { name: 'collateral', internalType: 'uint256', type: 'uint256' },
-          { name: 'asset', internalType: 'address', type: 'address' },
-          { name: 'liability', internalType: 'uint256', type: 'uint256' },
-          { name: 'dataFeed', internalType: 'address', type: 'address' },
-          { name: 'rate', internalType: 'uint256', type: 'uint256' },
-          { name: 'time', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-    ],
-    name: 'collateralizationRatio',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_loanId', internalType: 'uint256', type: 'uint256' }],
-    name: 'collect',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'dataFeed',
-        internalType: 'contract AggregatorV3Interface',
-        type: 'address',
-      },
-    ],
-    name: 'dataFeedPrice',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_loanId', internalType: 'uint256', type: 'uint256' }],
-    name: 'deposit',
-    outputs: [],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: 'dataFeed',
-        internalType: 'contract AggregatorV3Interface',
-        type: 'address',
-      },
-    ],
-    name: 'getChainlinkDataFeedLatestAnswer',
-    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_uid', internalType: 'uint256', type: 'uint256' }],
-    name: 'getLoan',
-    outputs: [
-      {
-        name: '',
-        internalType: 'struct Window.Loan',
-        type: 'tuple',
-        components: [
-          { name: 'id', internalType: 'uint256', type: 'uint256' },
-          { name: 'owner', internalType: 'address', type: 'address' },
-          { name: 'collateral', internalType: 'uint256', type: 'uint256' },
-          { name: 'asset', internalType: 'address', type: 'address' },
-          { name: 'liability', internalType: 'uint256', type: 'uint256' },
-          { name: 'dataFeed', internalType: 'address', type: 'address' },
-          { name: 'rate', internalType: 'uint256', type: 'uint256' },
-          { name: 'time', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'assetAddress', internalType: 'address', type: 'address' },
-    ],
-    name: 'issue',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'payable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_loanId', internalType: 'uint256', type: 'uint256' },
-      { name: 'payment', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'liquidate',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    name: 'loan',
-    outputs: [
-      { name: 'id', internalType: 'uint256', type: 'uint256' },
-      { name: 'owner', internalType: 'address', type: 'address' },
-      { name: 'collateral', internalType: 'uint256', type: 'uint256' },
-      { name: 'asset', internalType: 'address', type: 'address' },
-      { name: 'liability', internalType: 'uint256', type: 'uint256' },
-      { name: 'dataFeed', internalType: 'address', type: 'address' },
-      { name: 'rate', internalType: 'uint256', type: 'uint256' },
-      { name: 'time', internalType: 'uint256', type: 'uint256' },
-    ],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'owner',
-    outputs: [{ name: '', internalType: 'address', type: 'address' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'param', internalType: 'bytes32', type: 'bytes32' },
-      { name: 'value', internalType: 'uint32', type: 'uint32' },
-    ],
-    name: 'paramSetter',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
-    name: 'params',
-    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: '_loanId', internalType: 'uint256', type: 'uint256' },
-      { name: 'payment', internalType: 'uint256', type: 'uint256' },
-    ],
-    name: 'payback',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_etherDataFeedAddress',
-        internalType: 'address',
-        type: 'address',
-      },
-    ],
-    name: 'setEtherDataFeed',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      { name: 'amount', internalType: 'uint256', type: 'uint256' },
-      {
-        name: 'dataFeed',
-        internalType: 'contract AggregatorV3Interface',
-        type: 'address',
-      },
-    ],
-    name: 'usdToAsset',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
-  },
-  {
-    type: 'function',
-    inputs: [{ name: '_loanId', internalType: 'uint256', type: 'uint256' }],
-    name: 'withdraw',
-    outputs: [],
-    stateMutability: 'nonpayable',
-  },
-  {
-    type: 'function',
-    inputs: [
-      {
-        name: '_loan',
-        internalType: 'struct Window.Loan',
-        type: 'tuple',
-        components: [
-          { name: 'id', internalType: 'uint256', type: 'uint256' },
-          { name: 'owner', internalType: 'address', type: 'address' },
-          { name: 'collateral', internalType: 'uint256', type: 'uint256' },
-          { name: 'asset', internalType: 'address', type: 'address' },
-          { name: 'liability', internalType: 'uint256', type: 'uint256' },
-          { name: 'dataFeed', internalType: 'address', type: 'address' },
-          { name: 'rate', internalType: 'uint256', type: 'uint256' },
-          { name: 'time', internalType: 'uint256', type: 'uint256' },
-        ],
-      },
-    ],
-    name: 'withdrawalAmount',
-    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
-    stateMutability: 'view',
   },
 ] as const
 
@@ -7359,6 +6958,118 @@ export const ierc20Abi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IERC20Burnable
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const ierc20BurnableAbi = [
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'spender',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Approval',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address', indexed: true },
+      { name: 'to', internalType: 'address', type: 'address', indexed: true },
+      {
+        name: 'value',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'Transfer',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'spender', internalType: 'address', type: 'address' },
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'spender', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'approve',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'balanceOf',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'account', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'burnFrom',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'totalSupply',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transfer',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'from', internalType: 'address', type: 'address' },
+      { name: 'to', internalType: 'address', type: 'address' },
+      { name: 'value', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'transferFrom',
+    outputs: [{ name: '', internalType: 'bool', type: 'bool' }],
+    stateMutability: 'nonpayable',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // IERC20Errors
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -8445,6 +8156,218 @@ export const iVotesAbi = [
 ] as const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Loan
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const loanAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: '_window', internalType: 'address', type: 'address' },
+      { name: '_asset', internalType: 'address', type: 'address' },
+      { name: '_liabilityAmount', internalType: 'uint256', type: 'uint256' },
+      { name: '_borrowingRatio', internalType: 'uint32', type: 'uint32' },
+      { name: '_liquidationRatio', internalType: 'uint32', type: 'uint32' },
+      { name: '_interestRate', internalType: 'uint32', type: 'uint32' },
+      {
+        name: '_assetDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      {
+        name: '_etherDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      { name: '_time', internalType: 'uint256', type: 'uint256' },
+      { name: '_precision', internalType: 'uint8', type: 'uint8' },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      { name: '', internalType: 'address', type: 'address', indexed: false },
+      { name: '', internalType: 'uint256', type: 'uint256', indexed: false },
+    ],
+    name: 'Received',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'asset',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'assetDataFeedAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'dataFeedAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'assetToUsd',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'borrowingRatio',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'collateralizationRatio',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'collect',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'dataFeedAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'dataFeedPrice',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'etherDataFeedAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'interestRate',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'lastCollection',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'liabilityAmount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'payment', internalType: 'uint256', type: 'uint256' }],
+    name: 'liquidate',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'liquidationRatio',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'payment', internalType: 'uint256', type: 'uint256' }],
+    name: 'payback',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      { name: 'dataFeedAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'usdToAsset',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'withdrawalAmount',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  { type: 'receive', stateMutability: 'payable' },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Math
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -9400,6 +9323,368 @@ export const votesAbi = [
     name: 'nonces',
     outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
     stateMutability: 'view',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Window
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const windowAbi = [
+  {
+    type: 'constructor',
+    inputs: [
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: '_precision', internalType: 'uint8', type: 'uint8' },
+      { name: 'borrowingRatio', internalType: 'uint32', type: 'uint32' },
+      { name: 'daoFee', internalType: 'uint32', type: 'uint32' },
+      { name: 'liquidatorFee', internalType: 'uint32', type: 'uint32' },
+      { name: 'collectorFee', internalType: 'uint32', type: 'uint32' },
+      {
+        name: '_etherDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'owner', internalType: 'address', type: 'address' }],
+    name: 'OwnableInvalidOwner',
+  },
+  {
+    type: 'error',
+    inputs: [{ name: 'account', internalType: 'address', type: 'address' }],
+    name: 'OwnableUnauthorizedAccount',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'token',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      { name: 'name', internalType: 'string', type: 'string', indexed: false },
+      {
+        name: 'symbol',
+        internalType: 'string',
+        type: 'string',
+        indexed: false,
+      },
+      {
+        name: 'dataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      { name: 'rate', internalType: 'uint32', type: 'uint32', indexed: false },
+      {
+        name: 'liquidationRatio',
+        internalType: 'uint32',
+        type: 'uint32',
+        indexed: false,
+      },
+    ],
+    name: 'AssetEntity',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'loanAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'owner',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'collateralAmount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'assetAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'liabilityAmount',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+      {
+        name: 'dataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+        indexed: false,
+      },
+      {
+        name: 'borrowingRatio',
+        internalType: 'uint32',
+        type: 'uint32',
+        indexed: false,
+      },
+      {
+        name: 'liquidationRatio',
+        internalType: 'uint32',
+        type: 'uint32',
+        indexed: false,
+      },
+      {
+        name: 'interestRate',
+        internalType: 'uint32',
+        type: 'uint32',
+        indexed: false,
+      },
+      {
+        name: 'lastCollection',
+        internalType: 'uint256',
+        type: 'uint256',
+        indexed: false,
+      },
+    ],
+    name: 'LoanEntity',
+  },
+  {
+    type: 'event',
+    anonymous: false,
+    inputs: [
+      {
+        name: 'previousOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+      {
+        name: 'newOwner',
+        internalType: 'address',
+        type: 'address',
+        indexed: true,
+      },
+    ],
+    name: 'OwnershipTransferred',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'assetDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+      { name: 'name', internalType: 'string', type: 'string' },
+      { name: 'symbol', internalType: 'string', type: 'string' },
+      { name: 'rate', internalType: 'uint32', type: 'uint32' },
+      { name: 'liquidationRatio', internalType: 'uint32', type: 'uint32' },
+    ],
+    name: 'approveAsset',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'dataFeed',
+        internalType: 'contract AggregatorV3Interface',
+        type: 'address',
+      },
+    ],
+    name: 'assetToUsd',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'assets',
+    outputs: [{ name: '', internalType: 'contract Asset', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'dataFeed',
+        internalType: 'contract AggregatorV3Interface',
+        type: 'address',
+      },
+    ],
+    name: 'dataFeedPrice',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'etherDataFeedAddress',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: 'dataFeed',
+        internalType: 'contract AggregatorV3Interface',
+        type: 'address',
+      },
+    ],
+    name: 'getChainlinkDataFeedLatestAnswer',
+    outputs: [{ name: '', internalType: 'int256', type: 'int256' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'param', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getParam',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'assetAddress', internalType: 'address', type: 'address' },
+    ],
+    name: 'issue',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'payable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'loanAddress', internalType: 'address', type: 'address' },
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'collateralAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'assetAddress', internalType: 'address', type: 'address' },
+      { name: 'liabilityAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'dataFeedAddress', internalType: 'address', type: 'address' },
+      { name: 'borrowingRatio', internalType: 'uint32', type: 'uint32' },
+      { name: 'liquidationRatio', internalType: 'uint32', type: 'uint32' },
+      { name: 'interestRate', internalType: 'uint32', type: 'uint32' },
+      { name: 'lastCollection', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'loanEntityEvent',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'address', type: 'address' }],
+    name: 'loans',
+    outputs: [{ name: '', internalType: 'contract Loan', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'owner',
+    outputs: [{ name: '', internalType: 'address', type: 'address' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'params',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'view',
+  },
+  {
+    type: 'function',
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      {
+        name: '_etherDataFeedAddress',
+        internalType: 'address',
+        type: 'address',
+      },
+    ],
+    name: 'setEtherDataFeed',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'param', internalType: 'bytes32', type: 'bytes32' },
+      { name: 'value', internalType: 'uint32', type: 'uint32' },
+    ],
+    name: 'setParam',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [{ name: 'newOwner', internalType: 'address', type: 'address' }],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'amount', internalType: 'uint256', type: 'uint256' },
+      {
+        name: 'dataFeed',
+        internalType: 'contract AggregatorV3Interface',
+        type: 'address',
+      },
+    ],
+    name: 'usdToAsset',
+    outputs: [{ name: '', internalType: 'uint256', type: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// WindowInterface
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+export const windowInterfaceAbi = [
+  {
+    type: 'function',
+    inputs: [{ name: '', internalType: 'bytes32', type: 'bytes32' }],
+    name: 'getParam',
+    outputs: [{ name: '', internalType: 'uint32', type: 'uint32' }],
+    stateMutability: 'nonpayable',
+  },
+  {
+    type: 'function',
+    inputs: [
+      { name: 'loanAddress', internalType: 'address', type: 'address' },
+      { name: 'owner', internalType: 'address', type: 'address' },
+      { name: 'collateralAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'assetAddress', internalType: 'address', type: 'address' },
+      { name: 'liabilityAmount', internalType: 'uint256', type: 'uint256' },
+      { name: 'dataFeedAddress', internalType: 'address', type: 'address' },
+      { name: 'borrowingRatio', internalType: 'uint32', type: 'uint32' },
+      { name: 'liquidationRatio', internalType: 'uint32', type: 'uint32' },
+      { name: 'interestRate', internalType: 'uint32', type: 'uint32' },
+      { name: 'lastCollection', internalType: 'uint256', type: 'uint256' },
+    ],
+    name: 'loanEntityEvent',
+    outputs: [],
+    stateMutability: 'nonpayable',
   },
 ] as const
 
@@ -11014,6 +11299,15 @@ export const useReadAssetAllowance = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"assetDataFeedAddress"`
+ */
+export const useReadAssetAssetDataFeedAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: assetAbi,
+    functionName: 'assetDataFeedAddress',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"balanceOf"`
  */
 export const useReadAssetBalanceOf = /*#__PURE__*/ createUseReadContract({
@@ -11030,21 +11324,19 @@ export const useReadAssetDecimals = /*#__PURE__*/ createUseReadContract({
 })
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getDataFeedAddress"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"interestRate"`
  */
-export const useReadAssetGetDataFeedAddress =
-  /*#__PURE__*/ createUseReadContract({
-    abi: assetAbi,
-    functionName: 'getDataFeedAddress',
-  })
+export const useReadAssetInterestRate = /*#__PURE__*/ createUseReadContract({
+  abi: assetAbi,
+  functionName: 'interestRate',
+})
 
 /**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getRate"`
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"liquidationRatio"`
  */
-export const useReadAssetGetRate = /*#__PURE__*/ createUseReadContract({
-  abi: assetAbi,
-  functionName: 'getRate',
-})
+export const useReadAssetLiquidationRatio = /*#__PURE__*/ createUseReadContract(
+  { abi: assetAbi, functionName: 'liquidationRatio' },
+)
 
 /**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"name"`
@@ -11133,6 +11425,15 @@ export const useWriteAssetSetDataFeedAddress =
   /*#__PURE__*/ createUseWriteContract({
     abi: assetAbi,
     functionName: 'setDataFeedAddress',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setLiquidationRatio"`
+ */
+export const useWriteAssetSetLiquidationRatio =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: assetAbi,
+    functionName: 'setLiquidationRatio',
   })
 
 /**
@@ -11225,6 +11526,15 @@ export const useSimulateAssetSetDataFeedAddress =
   })
 
 /**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setLiquidationRatio"`
+ */
+export const useSimulateAssetSetLiquidationRatio =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: assetAbi,
+    functionName: 'setLiquidationRatio',
+  })
+
+/**
  * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setRate"`
  */
 export const useSimulateAssetSetRate = /*#__PURE__*/ createUseSimulateContract({
@@ -11289,354 +11599,6 @@ export const useWatchAssetTransferEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: assetAbi,
     eventName: 'Transfer',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__
- */
-export const useReadWindow = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"accruedInterest"`
- */
-export const useReadWindowAccruedInterest =
-  /*#__PURE__*/ createUseReadContract({
-    abi: windowAbi,
-    functionName: 'accruedInterest',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assetToUsd"`
- */
-export const useReadWindowAssetToUsd = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'assetToUsd',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assets"`
- */
-export const useReadWindowAssets = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'assets',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collateralizationRatio"`
- */
-export const useReadWindowCollateralizationRatio =
-  /*#__PURE__*/ createUseReadContract({
-    abi: windowAbi,
-    functionName: 'collateralizationRatio',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"dataFeedPrice"`
- */
-export const useReadWindowDataFeedPrice =
-  /*#__PURE__*/ createUseReadContract({
-    abi: windowAbi,
-    functionName: 'dataFeedPrice',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
- */
-export const useReadWindowGetChainlinkDataFeedLatestAnswer =
-  /*#__PURE__*/ createUseReadContract({
-    abi: windowAbi,
-    functionName: 'getChainlinkDataFeedLatestAnswer',
-  })
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getLoan"`
- */
-export const useReadWindowGetLoan = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'getLoan',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loan"`
- */
-export const useReadWindowLoan = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'loan',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"owner"`
- */
-export const useReadWindowOwner = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"params"`
- */
-export const useReadWindowParams = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'params',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"usdToAsset"`
- */
-export const useReadWindowUsdToAsset = /*#__PURE__*/ createUseReadContract({
-  abi: windowAbi,
-  functionName: 'usdToAsset',
-})
-
-/**
- * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdrawalAmount"`
- */
-export const useReadWindowWithdrawalAmount =
-  /*#__PURE__*/ createUseReadContract({
-    abi: windowAbi,
-    functionName: 'withdrawalAmount',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__
- */
-export const useWriteWindow = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
- */
-export const useWriteWindowApproveAsset =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: windowAbi,
-    functionName: 'approveAsset',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
- */
-export const useWriteWindowCollect = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-  functionName: 'collect',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
- */
-export const useWriteWindowDeposit = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
- */
-export const useWriteWindowIssue = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-  functionName: 'issue',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
- */
-export const useWriteWindowLiquidate = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-  functionName: 'liquidate',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
- */
-export const useWriteWindowParamSetter =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: windowAbi,
-    functionName: 'paramSetter',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
- */
-export const useWriteWindowPayback = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-  functionName: 'payback',
-})
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const useWriteWindowRenounceOwnership =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: windowAbi,
-    functionName: 'renounceOwnership',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
- */
-export const useWriteWindowSetEtherDataFeed =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: windowAbi,
-    functionName: 'setEtherDataFeed',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const useWriteWindowTransferOwnership =
-  /*#__PURE__*/ createUseWriteContract({
-    abi: windowAbi,
-    functionName: 'transferOwnership',
-  })
-
-/**
- * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
- */
-export const useWriteWindowWithdraw = /*#__PURE__*/ createUseWriteContract({
-  abi: windowAbi,
-  functionName: 'withdraw',
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__
- */
-export const useSimulateWindow = /*#__PURE__*/ createUseSimulateContract({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
- */
-export const useSimulateWindowApproveAsset =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'approveAsset',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
- */
-export const useSimulateWindowCollect =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'collect',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
- */
-export const useSimulateWindowDeposit =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'deposit',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
- */
-export const useSimulateWindowIssue =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'issue',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
- */
-export const useSimulateWindowLiquidate =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'liquidate',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
- */
-export const useSimulateWindowParamSetter =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'paramSetter',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
- */
-export const useSimulateWindowPayback =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'payback',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const useSimulateWindowRenounceOwnership =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'renounceOwnership',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
- */
-export const useSimulateWindowSetEtherDataFeed =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'setEtherDataFeed',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const useSimulateWindowTransferOwnership =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'transferOwnership',
-  })
-
-/**
- * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
- */
-export const useSimulateWindowWithdraw =
-  /*#__PURE__*/ createUseSimulateContract({
-    abi: windowAbi,
-    functionName: 'withdraw',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__
- */
-export const useWatchWindowEvent = /*#__PURE__*/ createUseWatchContractEvent(
-  { abi: windowAbi },
-)
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"AssetEntity"`
- */
-export const useWatchWindowAssetEntityEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: windowAbi,
-    eventName: 'AssetEntity',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"LoanEntity"`
- */
-export const useWatchWindowLoanEntityEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: windowAbi,
-    eventName: 'LoanEntity',
-  })
-
-/**
- * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"OwnershipTransferred"`
- */
-export const useWatchWindowOwnershipTransferredEvent =
-  /*#__PURE__*/ createUseWatchContractEvent({
-    abi: windowAbi,
-    eventName: 'OwnershipTransferred',
   })
 
 /**
@@ -15700,6 +15662,149 @@ export const useWatchIerc20TransferEvent =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const useReadIerc20Burnable = /*#__PURE__*/ createUseReadContract({
+  abi: ierc20BurnableAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"allowance"`
+ */
+export const useReadIerc20BurnableAllowance =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'allowance',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const useReadIerc20BurnableBalanceOf =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'balanceOf',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const useReadIerc20BurnableTotalSupply =
+  /*#__PURE__*/ createUseReadContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'totalSupply',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const useWriteIerc20Burnable = /*#__PURE__*/ createUseWriteContract({
+  abi: ierc20BurnableAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"approve"`
+ */
+export const useWriteIerc20BurnableApprove =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"burnFrom"`
+ */
+export const useWriteIerc20BurnableBurnFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'burnFrom',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useWriteIerc20BurnableTransfer =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useWriteIerc20BurnableTransferFrom =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const useSimulateIerc20Burnable =
+  /*#__PURE__*/ createUseSimulateContract({ abi: ierc20BurnableAbi })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"approve"`
+ */
+export const useSimulateIerc20BurnableApprove =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"burnFrom"`
+ */
+export const useSimulateIerc20BurnableBurnFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'burnFrom',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transfer"`
+ */
+export const useSimulateIerc20BurnableTransfer =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const useSimulateIerc20BurnableTransferFrom =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const useWatchIerc20BurnableEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({ abi: ierc20BurnableAbi })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `eventName` set to `"Approval"`
+ */
+export const useWatchIerc20BurnableApprovalEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: ierc20BurnableAbi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const useWatchIerc20BurnableTransferEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: ierc20BurnableAbi,
+    eventName: 'Transfer',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link ierc20MetadataAbi}__
  */
 export const useReadIerc20Metadata = /*#__PURE__*/ createUseReadContract({
@@ -16635,6 +16740,248 @@ export const useWatchIVotesDelegateVotesChangedEvent =
   })
 
 /**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__
+ */
+export const useReadLoan = /*#__PURE__*/ createUseReadContract({ abi: loanAbi })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"asset"`
+ */
+export const useReadLoanAsset = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'asset',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"assetDataFeedAddress"`
+ */
+export const useReadLoanAssetDataFeedAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: loanAbi,
+    functionName: 'assetDataFeedAddress',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"assetToUsd"`
+ */
+export const useReadLoanAssetToUsd = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'assetToUsd',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"borrowingRatio"`
+ */
+export const useReadLoanBorrowingRatio = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'borrowingRatio',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"collateralizationRatio"`
+ */
+export const useReadLoanCollateralizationRatio =
+  /*#__PURE__*/ createUseReadContract({
+    abi: loanAbi,
+    functionName: 'collateralizationRatio',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"dataFeedPrice"`
+ */
+export const useReadLoanDataFeedPrice = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'dataFeedPrice',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"etherDataFeedAddress"`
+ */
+export const useReadLoanEtherDataFeedAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: loanAbi,
+    functionName: 'etherDataFeedAddress',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"interestRate"`
+ */
+export const useReadLoanInterestRate = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'interestRate',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"lastCollection"`
+ */
+export const useReadLoanLastCollection = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'lastCollection',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liabilityAmount"`
+ */
+export const useReadLoanLiabilityAmount = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'liabilityAmount',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liquidationRatio"`
+ */
+export const useReadLoanLiquidationRatio = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'liquidationRatio',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"owner"`
+ */
+export const useReadLoanOwner = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"usdToAsset"`
+ */
+export const useReadLoanUsdToAsset = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'usdToAsset',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"withdrawalAmount"`
+ */
+export const useReadLoanWithdrawalAmount = /*#__PURE__*/ createUseReadContract({
+  abi: loanAbi,
+  functionName: 'withdrawalAmount',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link loanAbi}__
+ */
+export const useWriteLoan = /*#__PURE__*/ createUseWriteContract({
+  abi: loanAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"collect"`
+ */
+export const useWriteLoanCollect = /*#__PURE__*/ createUseWriteContract({
+  abi: loanAbi,
+  functionName: 'collect',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liquidate"`
+ */
+export const useWriteLoanLiquidate = /*#__PURE__*/ createUseWriteContract({
+  abi: loanAbi,
+  functionName: 'liquidate',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"payback"`
+ */
+export const useWriteLoanPayback = /*#__PURE__*/ createUseWriteContract({
+  abi: loanAbi,
+  functionName: 'payback',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useWriteLoanRenounceOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: loanAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useWriteLoanTransferOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: loanAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link loanAbi}__
+ */
+export const useSimulateLoan = /*#__PURE__*/ createUseSimulateContract({
+  abi: loanAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"collect"`
+ */
+export const useSimulateLoanCollect = /*#__PURE__*/ createUseSimulateContract({
+  abi: loanAbi,
+  functionName: 'collect',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liquidate"`
+ */
+export const useSimulateLoanLiquidate = /*#__PURE__*/ createUseSimulateContract(
+  { abi: loanAbi, functionName: 'liquidate' },
+)
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"payback"`
+ */
+export const useSimulateLoanPayback = /*#__PURE__*/ createUseSimulateContract({
+  abi: loanAbi,
+  functionName: 'payback',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useSimulateLoanRenounceOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: loanAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useSimulateLoanTransferOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: loanAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link loanAbi}__
+ */
+export const useWatchLoanEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: loanAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link loanAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const useWatchLoanOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: loanAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link loanAbi}__ and `eventName` set to `"Received"`
+ */
+export const useWatchLoanReceivedEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: loanAbi,
+    eventName: 'Received',
+  })
+
+/**
  * Wraps __{@link useReadContract}__ with `abi` set to __{@link mockAggregatorV3InterfaceAbi}__
  */
 export const useReadMockAggregatorV3Interface =
@@ -17482,6 +17829,314 @@ export const useWatchVotesEip712DomainChangedEvent =
   /*#__PURE__*/ createUseWatchContractEvent({
     abi: votesAbi,
     eventName: 'EIP712DomainChanged',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__
+ */
+export const useReadWindow = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assetToUsd"`
+ */
+export const useReadWindowAssetToUsd = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'assetToUsd',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assets"`
+ */
+export const useReadWindowAssets = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'assets',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"dataFeedPrice"`
+ */
+export const useReadWindowDataFeedPrice = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'dataFeedPrice',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"etherDataFeedAddress"`
+ */
+export const useReadWindowEtherDataFeedAddress =
+  /*#__PURE__*/ createUseReadContract({
+    abi: windowAbi,
+    functionName: 'etherDataFeedAddress',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
+ */
+export const useReadWindowGetChainlinkDataFeedLatestAnswer =
+  /*#__PURE__*/ createUseReadContract({
+    abi: windowAbi,
+    functionName: 'getChainlinkDataFeedLatestAnswer',
+  })
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getParam"`
+ */
+export const useReadWindowGetParam = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'getParam',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loans"`
+ */
+export const useReadWindowLoans = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'loans',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"owner"`
+ */
+export const useReadWindowOwner = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"params"`
+ */
+export const useReadWindowParams = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'params',
+})
+
+/**
+ * Wraps __{@link useReadContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"usdToAsset"`
+ */
+export const useReadWindowUsdToAsset = /*#__PURE__*/ createUseReadContract({
+  abi: windowAbi,
+  functionName: 'usdToAsset',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__
+ */
+export const useWriteWindow = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
+ */
+export const useWriteWindowApproveAsset = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
+  functionName: 'approveAsset',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
+ */
+export const useWriteWindowIssue = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
+  functionName: 'issue',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const useWriteWindowLoanEntityEvent =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: windowAbi,
+    functionName: 'loanEntityEvent',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useWriteWindowRenounceOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: windowAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const useWriteWindowSetEtherDataFeed =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: windowAbi,
+    functionName: 'setEtherDataFeed',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setParam"`
+ */
+export const useWriteWindowSetParam = /*#__PURE__*/ createUseWriteContract({
+  abi: windowAbi,
+  functionName: 'setParam',
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useWriteWindowTransferOwnership =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: windowAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__
+ */
+export const useSimulateWindow = /*#__PURE__*/ createUseSimulateContract({
+  abi: windowAbi,
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
+ */
+export const useSimulateWindowApproveAsset =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowAbi,
+    functionName: 'approveAsset',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
+ */
+export const useSimulateWindowIssue = /*#__PURE__*/ createUseSimulateContract({
+  abi: windowAbi,
+  functionName: 'issue',
+})
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const useSimulateWindowLoanEntityEvent =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowAbi,
+    functionName: 'loanEntityEvent',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const useSimulateWindowRenounceOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const useSimulateWindowSetEtherDataFeed =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowAbi,
+    functionName: 'setEtherDataFeed',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setParam"`
+ */
+export const useSimulateWindowSetParam =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowAbi,
+    functionName: 'setParam',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const useSimulateWindowTransferOwnership =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__
+ */
+export const useWatchWindowEvent = /*#__PURE__*/ createUseWatchContractEvent({
+  abi: windowAbi,
+})
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"AssetEntity"`
+ */
+export const useWatchWindowAssetEntityEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: windowAbi,
+    eventName: 'AssetEntity',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"LoanEntity"`
+ */
+export const useWatchWindowLoanEntityEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: windowAbi,
+    eventName: 'LoanEntity',
+  })
+
+/**
+ * Wraps __{@link useWatchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const useWatchWindowOwnershipTransferredEvent =
+  /*#__PURE__*/ createUseWatchContractEvent({
+    abi: windowAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowInterfaceAbi}__
+ */
+export const useWriteWindowInterface = /*#__PURE__*/ createUseWriteContract({
+  abi: windowInterfaceAbi,
+})
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"getParam"`
+ */
+export const useWriteWindowInterfaceGetParam =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: windowInterfaceAbi,
+    functionName: 'getParam',
+  })
+
+/**
+ * Wraps __{@link useWriteContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const useWriteWindowInterfaceLoanEntityEvent =
+  /*#__PURE__*/ createUseWriteContract({
+    abi: windowInterfaceAbi,
+    functionName: 'loanEntityEvent',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowInterfaceAbi}__
+ */
+export const useSimulateWindowInterface =
+  /*#__PURE__*/ createUseSimulateContract({ abi: windowInterfaceAbi })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"getParam"`
+ */
+export const useSimulateWindowInterfaceGetParam =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowInterfaceAbi,
+    functionName: 'getParam',
+  })
+
+/**
+ * Wraps __{@link useSimulateContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const useSimulateWindowInterfaceLoanEntityEvent =
+  /*#__PURE__*/ createUseSimulateContract({
+    abi: windowInterfaceAbi,
+    functionName: 'loanEntityEvent',
   })
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19052,6 +19707,14 @@ export const readAssetAllowance = /*#__PURE__*/ createReadContract({
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"assetDataFeedAddress"`
+ */
+export const readAssetAssetDataFeedAddress = /*#__PURE__*/ createReadContract({
+  abi: assetAbi,
+  functionName: 'assetDataFeedAddress',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"balanceOf"`
  */
 export const readAssetBalanceOf = /*#__PURE__*/ createReadContract({
@@ -19068,19 +19731,19 @@ export const readAssetDecimals = /*#__PURE__*/ createReadContract({
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getDataFeedAddress"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"interestRate"`
  */
-export const readAssetGetDataFeedAddress = /*#__PURE__*/ createReadContract({
+export const readAssetInterestRate = /*#__PURE__*/ createReadContract({
   abi: assetAbi,
-  functionName: 'getDataFeedAddress',
+  functionName: 'interestRate',
 })
 
 /**
- * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"getRate"`
+ * Wraps __{@link readContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"liquidationRatio"`
  */
-export const readAssetGetRate = /*#__PURE__*/ createReadContract({
+export const readAssetLiquidationRatio = /*#__PURE__*/ createReadContract({
   abi: assetAbi,
-  functionName: 'getRate',
+  functionName: 'liquidationRatio',
 })
 
 /**
@@ -19166,6 +19829,14 @@ export const writeAssetRenounceOwnership = /*#__PURE__*/ createWriteContract({
 export const writeAssetSetDataFeedAddress = /*#__PURE__*/ createWriteContract({
   abi: assetAbi,
   functionName: 'setDataFeedAddress',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setLiquidationRatio"`
+ */
+export const writeAssetSetLiquidationRatio = /*#__PURE__*/ createWriteContract({
+  abi: assetAbi,
+  functionName: 'setLiquidationRatio',
 })
 
 /**
@@ -19258,6 +19929,15 @@ export const simulateAssetSetDataFeedAddress =
   })
 
 /**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setLiquidationRatio"`
+ */
+export const simulateAssetSetLiquidationRatio =
+  /*#__PURE__*/ createSimulateContract({
+    abi: assetAbi,
+    functionName: 'setLiquidationRatio',
+  })
+
+/**
  * Wraps __{@link simulateContract}__ with `abi` set to __{@link assetAbi}__ and `functionName` set to `"setRate"`
  */
 export const simulateAssetSetRate = /*#__PURE__*/ createSimulateContract({
@@ -19321,341 +20001,6 @@ export const watchAssetTransferEvent = /*#__PURE__*/ createWatchContractEvent({
   abi: assetAbi,
   eventName: 'Transfer',
 })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__
- */
-export const readWindow = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"accruedInterest"`
- */
-export const readWindowAccruedInterest = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'accruedInterest',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assetToUsd"`
- */
-export const readWindowAssetToUsd = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'assetToUsd',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assets"`
- */
-export const readWindowAssets = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'assets',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collateralizationRatio"`
- */
-export const readWindowCollateralizationRatio =
-  /*#__PURE__*/ createReadContract({
-    abi: windowAbi,
-    functionName: 'collateralizationRatio',
-  })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"dataFeedPrice"`
- */
-export const readWindowDataFeedPrice = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'dataFeedPrice',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
- */
-export const readWindowGetChainlinkDataFeedLatestAnswer =
-  /*#__PURE__*/ createReadContract({
-    abi: windowAbi,
-    functionName: 'getChainlinkDataFeedLatestAnswer',
-  })
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getLoan"`
- */
-export const readWindowGetLoan = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'getLoan',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loan"`
- */
-export const readWindowLoan = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'loan',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"owner"`
- */
-export const readWindowOwner = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'owner',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"params"`
- */
-export const readWindowParams = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'params',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"usdToAsset"`
- */
-export const readWindowUsdToAsset = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'usdToAsset',
-})
-
-/**
- * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdrawalAmount"`
- */
-export const readWindowWithdrawalAmount = /*#__PURE__*/ createReadContract({
-  abi: windowAbi,
-  functionName: 'withdrawalAmount',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__
- */
-export const writeWindow = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
- */
-export const writeWindowApproveAsset = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'approveAsset',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
- */
-export const writeWindowCollect = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'collect',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
- */
-export const writeWindowDeposit = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
- */
-export const writeWindowIssue = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'issue',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
- */
-export const writeWindowLiquidate = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'liquidate',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
- */
-export const writeWindowParamSetter = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'paramSetter',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
- */
-export const writeWindowPayback = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'payback',
-})
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const writeWindowRenounceOwnership =
-  /*#__PURE__*/ createWriteContract({
-    abi: windowAbi,
-    functionName: 'renounceOwnership',
-  })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
- */
-export const writeWindowSetEtherDataFeed = /*#__PURE__*/ createWriteContract(
-  { abi: windowAbi, functionName: 'setEtherDataFeed' },
-)
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const writeWindowTransferOwnership =
-  /*#__PURE__*/ createWriteContract({
-    abi: windowAbi,
-    functionName: 'transferOwnership',
-  })
-
-/**
- * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
- */
-export const writeWindowWithdraw = /*#__PURE__*/ createWriteContract({
-  abi: windowAbi,
-  functionName: 'withdraw',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__
- */
-export const simulateWindow = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
- */
-export const simulateWindowApproveAsset =
-  /*#__PURE__*/ createSimulateContract({
-    abi: windowAbi,
-    functionName: 'approveAsset',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"collect"`
- */
-export const simulateWindowCollect = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-  functionName: 'collect',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"deposit"`
- */
-export const simulateWindowDeposit = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-  functionName: 'deposit',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
- */
-export const simulateWindowIssue = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-  functionName: 'issue',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"liquidate"`
- */
-export const simulateWindowLiquidate = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-  functionName: 'liquidate',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"paramSetter"`
- */
-export const simulateWindowParamSetter =
-  /*#__PURE__*/ createSimulateContract({
-    abi: windowAbi,
-    functionName: 'paramSetter',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"payback"`
- */
-export const simulateWindowPayback = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-  functionName: 'payback',
-})
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
- */
-export const simulateWindowRenounceOwnership =
-  /*#__PURE__*/ createSimulateContract({
-    abi: windowAbi,
-    functionName: 'renounceOwnership',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
- */
-export const simulateWindowSetEtherDataFeed =
-  /*#__PURE__*/ createSimulateContract({
-    abi: windowAbi,
-    functionName: 'setEtherDataFeed',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
- */
-export const simulateWindowTransferOwnership =
-  /*#__PURE__*/ createSimulateContract({
-    abi: windowAbi,
-    functionName: 'transferOwnership',
-  })
-
-/**
- * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"withdraw"`
- */
-export const simulateWindowWithdraw = /*#__PURE__*/ createSimulateContract({
-  abi: windowAbi,
-  functionName: 'withdraw',
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__
- */
-export const watchWindowEvent = /*#__PURE__*/ createWatchContractEvent({
-  abi: windowAbi,
-})
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"AssetEntity"`
- */
-export const watchWindowAssetEntityEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: windowAbi,
-    eventName: 'AssetEntity',
-  })
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"LoanEntity"`
- */
-export const watchWindowLoanEntityEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: windowAbi,
-    eventName: 'LoanEntity',
-  })
-
-/**
- * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"OwnershipTransferred"`
- */
-export const watchWindowOwnershipTransferredEvent =
-  /*#__PURE__*/ createWatchContractEvent({
-    abi: windowAbi,
-    eventName: 'OwnershipTransferred',
-  })
 
 /**
  * Wraps __{@link readContract}__ with `abi` set to __{@link eip712Abi}__
@@ -23650,6 +23995,145 @@ export const watchIerc20TransferEvent = /*#__PURE__*/ createWatchContractEvent({
 })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const readIerc20Burnable = /*#__PURE__*/ createReadContract({
+  abi: ierc20BurnableAbi,
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"allowance"`
+ */
+export const readIerc20BurnableAllowance = /*#__PURE__*/ createReadContract({
+  abi: ierc20BurnableAbi,
+  functionName: 'allowance',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"balanceOf"`
+ */
+export const readIerc20BurnableBalanceOf = /*#__PURE__*/ createReadContract({
+  abi: ierc20BurnableAbi,
+  functionName: 'balanceOf',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"totalSupply"`
+ */
+export const readIerc20BurnableTotalSupply = /*#__PURE__*/ createReadContract({
+  abi: ierc20BurnableAbi,
+  functionName: 'totalSupply',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const writeIerc20Burnable = /*#__PURE__*/ createWriteContract({
+  abi: ierc20BurnableAbi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"approve"`
+ */
+export const writeIerc20BurnableApprove = /*#__PURE__*/ createWriteContract({
+  abi: ierc20BurnableAbi,
+  functionName: 'approve',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"burnFrom"`
+ */
+export const writeIerc20BurnableBurnFrom = /*#__PURE__*/ createWriteContract({
+  abi: ierc20BurnableAbi,
+  functionName: 'burnFrom',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transfer"`
+ */
+export const writeIerc20BurnableTransfer = /*#__PURE__*/ createWriteContract({
+  abi: ierc20BurnableAbi,
+  functionName: 'transfer',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const writeIerc20BurnableTransferFrom =
+  /*#__PURE__*/ createWriteContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const simulateIerc20Burnable = /*#__PURE__*/ createSimulateContract({
+  abi: ierc20BurnableAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"approve"`
+ */
+export const simulateIerc20BurnableApprove =
+  /*#__PURE__*/ createSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'approve',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"burnFrom"`
+ */
+export const simulateIerc20BurnableBurnFrom =
+  /*#__PURE__*/ createSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'burnFrom',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transfer"`
+ */
+export const simulateIerc20BurnableTransfer =
+  /*#__PURE__*/ createSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transfer',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `functionName` set to `"transferFrom"`
+ */
+export const simulateIerc20BurnableTransferFrom =
+  /*#__PURE__*/ createSimulateContract({
+    abi: ierc20BurnableAbi,
+    functionName: 'transferFrom',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link ierc20BurnableAbi}__
+ */
+export const watchIerc20BurnableEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: ierc20BurnableAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `eventName` set to `"Approval"`
+ */
+export const watchIerc20BurnableApprovalEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: ierc20BurnableAbi,
+    eventName: 'Approval',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link ierc20BurnableAbi}__ and `eventName` set to `"Transfer"`
+ */
+export const watchIerc20BurnableTransferEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: ierc20BurnableAbi,
+    eventName: 'Transfer',
+  })
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link ierc20MetadataAbi}__
  */
 export const readIerc20Metadata = /*#__PURE__*/ createReadContract({
@@ -24559,6 +25043,241 @@ export const watchIVotesDelegateVotesChangedEvent =
   })
 
 /**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__
+ */
+export const readLoan = /*#__PURE__*/ createReadContract({ abi: loanAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"asset"`
+ */
+export const readLoanAsset = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'asset',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"assetDataFeedAddress"`
+ */
+export const readLoanAssetDataFeedAddress = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'assetDataFeedAddress',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"assetToUsd"`
+ */
+export const readLoanAssetToUsd = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'assetToUsd',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"borrowingRatio"`
+ */
+export const readLoanBorrowingRatio = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'borrowingRatio',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"collateralizationRatio"`
+ */
+export const readLoanCollateralizationRatio = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'collateralizationRatio',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"dataFeedPrice"`
+ */
+export const readLoanDataFeedPrice = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'dataFeedPrice',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"etherDataFeedAddress"`
+ */
+export const readLoanEtherDataFeedAddress = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'etherDataFeedAddress',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"interestRate"`
+ */
+export const readLoanInterestRate = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'interestRate',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"lastCollection"`
+ */
+export const readLoanLastCollection = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'lastCollection',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liabilityAmount"`
+ */
+export const readLoanLiabilityAmount = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'liabilityAmount',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liquidationRatio"`
+ */
+export const readLoanLiquidationRatio = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'liquidationRatio',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"owner"`
+ */
+export const readLoanOwner = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"usdToAsset"`
+ */
+export const readLoanUsdToAsset = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'usdToAsset',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"withdrawalAmount"`
+ */
+export const readLoanWithdrawalAmount = /*#__PURE__*/ createReadContract({
+  abi: loanAbi,
+  functionName: 'withdrawalAmount',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link loanAbi}__
+ */
+export const writeLoan = /*#__PURE__*/ createWriteContract({ abi: loanAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"collect"`
+ */
+export const writeLoanCollect = /*#__PURE__*/ createWriteContract({
+  abi: loanAbi,
+  functionName: 'collect',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liquidate"`
+ */
+export const writeLoanLiquidate = /*#__PURE__*/ createWriteContract({
+  abi: loanAbi,
+  functionName: 'liquidate',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"payback"`
+ */
+export const writeLoanPayback = /*#__PURE__*/ createWriteContract({
+  abi: loanAbi,
+  functionName: 'payback',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const writeLoanRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: loanAbi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const writeLoanTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: loanAbi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link loanAbi}__
+ */
+export const simulateLoan = /*#__PURE__*/ createSimulateContract({
+  abi: loanAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"collect"`
+ */
+export const simulateLoanCollect = /*#__PURE__*/ createSimulateContract({
+  abi: loanAbi,
+  functionName: 'collect',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"liquidate"`
+ */
+export const simulateLoanLiquidate = /*#__PURE__*/ createSimulateContract({
+  abi: loanAbi,
+  functionName: 'liquidate',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"payback"`
+ */
+export const simulateLoanPayback = /*#__PURE__*/ createSimulateContract({
+  abi: loanAbi,
+  functionName: 'payback',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const simulateLoanRenounceOwnership =
+  /*#__PURE__*/ createSimulateContract({
+    abi: loanAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link loanAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const simulateLoanTransferOwnership =
+  /*#__PURE__*/ createSimulateContract({
+    abi: loanAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link loanAbi}__
+ */
+export const watchLoanEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: loanAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link loanAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const watchLoanOwnershipTransferredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: loanAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link loanAbi}__ and `eventName` set to `"Received"`
+ */
+export const watchLoanReceivedEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: loanAbi,
+  eventName: 'Received',
+})
+
+/**
  * Wraps __{@link readContract}__ with `abi` set to __{@link mockAggregatorV3InterfaceAbi}__
  */
 export const readMockAggregatorV3Interface = /*#__PURE__*/ createReadContract({
@@ -25394,4 +26113,301 @@ export const watchVotesEip712DomainChangedEvent =
   /*#__PURE__*/ createWatchContractEvent({
     abi: votesAbi,
     eventName: 'EIP712DomainChanged',
+  })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__
+ */
+export const readWindow = /*#__PURE__*/ createReadContract({ abi: windowAbi })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assetToUsd"`
+ */
+export const readWindowAssetToUsd = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'assetToUsd',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"assets"`
+ */
+export const readWindowAssets = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'assets',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"dataFeedPrice"`
+ */
+export const readWindowDataFeedPrice = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'dataFeedPrice',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"etherDataFeedAddress"`
+ */
+export const readWindowEtherDataFeedAddress = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'etherDataFeedAddress',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getChainlinkDataFeedLatestAnswer"`
+ */
+export const readWindowGetChainlinkDataFeedLatestAnswer =
+  /*#__PURE__*/ createReadContract({
+    abi: windowAbi,
+    functionName: 'getChainlinkDataFeedLatestAnswer',
+  })
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"getParam"`
+ */
+export const readWindowGetParam = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'getParam',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loans"`
+ */
+export const readWindowLoans = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'loans',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"owner"`
+ */
+export const readWindowOwner = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'owner',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"params"`
+ */
+export const readWindowParams = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'params',
+})
+
+/**
+ * Wraps __{@link readContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"usdToAsset"`
+ */
+export const readWindowUsdToAsset = /*#__PURE__*/ createReadContract({
+  abi: windowAbi,
+  functionName: 'usdToAsset',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__
+ */
+export const writeWindow = /*#__PURE__*/ createWriteContract({ abi: windowAbi })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
+ */
+export const writeWindowApproveAsset = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'approveAsset',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
+ */
+export const writeWindowIssue = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'issue',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const writeWindowLoanEntityEvent = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'loanEntityEvent',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const writeWindowRenounceOwnership = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'renounceOwnership',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const writeWindowSetEtherDataFeed = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'setEtherDataFeed',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setParam"`
+ */
+export const writeWindowSetParam = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'setParam',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const writeWindowTransferOwnership = /*#__PURE__*/ createWriteContract({
+  abi: windowAbi,
+  functionName: 'transferOwnership',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__
+ */
+export const simulateWindow = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"approveAsset"`
+ */
+export const simulateWindowApproveAsset = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
+  functionName: 'approveAsset',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"issue"`
+ */
+export const simulateWindowIssue = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
+  functionName: 'issue',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const simulateWindowLoanEntityEvent =
+  /*#__PURE__*/ createSimulateContract({
+    abi: windowAbi,
+    functionName: 'loanEntityEvent',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"renounceOwnership"`
+ */
+export const simulateWindowRenounceOwnership =
+  /*#__PURE__*/ createSimulateContract({
+    abi: windowAbi,
+    functionName: 'renounceOwnership',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setEtherDataFeed"`
+ */
+export const simulateWindowSetEtherDataFeed =
+  /*#__PURE__*/ createSimulateContract({
+    abi: windowAbi,
+    functionName: 'setEtherDataFeed',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"setParam"`
+ */
+export const simulateWindowSetParam = /*#__PURE__*/ createSimulateContract({
+  abi: windowAbi,
+  functionName: 'setParam',
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowAbi}__ and `functionName` set to `"transferOwnership"`
+ */
+export const simulateWindowTransferOwnership =
+  /*#__PURE__*/ createSimulateContract({
+    abi: windowAbi,
+    functionName: 'transferOwnership',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__
+ */
+export const watchWindowEvent = /*#__PURE__*/ createWatchContractEvent({
+  abi: windowAbi,
+})
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"AssetEntity"`
+ */
+export const watchWindowAssetEntityEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: windowAbi,
+    eventName: 'AssetEntity',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"LoanEntity"`
+ */
+export const watchWindowLoanEntityEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: windowAbi,
+    eventName: 'LoanEntity',
+  })
+
+/**
+ * Wraps __{@link watchContractEvent}__ with `abi` set to __{@link windowAbi}__ and `eventName` set to `"OwnershipTransferred"`
+ */
+export const watchWindowOwnershipTransferredEvent =
+  /*#__PURE__*/ createWatchContractEvent({
+    abi: windowAbi,
+    eventName: 'OwnershipTransferred',
+  })
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowInterfaceAbi}__
+ */
+export const writeWindowInterface = /*#__PURE__*/ createWriteContract({
+  abi: windowInterfaceAbi,
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"getParam"`
+ */
+export const writeWindowInterfaceGetParam = /*#__PURE__*/ createWriteContract({
+  abi: windowInterfaceAbi,
+  functionName: 'getParam',
+})
+
+/**
+ * Wraps __{@link writeContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const writeWindowInterfaceLoanEntityEvent =
+  /*#__PURE__*/ createWriteContract({
+    abi: windowInterfaceAbi,
+    functionName: 'loanEntityEvent',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowInterfaceAbi}__
+ */
+export const simulateWindowInterface = /*#__PURE__*/ createSimulateContract({
+  abi: windowInterfaceAbi,
+})
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"getParam"`
+ */
+export const simulateWindowInterfaceGetParam =
+  /*#__PURE__*/ createSimulateContract({
+    abi: windowInterfaceAbi,
+    functionName: 'getParam',
+  })
+
+/**
+ * Wraps __{@link simulateContract}__ with `abi` set to __{@link windowInterfaceAbi}__ and `functionName` set to `"loanEntityEvent"`
+ */
+export const simulateWindowInterfaceLoanEntityEvent =
+  /*#__PURE__*/ createSimulateContract({
+    abi: windowInterfaceAbi,
+    functionName: 'loanEntityEvent',
   })

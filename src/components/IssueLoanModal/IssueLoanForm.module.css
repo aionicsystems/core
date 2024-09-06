@@ -24,9 +24,6 @@
     border: none;
     text-align: center;
 }
-.collateralInput::placeholder {
-    color: #E9E9E985;
-}
 
 @media (min-width: 768px) {
     .collateralInput {
