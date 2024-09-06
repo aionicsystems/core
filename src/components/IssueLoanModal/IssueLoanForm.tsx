@@ -3,7 +3,7 @@ import { Button } from "../Button/Button.tsx";
 import styles from "./IssueLoanForm.module.css";
 import { contractAddress } from "../../repository/contracts.ts";
 import { useAccount, useWriteContract } from 'wagmi';
-import { abi } from '../../../artifacts/contracts/Loan.sol/Loan.json'
+import { abi } from '../../../artifacts/contracts/Window.sol/Window.json'
 import { parseEther, Address } from "viem";
 
 export type IssueLoanFormProps = {
@@ -31,14 +31,14 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
       address: contractAddress("window", chain?.id) as Address,
       abi,
       functionName: 'issue',
-      args: [assetID],
+      args: [assetID as Address],
       value: parseEther(collateral)
     })
   }
 
   return (
     <form
-      onSubmit={() => submit}
+      onSubmit={submit}
       id={assetID}
       className={styles.issueLoanForm}
     >
