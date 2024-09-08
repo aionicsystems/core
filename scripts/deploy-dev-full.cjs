@@ -60,8 +60,15 @@ async function main() {
     // Contracts are deployed using the first signer/account by default
     const [owner, otherAccount] = await hre.ethers.getSigners();
 
+    const EthDataAgg = await hre.ethers.getContractFactory("MockAggregator");
+    const ethDataAgg = await EthDataAgg.deploy();
+
+    await ethDataAgg.waitForDeployment();
+
+    console.log(`Mock ETH Aggregator deployed to: ${await ethDataAgg.getAddress()}`);
+
     const EthDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
-    const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice);
+    const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice, await ethDataAgg.getAddress());
 
     await ethDataFeed.waitForDeployment();
 
@@ -94,8 +101,15 @@ async function main() {
 
     console.log(`${latestRoundData}`);
 
+    const AssetDataAgg = await hre.ethers.getContractFactory("MockAggregator");
+    const assetDataAgg = await AssetDataAgg.deploy();
+
+    await assetDataAgg.waitForDeployment();
+
+    console.log(`Mock Asset Aggregator deployed to: ${await assetDataAgg.getAddress()}`);
+
     const AssetDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
-    const assetDataFeed = await AssetDataFeed.deploy(decimals, initialAssetPrice);
+    const assetDataFeed = await AssetDataFeed.deploy(decimals, initialAssetPrice, await assetDataAgg.getAddress());
 
     await assetDataFeed.waitForDeployment();
 

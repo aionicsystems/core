@@ -8,7 +8,7 @@ dataSources:
     name: Window
     network: test
     source:
-      address: '0xc296b0e1EB53935e9965B3c9c83821Cf0470d77D'
+      address: '0xA9CB70e60357E943A881EcfCafD0278A79F510A0'
       abi: Window
       startBlock: 0
     mapping:
