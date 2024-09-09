@@ -19,7 +19,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
 
   asset.name = event.params.name
   asset.symbol = event.params.symbol
-  asset.dataFeedAddress = event.params.dataFeedAddress
+  asset.dataFeed = event.params.dataFeedAddress
   asset.rate = event.params.rate
   asset.liquidationRatio = event.params.liquidationRatio
 

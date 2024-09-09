@@ -2,7 +2,7 @@ type AssetEntity @entity {
   id: Bytes!
   name: String! # string
   symbol: String! # string
-  dataFeedAddress: Bytes! # address
+  dataFeed: DataFeedEntity! # address
   rate: BigInt! # 500 = 5%
   liquidationRatio: BigInt! # 12500 = 125%
   blockNumber: BigInt!
@@ -39,4 +39,19 @@ type OwnershipTransferred @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type DataFeedEntity @entity {
+  id: Bytes! # address
+  decimals: Int # uint8
+  prices: [DataPointEntity!] @derivedFrom(field: "feed")
+}
+
+type DataPointEntity @entity {
+  id: Bytes! # bytes - transaction hash
+  feed: DataFeedEntity! # address
+  price: BigInt! # int256
+  roundId: BigInt! # uint256
+  blockNumber: BigInt! # uint256
+  blockTimestamp: BigInt! # uint256
 }

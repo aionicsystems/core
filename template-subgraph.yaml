@@ -30,3 +30,23 @@ dataSources:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
       file: ./src/mapping.ts
+templates:
+  - name: DataFeed
+    kind: ethereum/contract
+    network: test
+    source:
+      abi: AggregatorInterface
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/price-data-feed.ts
+      entities:
+        - DataFeed
+        - DataPoint
+      abis:
+        - name: AggregatorInterface
+          file: ./node_modules/@chainlink/contracts/abi/v0.8/AggregatorInterface.json
+      eventHandlers:
+        - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
+          handler: handleAnswerUpdated
