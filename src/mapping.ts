@@ -9,8 +9,10 @@ import {
   OwnerEntity,
   OwnershipTransferred
 } from "../generated/schema"
+import { DataFeed as PriceDataFeedTemplate } from "../generated/templates";
 
 import { ipfs, json, JSONValue, log } from '@graphprotocol/graph-ts'
+const ID = "id";
 
 export function handleAssetEntity(event: AssetEntityEvent): void {
   let asset = new AssetEntity(event.params.token)
@@ -19,7 +21,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
 
   asset.name = event.params.name
   asset.symbol = event.params.symbol
-  asset.dataFeed = event.params.dataFeedAddress
+  asset.dataFeedAddress = event.params.dataFeedAddress
   asset.rate = event.params.rate
   asset.liquidationRatio = event.params.liquidationRatio
 
@@ -27,6 +29,10 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
   
+  // Create the new Price Data Feed Template
+  let context = new DataSourceContext();
+  context.setString(ID, event.params.aggregator.toHexString());
+  PriceDataFeedTemplate.createWithContext(event.params.Aggregator, context);
 
   asset.save()
 }

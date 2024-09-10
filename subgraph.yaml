@@ -18,7 +18,7 @@ dataSources:
       entities:
         - AssetEntity
         - LoanEntity
-        - DataFeedEntity
+        - AggregatorEntity
         - OwnerTransferred
       abis:
         - name: Window
@@ -43,8 +43,8 @@ templates:
       language: wasm/assemblyscript
       file: ./src/price-data-feed.ts
       entities:
-        - DataFeed
-        - DataPoint
+        - AggregatorEntity
+        - DataPointEntity
       abis:
         - name: AggregatorInterface
           file: ./node_modules/@chainlink/contracts/abi/v0.8/AggregatorInterface.json

@@ -80,8 +80,8 @@ export class AssetEntity extends Entity {
     this.set("symbol", Value.fromString(value));
   }
 
-  get dataFeed(): Bytes {
-    let value = this.get("dataFeed");
+  get dataFeedAddress(): Bytes {
+    let value = this.get("dataFeedAddress");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -89,8 +89,21 @@ export class AssetEntity extends Entity {
     }
   }
 
-  set dataFeed(value: Bytes) {
-    this.set("dataFeed", Value.fromBytes(value));
+  set dataFeedAddress(value: Bytes) {
+    this.set("dataFeedAddress", Value.fromBytes(value));
+  }
+
+  get aggregator(): Bytes {
+    let value = this.get("aggregator");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set aggregator(value: Bytes) {
+    this.set("aggregator", Value.fromBytes(value));
   }
 
   get rate(): BigInt {
@@ -528,7 +541,7 @@ export class OwnershipTransferred extends Entity {
   }
 }
 
-export class DataFeedEntity extends Entity {
+export class AggregatorEntity extends Entity {
   constructor(id: Bytes) {
     super();
     this.set("id", Value.fromBytes(id));
@@ -536,25 +549,25 @@ export class DataFeedEntity extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save DataFeedEntity entity without an ID");
+    assert(id != null, "Cannot save AggregatorEntity entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.BYTES,
-        `Entities of type DataFeedEntity must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+        `Entities of type AggregatorEntity must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
-      store.set("DataFeedEntity", id.toBytes().toHexString(), this);
+      store.set("AggregatorEntity", id.toBytes().toHexString(), this);
     }
   }
 
-  static loadInBlock(id: Bytes): DataFeedEntity | null {
-    return changetype<DataFeedEntity | null>(
-      store.get_in_block("DataFeedEntity", id.toHexString()),
+  static loadInBlock(id: Bytes): AggregatorEntity | null {
+    return changetype<AggregatorEntity | null>(
+      store.get_in_block("AggregatorEntity", id.toHexString()),
     );
   }
 
-  static load(id: Bytes): DataFeedEntity | null {
-    return changetype<DataFeedEntity | null>(
-      store.get("DataFeedEntity", id.toHexString()),
+  static load(id: Bytes): AggregatorEntity | null {
+    return changetype<AggregatorEntity | null>(
+      store.get("AggregatorEntity", id.toHexString()),
     );
   }
 
@@ -586,7 +599,7 @@ export class DataFeedEntity extends Entity {
 
   get prices(): DataPointEntityLoader {
     return new DataPointEntityLoader(
-      "DataFeedEntity",
+      "AggregatorEntity",
       this.get("id")!.toBytes().toHexString(),
       "prices",
     );
