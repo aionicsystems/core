@@ -30,6 +30,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.blockNumber = event.block.number
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
+  asset.latestPrice = event.params.latestPrice
   
   // Create the new Price Data Feed Template
   let context = new DataSourceContext();
@@ -41,7 +42,6 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   let aggregator = new AggregatorEntity(event.params.aggregatorAddress);
   aggregator.asset = event.params.token;
   aggregator.decimals = event.params.decimals;
-  aggregator.latestPrice = event.params.latestPrice;
   aggregator.save();
 }
 

@@ -178,6 +178,27 @@ export class AssetEntity extends Entity {
       "loans",
     );
   }
+
+  get latestPrice(): BigInt {
+    let value = this.get("latestPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set latestPrice(value: BigInt) {
+    this.set("latestPrice", Value.fromBigInt(value));
+  }
+
+  get prices(): DataPointEntityLoader {
+    return new DataPointEntityLoader(
+      "AssetEntity",
+      this.get("id")!.toBytes().toHexString(),
+      "prices",
+    );
+  }
 }
 
 export class LoanEntity extends Entity {
@@ -597,19 +618,6 @@ export class AggregatorEntity extends Entity {
     this.set("decimals", Value.fromI32(value));
   }
 
-  get latestPrice(): BigInt {
-    let value = this.get("latestPrice");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set latestPrice(value: BigInt) {
-    this.set("latestPrice", Value.fromBigInt(value));
-  }
-
   get prices(): DataPointEntityLoader {
     return new DataPointEntityLoader(
       "AggregatorEntity",
@@ -662,8 +670,8 @@ export class DataPointEntity extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
-  get feed(): Bytes {
-    let value = this.get("feed");
+  get asset(): Bytes {
+    let value = this.get("asset");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -671,8 +679,21 @@ export class DataPointEntity extends Entity {
     }
   }
 
-  set feed(value: Bytes) {
-    this.set("feed", Value.fromBytes(value));
+  set asset(value: Bytes) {
+    this.set("asset", Value.fromBytes(value));
+  }
+
+  get aggregator(): Bytes {
+    let value = this.get("aggregator");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set aggregator(value: Bytes) {
+    this.set("aggregator", Value.fromBytes(value));
   }
 
   get price(): BigInt {
