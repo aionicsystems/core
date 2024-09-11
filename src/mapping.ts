@@ -1,16 +1,19 @@
+import { log, DataSourceContext } from "@graphprotocol/graph-ts";
 import {
   AssetEntity as AssetEntityEvent,
   LoanEntity as LoanEntityEvent,
   OwnershipTransferred as OwnershipTransferredEvent
 } from "../generated/Window/Window"
 import {
+  AggregatorEntity,
   AssetEntity,
   LoanEntity,
   OwnerEntity,
   OwnershipTransferred
 } from "../generated/schema"
+import { Aggregator as AggregatorTemplate } from "../generated/templates";
 
-import { ipfs, json, JSONValue, log } from '@graphprotocol/graph-ts'
+const ID = "id";
 
 export function handleAssetEntity(event: AssetEntityEvent): void {
   let asset = new AssetEntity(event.params.token)
@@ -20,15 +23,26 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.name = event.params.name
   asset.symbol = event.params.symbol
   asset.dataFeedAddress = event.params.dataFeedAddress
+  asset.aggregator = event.params.aggregatorAddress
   asset.rate = event.params.rate
   asset.liquidationRatio = event.params.liquidationRatio
 
   asset.blockNumber = event.block.number
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
+  asset.latestPrice = event.params.latestPrice
   
+  // Create the new Price Data Feed Template
+  let context = new DataSourceContext();
+  context.setString(ID, event.params.aggregatorAddress.toHexString());
+  AggregatorTemplate.createWithContext(event.params.aggregatorAddress, context);
 
   asset.save()
+
+  let aggregator = new AggregatorEntity(event.params.aggregatorAddress);
+  aggregator.asset = event.params.token;
+  aggregator.decimals = event.params.decimals;
+  aggregator.save();
 }
 
 export function handleLoanEntity(event: LoanEntityEvent): void {
@@ -45,13 +59,12 @@ export function handleLoanEntity(event: LoanEntityEvent): void {
   log.debug('The LoanID is: {} ', [event.params.loanAddress.toString()]);
 
   loan.owner = event.params.owner
-  loan.asset = event.params.assetAddress
   loan.collateralAmount = event.params.collateralAmount
+  loan.asset = event.params.assetAddress
   loan.liabilityAmount = event.params.liabilityAmount
-  loan.dataFeedAddress = event.params.dataFeedAddress
-  loan.interestRate = event.params.interestRate
   loan.borrowingRatio = event.params.borrowingRatio
   loan.liquidationRatio = event.params.liquidationRatio
+  loan.interestRate = event.params.interestRate
   loan.lastCollection = event.params.lastCollection
   loan.blockNumber = event.block.number
   loan.blockTimestamp = event.block.timestamp

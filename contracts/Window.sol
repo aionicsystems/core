@@ -7,6 +7,10 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 import { Loan } from "./Loan.sol";
 
+interface AggregatorInterface is AggregatorV3Interface {
+    function aggregator() external returns (address);
+}
+
 contract Window is Ownable {
     event LoanEntity(
         address indexed loanAddress, 
@@ -53,8 +57,11 @@ contract Window is Ownable {
         string name, 
         string symbol, 
         address dataFeedAddress,
+        address aggregatorAddress,
         uint32 rate,
-        uint32 liquidationRatio
+        uint32 liquidationRatio,
+        uint8 decimals,
+        int256 latestPrice 
     );
  
     // Number of decimal precision used in ratios and rates
@@ -65,7 +72,7 @@ contract Window is Ownable {
 
     // Ether data feed address
     address public etherDataFeedAddress;
-    AggregatorV3Interface internal etherDataFeed;
+    AggregatorInterface internal etherDataFeed;
     
     // Loan mapped to Address
     mapping(address => Loan) public loans;
@@ -94,7 +101,19 @@ contract Window is Ownable {
         params["collectorFee"] = collectorFee;
 
         etherDataFeedAddress = _etherDataFeedAddress;
-        etherDataFeed = AggregatorV3Interface(etherDataFeedAddress);
+        etherDataFeed = AggregatorInterface(etherDataFeedAddress);
+
+        emit AssetEntity(
+            address(0), 
+            "Ether", 
+            "ETH", 
+            etherDataFeedAddress,
+            AggregatorInterface(etherDataFeedAddress).aggregator(),
+            0,
+            0,
+            AggregatorInterface(etherDataFeedAddress).decimals(),
+            getChainlinkDataFeedLatestAnswer(etherDataFeed)
+        );
     }
 
     function setParam(bytes32 param, uint32 value) public onlyOwner {
@@ -108,11 +127,12 @@ contract Window is Ownable {
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate, uint32 liquidationRatio) public onlyOwner returns(address) {
         Asset asset = new Asset(name, symbol, rate, liquidationRatio, address(this), assetDataFeedAddress);
         assets[address(asset)] = asset;
-        emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, rate, liquidationRatio);
+        AggregatorInterface dataFeed = AggregatorInterface(assetDataFeedAddress);
+        emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, dataFeed.aggregator(), rate, liquidationRatio, dataFeed.decimals(), getChainlinkDataFeedLatestAnswer(dataFeed));
         return address(asset);
     }
 
-    function getChainlinkDataFeedLatestAnswer(AggregatorV3Interface dataFeed) public view returns (int) {
+    function getChainlinkDataFeedLatestAnswer(AggregatorInterface dataFeed) public view returns (int) {
         // prettier-ignore
         (
             /* uint320 roundID */,
@@ -124,23 +144,23 @@ contract Window is Ownable {
         return answer;
     }
 
-    function dataFeedPrice(AggregatorV3Interface dataFeed) public view returns (uint256) {
+    function dataFeedPrice(AggregatorInterface dataFeed) public view returns (uint256) {
         int price = getChainlinkDataFeedLatestAnswer(dataFeed);
         require(price > 0, "price must be greater than zero");
         return uint256(price);
     }
 
-    function assetToUsd(uint256 amount, AggregatorV3Interface dataFeed) public view returns (uint256) {
+    function assetToUsd(uint256 amount, AggregatorInterface dataFeed) public view returns (uint256) {
         return dataFeedPrice(dataFeed)*amount/dataFeed.decimals();
     }
 
-    function usdToAsset(uint256 amount, AggregatorV3Interface dataFeed) public view returns (uint256) {
+    function usdToAsset(uint256 amount, AggregatorInterface dataFeed) public view returns (uint256) {
         return (amount * dataFeed.decimals()) / dataFeedPrice(dataFeed);
     }
 
     function setEtherDataFeed(address _etherDataFeedAddress) public onlyOwner {
         etherDataFeedAddress = _etherDataFeedAddress;
-        etherDataFeed = AggregatorV3Interface(_etherDataFeedAddress);
+        etherDataFeed = AggregatorInterface(_etherDataFeedAddress);
     }
  
     // Issue loan by depositing collateral and receiving
@@ -151,7 +171,7 @@ contract Window is Ownable {
         require(msg.value > 0, "Amount ETH must be greater than zero");
         require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
-        AggregatorV3Interface assetDataFeed = AggregatorV3Interface(assets[assetAddress].assetDataFeedAddress());
+        AggregatorInterface assetDataFeed = AggregatorInterface(assets[assetAddress].assetDataFeedAddress());
         
         uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
         uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
