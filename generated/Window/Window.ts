@@ -39,12 +39,24 @@ export class AssetEntity__Params {
     return this._event.parameters[3].value.toAddress();
   }
 
+  get aggregatorAddress(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
   get rate(): BigInt {
-    return this._event.parameters[4].value.toBigInt();
+    return this._event.parameters[5].value.toBigInt();
   }
 
   get liquidationRatio(): BigInt {
-    return this._event.parameters[5].value.toBigInt();
+    return this._event.parameters[6].value.toBigInt();
+  }
+
+  get decimals(): i32 {
+    return this._event.parameters[7].value.toI32();
+  }
+
+  get latestPrice(): BigInt {
+    return this._event.parameters[8].value.toBigInt();
   }
 }
 

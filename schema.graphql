@@ -18,7 +18,6 @@ type LoanEntity @entity(immutable: true) {
   collateralAmount: BigInt! # uint256
   asset: AssetEntity!
   liabilityAmount: BigInt! # uint256
-  dataFeedAddress: Bytes! # address
   borrowingRatio: BigInt! #uint32
   liquidationRatio: BigInt! #uint32
   interestRate: BigInt! # uint32
@@ -44,7 +43,9 @@ type OwnershipTransferred @entity(immutable: true) {
 
 type AggregatorEntity @entity {
   id: Bytes! # address
+  asset: AssetEntity!
   decimals: Int # uint8
+  latestPrice: BigInt! # int256
   prices: [DataPointEntity!] @derivedFrom(field: "feed")
 }
 

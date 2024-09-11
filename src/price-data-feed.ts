@@ -2,7 +2,7 @@ import { Address, dataSource } from "@graphprotocol/graph-ts";
 import {
   AnswerUpdated as AnswerUpdatedEvent,
 } from "../generated/templates/DataFeed/AggregatorInterface";
-import { DataPointEntity } from "../generated/schema";
+import { AggregatorEntity, AssetEntity, DataPointEntity } from "../generated/schema";
 
 const ID = "id";
 
@@ -20,4 +20,10 @@ export function handleAnswerUpdated(event: AnswerUpdatedEvent): void {
   dataPoint.blockNumber = event.block.number;
   dataPoint.blockTimestamp = event.params.updatedAt; // BigInt
   dataPoint.save();
+
+  let aggregator = AggregatorEntity.load(address)
+  if (aggregator != null) {
+    aggregator.latestPrice = dataPoint.price;
+    aggregator.save();
+  }
 }

@@ -275,19 +275,6 @@ export class LoanEntity extends Entity {
     this.set("liabilityAmount", Value.fromBigInt(value));
   }
 
-  get dataFeedAddress(): Bytes {
-    let value = this.get("dataFeedAddress");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set dataFeedAddress(value: Bytes) {
-    this.set("dataFeedAddress", Value.fromBytes(value));
-  }
-
   get borrowingRatio(): BigInt {
     let value = this.get("borrowingRatio");
     if (!value || value.kind == ValueKind.NULL) {
@@ -584,6 +571,19 @@ export class AggregatorEntity extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
+  get asset(): Bytes {
+    let value = this.get("asset");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set asset(value: Bytes) {
+    this.set("asset", Value.fromBytes(value));
+  }
+
   get decimals(): i32 {
     let value = this.get("decimals");
     if (!value || value.kind == ValueKind.NULL) {
@@ -595,6 +595,19 @@ export class AggregatorEntity extends Entity {
 
   set decimals(value: i32) {
     this.set("decimals", Value.fromI32(value));
+  }
+
+  get latestPrice(): BigInt {
+    let value = this.get("latestPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set latestPrice(value: BigInt) {
+    this.set("latestPrice", Value.fromBigInt(value));
   }
 
   get prices(): DataPointEntityLoader {

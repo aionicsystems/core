@@ -59,7 +59,9 @@ contract Window is Ownable {
         address dataFeedAddress,
         address aggregatorAddress,
         uint32 rate,
-        uint32 liquidationRatio
+        uint32 liquidationRatio,
+        uint8 decimals,
+        int256 latestPrice 
     );
  
     // Number of decimal precision used in ratios and rates
@@ -113,7 +115,8 @@ contract Window is Ownable {
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate, uint32 liquidationRatio) public onlyOwner returns(address) {
         Asset asset = new Asset(name, symbol, rate, liquidationRatio, address(this), assetDataFeedAddress);
         assets[address(asset)] = asset;
-        emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, AggregatorInterface(assetDataFeedAddress).aggregator(), rate, liquidationRatio);
+        AggregatorInterface dataFeed = AggregatorInterface(assetDataFeedAddress);
+        emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, dataFeed.aggregator(), rate, liquidationRatio, dataFeed.decimals(), getChainlinkDataFeedLatestAnswer(dataFeed));
         return address(asset);
     }
 
