@@ -52,6 +52,16 @@ contract Window is Ownable {
         );
     }
 
+    event CollateralEntity(
+        address indexed token, 
+        string name, 
+        string symbol, 
+        address dataFeedAddress,
+        address aggregatorAddress,
+        uint8 decimals,
+        int256 latestPrice 
+    );
+
     event AssetEntity(
         address indexed token, 
         string name, 
@@ -102,6 +112,16 @@ contract Window is Ownable {
 
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorInterface(etherDataFeedAddress);
+
+        emit CollateralEntity(
+            address(0), 
+            "Ether", 
+            "ETH", 
+            etherDataFeedAddress,
+            etherDataFeed.aggregator(),
+            etherDataFeed.decimals(),
+            getChainlinkDataFeedLatestAnswer(etherDataFeed)
+        );
     }
 
     function setParam(bytes32 param, uint32 value) public onlyOwner {
