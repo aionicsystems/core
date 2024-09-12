@@ -9,6 +9,10 @@ import { SmallLoader } from "../Loader/SmallLoader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
 import { formatRatio } from "../../utils";
+import {
+  loanInterestRate,
+  loanLiquidationRatioRate,
+} from "../../utils/calculations.ts";
 
 export type LoanOverviewProps = {
   loanID: string;
@@ -50,11 +54,13 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
 
   const loanData: LoanType = data?.loanEntity ?? {};
 
+  console.log(loanData);
+
   return (
     <div className={styles.loanOverview}>
       <div className={styles.overviewCardsWrapper}>
         <OverviewCard
-          value={loanData.id ? loanData.id : "No data"}
+          value={loanData.id ? `${loanData.id.substring(0, 8)}...` : "No data"}
           label={"Loan ID"}
           icon={loanId as string}
           color={"light-skyBlue"}
@@ -68,7 +74,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
         <OverviewCard
           value={
             loanData.interestRate
-              ? formatRatio(String(loanData.interestRate))
+              ? loanInterestRate(loanData.interestRate).toFixed(2)
               : "No data"
           }
           label={"Interest rate"}
@@ -96,7 +102,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
         <OverviewCardSmall
           value={
             loanData.liquidationRatio
-              ? formatRatio(String(loanData.liquidationRatio))
+              ? `${loanLiquidationRatioRate(loanData.liquidationRatio).toFixed(2)}`
               : "No data"
           }
           label={"Liquidation Ratio"}

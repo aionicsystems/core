@@ -4,7 +4,7 @@ import {
 } from "../../types/TableTypes.ts";
 import { SortableTableBodyItem } from "./SortableTableBodyItem.tsx";
 import styles from "./SortableTable.module.css";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
 export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
@@ -50,10 +50,9 @@ export const SortableTableBody = <T,>({
     <tbody className={styles.sortableTableTBody}>
       {sortedData.length > 0 || !isError ? (
         sortedData.map((dataItem, index) => (
-          <>
+          <Fragment key={dataItem.id}>
             <tr
               onClick={() => (selectLoan ? selectLoan(dataItem.id) : null)}
-              key={dataItem.id}
               className={`${selectedID === dataItem.id ? styles.selectedRow : ""}`}
             >
               {titles.map((title) => (
@@ -69,7 +68,7 @@ export const SortableTableBody = <T,>({
                 <td colSpan={titles.length}></td>
               </tr>
             )}
-          </>
+          </Fragment>
         ))
       ) : (
         <tr>
