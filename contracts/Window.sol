@@ -173,10 +173,7 @@ contract Window is Ownable {
 
         AggregatorInterface assetDataFeed = AggregatorInterface(assets[assetAddress].assetDataFeedAddress());
         
-        uint256 usdCollateral = assetToUsd(msg.value, etherDataFeed);
-        uint256 usdLiability = (usdCollateral * 10^precision) / params["borrowingRatio"];
-        uint256 liabilityAmount = (usdLiability * assetDataFeed.decimals()) / dataFeedPrice(assetDataFeed);
-        
+        uint256 liabilityAmount = (msg.value*dataFeedPrice(etherDataFeed)*10**precision*assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed)*params["borrowingRatio"]*etherDataFeed.decimals());
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
