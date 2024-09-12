@@ -150,14 +150,6 @@ contract Window is Ownable {
         return uint256(price);
     }
 
-    function assetToUsd(uint256 amount, AggregatorInterface dataFeed) public view returns (uint256) {
-        return dataFeedPrice(dataFeed)*amount/dataFeed.decimals();
-    }
-
-    function usdToAsset(uint256 amount, AggregatorInterface dataFeed) public view returns (uint256) {
-        return (amount * dataFeed.decimals()) / dataFeedPrice(dataFeed);
-    }
-
     function setEtherDataFeed(address _etherDataFeedAddress) public onlyOwner {
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorInterface(_etherDataFeedAddress);
@@ -173,6 +165,12 @@ contract Window is Ownable {
 
         AggregatorInterface assetDataFeed = AggregatorInterface(assets[assetAddress].assetDataFeedAddress());
         
+        // Liability(USD) = Collateral(USD) / BorrowingRatio
+        // Liability(USD) = Liability(Asset) * Price(Asset)
+        // Collateral(USD) = Collateral(ETH) * Price(ETH)
+        // Liability(Asset) * Price(Asset)  = Collateral(USD) / BorrowingRatio
+        // Liability(Asset) = Collateral(USD) / (BorrowingRatio * Price(Asset))
+        // Liability(Asset) = (Collateral(ETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
         uint256 liabilityAmount = (msg.value*dataFeedPrice(etherDataFeed)*10**precision*assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed)*params["borrowingRatio"]*etherDataFeed.decimals());
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
