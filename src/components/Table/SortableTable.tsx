@@ -10,7 +10,7 @@ import { DefaultError, QueryObserverResult } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 
 export type SortableTableProps<T> = {
-  titles: SortableTableHeadType[];
+  titles: SortableTableHeadType<T>[];
   isError: boolean;
   tableData: SortableTableDataType<T>[];
   setTableConfig: ({
@@ -75,7 +75,7 @@ export const SortableTable = <T,>({
         }
       }
     },
-    [isResizing, startY, startHeight]
+    [isResizing, startY, startHeight],
   );
 
   const stopResizing = useCallback(() => {

@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
-import { loanId, netValue, barrowRate } from "../../static/images.ts";
+import { loanId, netValue, barrowRate, eth, dia } from "../../static/images.ts";
 import styles from "./LoanOverview.module.css";
+import accStyles from "../../App.module.css";
 import { OverviewCard } from "../OverviewCard/OverviewCard.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { client, loanSingleEntity } from "../../repository/requests.ts";
@@ -10,9 +11,15 @@ import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
 import { formatRatio } from "../../utils";
 import {
+  loanCollateralUSD,
+  loanCRatio,
   loanInterestRate,
+  loanLiabilityUSD,
   loanLiquidationRatioRate,
 } from "../../utils/calculations.ts";
+import { accounts, positionsCards } from "../../static/data.ts";
+import { AccountsCard } from "../AccountsCard/AccountsCard.tsx";
+import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 
 export type LoanOverviewProps = {
   loanID: string;
@@ -54,7 +61,25 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
 
   const loanData: LoanType = data?.loanEntity ?? {};
 
-  console.log(loanData);
+  const calcCRatio = (
+    collateralAmount?: number,
+    latestPrice?: number,
+    decimals?: number,
+    liabilityAmount?: number,
+  ) => {
+    const collateralUSD = loanCollateralUSD(
+      collateralAmount,
+      latestPrice,
+      decimals,
+    );
+    const liabilityUSD = loanLiabilityUSD(
+      liabilityAmount,
+      latestPrice,
+      decimals,
+    );
+
+    return loanCRatio(collateralUSD, liabilityUSD);
+  };
 
   return (
     <div className={styles.loanOverview}>
@@ -73,9 +98,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
         />
         <OverviewCard
           value={
-            loanData.interestRate
-              ? loanInterestRate(loanData.interestRate).toFixed(2)
-              : "No data"
+            loanData.asset ? loanInterestRate(loanData.asset.rate) : "No data"
           }
           label={"Interest rate"}
           icon={barrowRate as string}
@@ -85,8 +108,13 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
       <div className={styles.overviewCardsWrapper}>
         <OverviewCardSmall
           value={
-            loanData.collateralAmount
-              ? formatRatio(String(loanData.collateralAmount))
+            loanData.asset
+              ? calcCRatio(
+                  loanData.collateralAmount,
+                  loanData.asset.latestPrice,
+                  loanData.asset?.aggregator?.decimals,
+                  loanData.liabilityAmount,
+                )
               : "No data"
           }
           label={"Collateralization Ratio"}
@@ -102,12 +130,50 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
         <OverviewCardSmall
           value={
             loanData.liquidationRatio
-              ? `${loanLiquidationRatioRate(loanData.liquidationRatio).toFixed(2)}`
+              ? loanLiquidationRatioRate(loanData.liquidationRatio)
               : "No data"
           }
           label={"Liquidation Ratio"}
         />
       </div>
+      <div className={accStyles.accountsWrapper}>
+        {accounts.map((item) => (
+          <AccountsCard
+            balance={item.balance}
+            key={item.id}
+            text={item.text}
+            btnText={item.btnText}
+          />
+        ))}
+      </div>
+      <section
+        className={`${accStyles.mainSection} ${accStyles.positionsSection}`}
+      >
+        <div className={accStyles.positionsCardsWrapper}>
+          <PositionsCard
+            img={eth as string}
+            volume={loanCollateralUSD(
+              loanData.collateralAmount,
+              loanData?.asset?.latestPrice,
+              loanData?.asset?.aggregator.decimals,
+            ).toFixed(2)}
+            coinType={"ETH"}
+            badgeType={"text-bg-green"}
+            badgeText={"Collateral"}
+          />
+          <PositionsCard
+            img={dia as string}
+            volume={loanLiabilityUSD(
+              loanData.liabilityAmount,
+              loanData?.asset?.latestPrice,
+              loanData?.asset?.aggregator.decimals,
+            ).toFixed(2)}
+            coinType={"dia"}
+            badgeType={"text-bg-orange"}
+            badgeText={"Debt"}
+          />
+        </div>
+      </section>
     </div>
   );
 };

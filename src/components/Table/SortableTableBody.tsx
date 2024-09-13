@@ -8,7 +8,7 @@ import { Fragment, useMemo } from "react";
 
 export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
-  titles: SortableTableHeadType[];
+  titles: SortableTableHeadType<T>[];
   sortOrder?: "asc" | "desc" | null;
   sortBy?: keyof T;
   isError: boolean;
@@ -58,6 +58,8 @@ export const SortableTableBody = <T,>({
               {titles.map((title) => (
                 <SortableTableBodyItem
                   key={title.key}
+                  mutateValue={title.mutateValue}
+                  destructure={title.destructure}
                   dataItem={dataItem}
                   dataKey={title.key}
                 />

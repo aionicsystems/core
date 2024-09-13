@@ -37,15 +37,22 @@ export const loanEntities = gql(`
     query LoanEntitiesQuery($sort_by: String, $sort_order: String,) {
     loanEntities(orderBy: $sort_by, orderDirection: $sort_order) {
       id
-      asset {
-        id
-        name
-        symbol
+    collateralAmount
+    liabilityAmount
+    liquidationRatio
+    asset {
+      id
+      latestPrice
+      rate
+      liquidationRatio
+      dataFeedAddress
+      symbol
+      name
+      aggregator {
+        decimals
       }
-      liabilityAmount
-      collateralAmount
-      interestRate
-      __typename
+    }
+    __typename
     }
   }
 `);
@@ -54,17 +61,21 @@ export const loanSingleEntity = gql(
   `query LoanSingleEntity ($id: Bytes) {
   loanEntity(id: $id) {
     id
-    liabilityAmount
     collateralAmount
+    liabilityAmount
+    liquidationRatio
     asset {
       id
-      name
+      latestPrice
       rate
+      liquidationRatio
+      dataFeedAddress
       symbol
+      name
+      aggregator {
+        decimals
+      }
     }
-    borrowingRatio
-    liquidationRatio
-    interestRate
   }
 }`,
 );

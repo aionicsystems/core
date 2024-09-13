@@ -1,9 +1,11 @@
 import { AssetType } from "./AssetTypes";
 
-export type SortableTableHeadType = {
+export type SortableTableHeadType<T> = {
   title: string;
   sortable?: boolean;
   key: string;
+  mutateValue?: (v: string | number | T) => string | number;
+  destructure?: (o: T) => T[keyof T];
 };
 
 export type SortableTableConfigType<T> = {
