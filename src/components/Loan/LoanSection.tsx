@@ -19,7 +19,10 @@ import {
   loanLiability,
   loanLiquidationRatioRate,
 } from "../../utils/calculations.ts";
-import { useGlobalState } from "../../hooks/GlobalStateProvider.tsx";
+// import { useGlobalState } from "../../hooks/GlobalStateProvider.tsx";
+import { AssetType } from "../../types/AssetTypes.ts";
+// import { useReadContracts } from "wagmi";
+// import { abi } from "../../abi/abi.ts";
 
 const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   {
@@ -71,7 +74,7 @@ export const LoanSection: FC = () => {
   });
   const [error, setError] = useState<boolean>(false);
   const [selectedLoan, setSelectedLoan] = useState<string>("");
-  const { state, setState } = useGlobalState();
+  // const { state, setState } = useGlobalState();
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryFn: async () => {
@@ -92,6 +95,20 @@ export const LoanSection: FC = () => {
     queryKey: [REQUEST_LOANS_ENTITIES],
   });
 
+  // const loanDataAddresses: string[] =
+  //   data?.loanEntities.map((entity: LoanType) => entity.asset.id) ?? [];
+
+  // const { data: prices, isFetching } = useReadContracts({
+  //   contracts: loanDataAddresses.map((address) => ({
+  //     address,
+  //     abi: abi,
+  //     functionName: "latestRoundData",
+  //   })),
+  //   watch: true,
+  // });
+  //
+  // console.log(prices, isFetching);
+
   const toggleSelectAsset = () => {
     setSelectAssetModal(!selectAssetModal);
     handleBodyScroll();
@@ -102,6 +119,7 @@ export const LoanSection: FC = () => {
   }
 
   const tableData: LoanType[] = data?.loanEntities ?? [];
+  const assetETH: AssetType = data?.assetEntity ?? {};
 
   const selectLoan = (id: string) => {
     setSelectedLoan(id);
@@ -128,7 +146,7 @@ export const LoanSection: FC = () => {
         selectLoan={selectLoan}
         selectedID={selectedLoan}
       />
-      <LoanOverview loanID={selectedLoan} />
+      <LoanOverview loanID={selectedLoan} assetETH={assetETH} />
       {selectAssetModal && (
         <LoanAssetsModal
           onClose={toggleSelectAsset}

@@ -11,21 +11,23 @@ import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
 import { formatRatio } from "../../utils";
 import {
-  loanCollateralUSD,
-  loanCRatio,
   loanInterestRate,
-  loanLiabilityUSD,
   loanLiquidationRatioRate,
+  selectedLoanCollateralUSD,
+  selectedLoanCRatio,
+  selectedLoanLiabilityUSD,
 } from "../../utils/calculations.ts";
-import { accounts, positionsCards } from "../../static/data.ts";
+import { accounts } from "../../static/data.ts";
 import { AccountsCard } from "../AccountsCard/AccountsCard.tsx";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
+import { AssetType } from "../../types/AssetTypes.ts";
 
 export type LoanOverviewProps = {
   loanID: string;
+  assetETH: AssetType;
 };
 
-export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
+export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
   const [error, setError] = useState<boolean>(false);
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
@@ -61,25 +63,26 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
 
   const loanData: LoanType = data?.loanEntity ?? {};
 
-  const calcCRatio = (
-    collateralAmount?: number,
-    latestPrice?: number,
-    decimals?: number,
-    liabilityAmount?: number,
-  ) => {
-    const collateralUSD = loanCollateralUSD(
-      collateralAmount,
-      latestPrice,
-      decimals,
-    );
-    const liabilityUSD = loanLiabilityUSD(
-      liabilityAmount,
-      latestPrice,
-      decimals,
-    );
+  const collateralValue = selectedLoanCollateralUSD(
+    loanData.collateralAmount,
+    assetETH.latestPrice,
+    assetETH.aggregator.decimals,
+  ).toFixed(2);
 
-    return loanCRatio(collateralUSD, liabilityUSD);
-  };
+  const liabilityValue = selectedLoanLiabilityUSD(
+    loanData.liabilityAmount,
+    loanData?.asset?.latestPrice,
+    loanData?.asset?.aggregator.decimals,
+  ).toFixed(2);
+
+  const collRation = selectedLoanCRatio(
+    loanData.collateralAmount,
+    assetETH?.latestPrice,
+    loanData?.asset?.aggregator?.decimals,
+    loanData?.liabilityAmount,
+    loanData?.asset?.latestPrice,
+    assetETH?.aggregator?.decimals,
+  );
 
   return (
     <div className={styles.loanOverview}>
@@ -107,16 +110,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
       </div>
       <div className={styles.overviewCardsWrapper}>
         <OverviewCardSmall
-          value={
-            loanData.asset
-              ? calcCRatio(
-                  loanData.collateralAmount,
-                  loanData.asset.latestPrice,
-                  loanData.asset?.aggregator?.decimals,
-                  loanData.liabilityAmount,
-                )
-              : "No data"
-          }
+          value={loanData.asset ? collRation : "No data"}
           label={"Collateralization Ratio"}
         />
         <OverviewCardSmall
@@ -152,22 +146,14 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID }) => {
         <div className={accStyles.positionsCardsWrapper}>
           <PositionsCard
             img={eth as string}
-            volume={loanCollateralUSD(
-              loanData.collateralAmount,
-              loanData?.asset?.latestPrice,
-              loanData?.asset?.aggregator.decimals,
-            ).toFixed(2)}
-            coinType={"ETH"}
+            volume={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
+            coinType={assetETH.symbol}
             badgeType={"text-bg-green"}
             badgeText={"Collateral"}
           />
           <PositionsCard
             img={dia as string}
-            volume={loanLiabilityUSD(
-              loanData.liabilityAmount,
-              loanData?.asset?.latestPrice,
-              loanData?.asset?.aggregator.decimals,
-            ).toFixed(2)}
+            volume={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
             coinType={"dia"}
             badgeType={"text-bg-orange"}
             badgeText={"Debt"}

@@ -35,11 +35,20 @@ export const assetSingleEntity = gql(`
 
 export const loanEntities = gql(`
     query LoanEntitiesQuery($sort_by: String, $sort_order: String,) {
+    assetEntity (id: "0x0000000000000000000000000000000000000000") {
+    id
+    symbol
+    latestPrice
+    aggregator {
+      decimals
+    }
+  }
     loanEntities(orderBy: $sort_by, orderDirection: $sort_order) {
       id
     collateralAmount
     liabilityAmount
     liquidationRatio
+    borrowingRatio
     asset {
       id
       latestPrice
@@ -64,6 +73,7 @@ export const loanSingleEntity = gql(
     collateralAmount
     liabilityAmount
     liquidationRatio
+    borrowingRatio
     asset {
       id
       latestPrice

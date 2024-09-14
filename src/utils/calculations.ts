@@ -22,6 +22,14 @@ export const loanCollateralUSD = (
   return (collateralAmount * latestPrice) / Math.pow(10, decimals || 0);
 };
 
+export const selectedLoanCollateralUSD = (
+  collateralAmount?: number,
+  latestPrice?: number,
+  decimals?: number,
+) => {
+  return (collateralAmount * latestPrice) / (decimals * Math.pow(10, 18));
+};
+
 export const loanLiabilityUSD = (
   liabilityAmount?: number,
   latestPrice?: number,
@@ -30,6 +38,29 @@ export const loanLiabilityUSD = (
   return (liabilityAmount * latestPrice) / Math.pow(10, decimals || 0);
 };
 
+export const selectedLoanLiabilityUSD = (
+  liabilityAmount?: number,
+  latestPrice?: number,
+  decimals?: number,
+) => {
+  return (liabilityAmount * latestPrice) / (decimals * Math.pow(10, 18));
+};
+
 export const loanCRatio = (collUSD: number, liabUSD: number) => {
   return `${((collUSD / liabUSD) * 100).toFixed(2)}%`;
+};
+
+export const selectedLoanCRatio = (
+  collateralAmount?: number,
+  latestPriceETH?: number,
+  decimals?: number,
+  liabilityAmount?: number,
+  latestPrice?: number,
+  decimalsETH?: number,
+) => {
+  return `${(
+    ((collateralAmount * latestPriceETH * decimals) /
+      (liabilityAmount * latestPrice * decimalsETH)) *
+    100
+  ).toFixed(2)}%`;
 };
