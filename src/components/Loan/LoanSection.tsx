@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
@@ -14,67 +14,78 @@ import { LoanType } from "../../types/LoanTypes.ts";
 import { handleBodyScroll } from "../../utils";
 import sectionStyles from "./LoanOverview.module.css";
 import { LoanOverview } from "./LoanOverview.tsx";
+import {
+  loanCollateral,
+  loanLiability,
+  loanLiquidationRatioRate,
+} from "../../utils/calculations.ts";
+import { AssetType } from "../../types/AssetTypes.ts";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
-const loanTableTitles: SortableTableHeadType[] = [
+const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   {
     title: "Loan ID",
     key: "id",
     sortable: true,
+    mutateValue: (v) => `${String(v).substring(0, 8)}...`,
   },
   {
     title: "Asset",
     key: "assetName",
     sortable: false,
+    destructure: (o) => o.asset.symbol,
   },
   {
     title: "Liability",
     key: "liabilityAmount",
     sortable: true,
+    mutateValue: (v, join) => `${loanLiability(Number(v))} ${join ? join : ""}`,
   },
   {
     title: "Collateral",
     key: "collateralAmount",
     sortable: true,
+    mutateValue: (v, join) =>
+      `${loanCollateral(Number(v))} ${join ? join : ""}`,
   },
   {
     title: "C Ratio",
-    key: "interestRate",
+    key: "cRatio",
     sortable: true,
   },
   {
     title: "L Ratio",
-    key: "lRatio",
+    key: "liquidationRatio",
     sortable: true,
+    mutateValue: (v) => loanLiquidationRatioRate(Number(v)),
   },
 ];
 
 export const LoanSection: FC = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
-  const [tableConfig, setTableConfig] = useState<SortableTableConfigType>({
+  const [tableConfig, setTableConfig] = useState<
+    SortableTableConfigType<LoanType>
+  >({
     sort_order: "asc",
     sort_by: "id",
     filters: {},
     page_number: 1,
   });
-  const [error, setError] = useState<boolean>(false);
   const [selectedLoan, setSelectedLoan] = useState<string>("");
+  const { setState } = useGlobalState();
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryFn: async () => {
-      try {
-        const result = await client.query({
-          query: loanEntities,
-          variables: {
-            sort_by: tableConfig.sort_by,
-            sort_order: tableConfig.sort_order,
-          },
-        });
-        return result.data;
-      } catch (error) {
-        setError(true);
-        throw error;
-      }
+      const result = await client.query({
+        query: loanEntities,
+        variables: {
+          sort_by: tableConfig.sort_by,
+          sort_order: tableConfig.sort_order,
+        },
+      });
+      return result.data;
     },
+    refetchInterval: 10000,
     queryKey: [REQUEST_LOANS_ENTITIES],
   });
 
@@ -83,11 +94,34 @@ export const LoanSection: FC = () => {
     handleBodyScroll();
   };
 
+  useEffect(() => {
+    if (data?.loanEntities && data?.assetEntity) {
+      setState((prevState) => ({
+        ...prevState,
+        Price: new Map([
+          ...(prevState.Price || []),
+          ...data.loanEntities.map((loan: LoanType) => [
+            loan.id,
+            loan.asset.latestPrice,
+          ]),
+          ["latestPriceETH", data?.assetEntity.latestPrice],
+          ["decimalsETH", data?.assetEntity.aggregator.decimals],
+        ]),
+      }));
+    }
+  }, [
+    data?.assetEntity.aggregator.decimals,
+    data?.assetEntity.latestPrice,
+    data,
+    setState,
+  ]);
+
   if (isLoading) {
     return <Loader />;
   }
 
   const tableData: LoanType[] = data?.loanEntities ?? [];
+  const assetETH: AssetType = data?.assetEntity ?? {};
 
   const selectLoan = (id: string) => {
     setSelectedLoan(id);
@@ -109,59 +143,13 @@ export const LoanSection: FC = () => {
         tableData={tableData}
         tableConfig={tableConfig}
         setTableConfig={setTableConfig}
-        isError={error || isError}
+        isError={isError}
         callRefetch={refetch}
         selectLoan={selectLoan}
         selectedID={selectedLoan}
+        assetSymbol={assetETH.symbol}
       />
-      <LoanOverview loanID={selectedLoan} />
-      {/*<div className={styles.fundsSection}>*/}
-      {/*  <Card className={styles.fundsSectionCard}>*/}
-      {/*    <div className={styles.fundsSectionCardInner}>*/}
-      {/*      <div>*/}
-      {/*        <h5 className={styles.fundsSectionCardTitle}>*/}
-      {/*          0.00%*/}
-      {/*          <button*/}
-      {/*            type="button"*/}
-      {/*            className={styles.fundsSectionCardTitleButton}*/}
-      {/*          >*/}
-      {/*            <img src={iIcon as string} alt="icon" />*/}
-      {/*          </button>*/}
-      {/*        </h5>*/}
-      {/*        <p className={styles.fundsSectionCardSubtitle}>D / C (%)</p>*/}
-      {/*      </div>*/}
-      {/*      <div>*/}
-      {/*        <span className={styles.fundsSectionCardMessage}>*/}
-      {/*          No position*/}
-      {/*        </span>*/}
-      {/*        <p className={styles.fundsSectionCardValue}>*/}
-      {/*          Max - <span style={{ fontWeight: "600" }}>68.97</span>%*/}
-      {/*        </p>*/}
-      {/*      </div>*/}
-      {/*    </div>*/}
-      {/*  </Card>*/}
-      {/*  <Card className={styles.fundsSectionCard}>*/}
-      {/*    <div>*/}
-      {/*      <h5 className={styles.fundsSectionCardTitle}>0.00% / $3,468.08</h5>*/}
-      {/*      <p*/}
-      {/*        style={{*/}
-      {/*          display: "flex",*/}
-      {/*          alignItems: "center",*/}
-      {/*          gap: "6px",*/}
-      {/*        }}*/}
-      {/*        className={styles.fundsSectionCardSubtitle}*/}
-      {/*      >*/}
-      {/*        Liquidation (ETH)*/}
-      {/*        <button*/}
-      {/*          type="button"*/}
-      {/*          className={styles.fundsSectionCardTitleButton}*/}
-      {/*        >*/}
-      {/*          <img src={iIcon as string} alt="icon" />*/}
-      {/*        </button>*/}
-      {/*      </p>*/}
-      {/*    </div>*/}
-      {/*  </Card>*/}
-      {/*</div>*/}
+      <LoanOverview loanID={selectedLoan} assetETH={assetETH} />
       {selectAssetModal && (
         <LoanAssetsModal
           onClose={toggleSelectAsset}

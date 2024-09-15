@@ -4,16 +4,17 @@ import {
 } from "../../types/TableTypes.ts";
 import { SortableTableBodyItem } from "./SortableTableBodyItem.tsx";
 import styles from "./SortableTable.module.css";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 
 export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
-  titles: SortableTableHeadType[];
+  titles: SortableTableHeadType<T>[];
   sortOrder?: "asc" | "desc" | null;
   sortBy?: keyof T;
   isError: boolean;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
+  assetSymbol?: string;
 };
 
 export const SortableTableBody = <T,>({
@@ -24,6 +25,7 @@ export const SortableTableBody = <T,>({
   isError,
   selectLoan,
   selectedID,
+  assetSymbol,
 }: SortableTableBodyProps<T>) => {
   const sortedData = useMemo(() => {
     return tableData.slice().sort((a, b) => {
@@ -50,17 +52,19 @@ export const SortableTableBody = <T,>({
     <tbody className={styles.sortableTableTBody}>
       {sortedData.length > 0 || !isError ? (
         sortedData.map((dataItem, index) => (
-          <>
+          <Fragment key={dataItem.id}>
             <tr
               onClick={() => (selectLoan ? selectLoan(dataItem.id) : null)}
-              key={dataItem.id}
               className={`${selectedID === dataItem.id ? styles.selectedRow : ""}`}
             >
               {titles.map((title) => (
                 <SortableTableBodyItem
                   key={title.key}
+                  mutateValue={title.mutateValue}
+                  destructure={title.destructure}
                   dataItem={dataItem}
                   dataKey={title.key}
+                  assetSymbol={assetSymbol}
                 />
               ))}
             </tr>
@@ -69,7 +73,7 @@ export const SortableTableBody = <T,>({
                 <td colSpan={titles.length}></td>
               </tr>
             )}
-          </>
+          </Fragment>
         ))
       ) : (
         <tr>

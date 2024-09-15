@@ -6,7 +6,7 @@ import styles from "./SortableTable.module.css";
 import { SortableTableSortButton } from "./SortableTableSortButton.tsx";
 
 export type SortableTableHeadItemProps<T> = {
-  title: SortableTableHeadType;
+  title: SortableTableHeadType<T>;
   tableConfig: SortableTableConfigType<T>;
   onSort: (key: keyof T) => void;
 };
