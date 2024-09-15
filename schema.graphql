@@ -3,12 +3,15 @@ type AssetEntity @entity {
   name: String! # string
   symbol: String! # string
   dataFeedAddress: Bytes! # address
+  aggregator: AggregatorEntity! # address
   rate: BigInt! # 500 = 5%
   liquidationRatio: BigInt! # 12500 = 125%
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   loans: [LoanEntity!]! @derivedFrom(field: "asset")
+  latestPrice: BigInt! # int256
+  prices: [DataPointEntity!] @derivedFrom(field: "asset")
 }
 
 type LoanEntity @entity(immutable: true) {
@@ -17,7 +20,6 @@ type LoanEntity @entity(immutable: true) {
   collateralAmount: BigInt! # uint256
   asset: AssetEntity!
   liabilityAmount: BigInt! # uint256
-  dataFeedAddress: Bytes! # address
   borrowingRatio: BigInt! #uint32
   liquidationRatio: BigInt! #uint32
   interestRate: BigInt! # uint32
@@ -39,4 +41,21 @@ type OwnershipTransferred @entity(immutable: true) {
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
+}
+
+type AggregatorEntity @entity {
+  id: Bytes! # address
+  asset: AssetEntity!
+  decimals: Int # uint8
+  prices: [DataPointEntity!] @derivedFrom(field: "aggregator")
+}
+
+type DataPointEntity @entity {
+  id: Bytes! # bytes - transaction hash
+  asset: AssetEntity!
+  aggregator: AggregatorEntity!
+  price: BigInt! # int256
+  roundId: BigInt! # uint256
+  blockNumber: BigInt! # uint256
+  blockTimestamp: BigInt! # uint256
 }

@@ -35,6 +35,7 @@
 .positionsCardInnerWrapper {
     display: flex;
     align-items: flex-start;
+    overflow: hidden;
     gap: 12px;
 }
 .positionsCardIcon {
@@ -47,6 +48,10 @@
     color: #ffffff;
     font-weight: 500;
     letter-spacing: -0.762px;
+    max-width: max-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .positionsCardVolumeType {
     display: flex;
@@ -56,6 +61,13 @@
     color: #475467;
     letter-spacing: -0.762px;
     margin-top: 10px;
+    overflow: hidden;
+}
+.positionsCardVolumeTypeValue {
+    max-width: max-content;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 @media (min-width: 992px) {
     .positionsCard {

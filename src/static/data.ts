@@ -1,24 +1,4 @@
-import { dia, eth } from "./images.ts";
-import { AccountType, PositionCardType } from "../types/DataTypes.ts";
-
-export const positionsCards: PositionCardType[] = [
-  {
-    id: 1,
-    img: eth,
-    volume: "0.00",
-    coinType: "ETH",
-    badgeType: "text-bg-green",
-    badgeText: "Collateral",
-  },
-  {
-    id: 2,
-    img: dia,
-    volume: "0.00",
-    coinType: "dia",
-    badgeType: "text-bg-orange",
-    badgeText: "Debt",
-  },
-];
+import { AccountType } from "../types/DataTypes.ts";
 
 export const accounts: AccountType[] = [
   {

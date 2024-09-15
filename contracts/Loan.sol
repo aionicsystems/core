@@ -91,22 +91,20 @@ contract Loan is Ownable {
         return uint256(price);
     }
 
-    function assetToUsd(uint256 amount, address dataFeedAddress) public view returns (uint256) {
-        return dataFeedPrice(dataFeedAddress)*amount/AggregatorV3Interface(dataFeedAddress).decimals();
-    }
-
-    function usdToAsset(uint256 amount, address dataFeedAddress) public view returns (uint256) {
-        return (amount * AggregatorV3Interface(dataFeedAddress).decimals()) / dataFeedPrice(dataFeedAddress);
-    }
-
     function withdrawalAmount() public view returns (uint256) {
-        uint256 usdLiability = assetToUsd(liabilityAmount, assetDataFeedAddress);
-        uint256 usdCollateralNew = (usdLiability * borrowingRatio) / 10^precision;
-        return usdToAsset((assetToUsd(address(this).balance, etherDataFeedAddress) - usdCollateralNew), etherDataFeedAddress);
+        // Collateral(USD) = Liability(USD) * BorrowingRatio
+        // Collateral(USD) = Collateral(ETH) * Price(ETH)
+        // Liability(USD) = Liability(Asset) * Price(Asset)
+        // Collateral(ETH) = Liability(Asset) * Price(Asset) * BorrowingRatio / Price(ETH)
+        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*AggregatorV3Interface(assetDataFeedAddress).decimals()*precision**4);
+        return address(this).balance - collateralEnd;
     }
 
+    // Precision is defined by 10^precision
     function collateralizationRatio() public view returns(uint256) {
-        return (assetToUsd(address(this).balance, etherDataFeedAddress)*10^precision)/assetToUsd(liabilityAmount, assetDataFeedAddress);
+        // CR = collateral(USD) / liability(USD)
+        // CR = collateral(ETH) * Price(ETH) / (liability(Asset) * price(Asset))
+        return (address(this).balance * dataFeedPrice(etherDataFeedAddress) * AggregatorV3Interface(assetDataFeedAddress).decimals() * 10**precision) / (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * AggregatorV3Interface(etherDataFeedAddress).decimals());
     }
 
     // Payback loan with borrowed assets
@@ -135,6 +133,7 @@ contract Loan is Ownable {
     // Liquidates collateral to buy back loaned assets off market
     function liquidate(uint256 payment) public {
         require(payment > 0, "payment must be greater than zero");
+        require(payment <= liabilityAmount, "payment must less than or equal to loan liability");
         
         require(liabilityAmount >= payment);
         require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
@@ -146,15 +145,20 @@ contract Loan is Ownable {
         IERC20Burnable(asset).burnFrom(msg.sender, payment);
         
         // Calculate amount of ether redeemed for liquidation payment
-        uint256 redemption = usdToAsset(assetToUsd(payment, assetDataFeedAddress), etherDataFeedAddress);
+        // Collateral(USD) = Liability(USD)
+        // Collateral(ETH) = Liability(Asset) * Price(Asset) / Price(ETH)
+        uint256 redemption = payment * dataFeedPrice(assetDataFeedAddress) * AggregatorV3Interface(etherDataFeedAddress).decimals() / (dataFeedPrice(etherDataFeedAddress) * AggregatorV3Interface(assetDataFeedAddress).decimals());
         
         // Calculate total liquidator payment redemption plus fee
-        uint256 liquidator = redemption + (redemption * window.getParam("liquidatorFee")) / 10^precision;
+        uint256 liquidator = redemption + (redemption * window.getParam("liquidatorFee")) / 10**precision;
         payable(msg.sender).transfer(liquidator);
 
         // Calculate Dao fee
-        uint256 dao = (redemption * window.getParam("daoFee")) / 10^precision;
+        uint256 dao = (redemption * window.getParam("daoFee")) / 10**precision;
         payable(address(window)).transfer(dao);
+
+        // After transaction collateralization ratio must be less than or equal to the liquidation ratio
+        require(collateralizationRatio() <= liquidationRatio);
 
         loanEvent();
     }
@@ -166,8 +170,8 @@ contract Loan is Ownable {
         // Calculate interest
         // Collateral * Interest Rate = Yearly Interest
         // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
-        uint256 interest = (address(this).balance * interestRate * (block.timestamp - lastCollection)) / (31536000 * 10^precision);
-        uint256 collector = (interest * window.getParam("collectorFee")) / 10^precision;
+        uint256 interest = (address(this).balance * interestRate * (block.timestamp - lastCollection)) / (31536000 * 10**precision);
+        uint256 collector = (interest * window.getParam("collectorFee")) / 10**precision;
         
         // Pay window interest - collector fee
         payable(address(window)).transfer(interest - collector);
