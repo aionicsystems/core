@@ -28,6 +28,9 @@ export const assetSingleEntity = gql(`
       symbol
       rate
       liquidationRatio
+      aggregator {
+        decimals
+      }
       __typename
     }
   }
