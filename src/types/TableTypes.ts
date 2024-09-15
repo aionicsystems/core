@@ -4,7 +4,7 @@ export type SortableTableHeadType<T> = {
   title: string;
   sortable?: boolean;
   key: string;
-  mutateValue?: (v: string | number | T) => string | number;
+  mutateValue?: (v: string | number | T, join?: string) => string | number;
   destructure?: (o: T) => T[keyof T];
 };
 

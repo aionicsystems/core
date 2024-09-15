@@ -1,4 +1,4 @@
-import { FC, Fragment } from "react";
+import { FC } from "react";
 import { questionMark, xClose } from "../../static/images.ts";
 import styles from "./ModalHeading.module.css";
 

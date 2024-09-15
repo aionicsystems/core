@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { loanId, netValue, barrowRate, eth, dia } from "../../static/images.ts";
 import styles from "./LoanOverview.module.css";
 import accStyles from "../../App.module.css";
@@ -28,19 +28,13 @@ export type LoanOverviewProps = {
 };
 
 export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
-  const [error, setError] = useState<boolean>(false);
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
-      try {
-        const result = await client.query({
-          query: loanSingleEntity,
-          variables: { id: loanID },
-        });
-        return result.data;
-      } catch (error) {
-        setError(true);
-        throw error;
-      }
+      const result = await client.query({
+        query: loanSingleEntity,
+        variables: { id: loanID },
+      });
+      return result.data;
     },
     queryKey: [`${REQUEST_LOANS_ENTITY}_${loanID}`],
   });
@@ -53,7 +47,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
     );
   }
 
-  if (error || isError) {
+  if (isError) {
     return (
       <div>
         <p>No data.</p>

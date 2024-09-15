@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
@@ -19,10 +19,8 @@ import {
   loanLiability,
   loanLiquidationRatioRate,
 } from "../../utils/calculations.ts";
-// import { useGlobalState } from "../../hooks/GlobalStateProvider.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
-// import { useReadContracts } from "wagmi";
-// import { abi } from "../../abi/abi.ts";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   {
@@ -41,13 +39,14 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
     title: "Liability",
     key: "liabilityAmount",
     sortable: true,
-    mutateValue: (v) => loanLiability(Number(v)).toFixed(6),
+    mutateValue: (v, join) => `${loanLiability(Number(v))} ${join ? join : ""}`,
   },
   {
     title: "Collateral",
     key: "collateralAmount",
     sortable: true,
-    mutateValue: (v) => loanCollateral(Number(v)).toFixed(6),
+    mutateValue: (v, join) =>
+      `${loanCollateral(Number(v))} ${join ? join : ""}`,
   },
   {
     title: "C Ratio",
@@ -72,47 +71,50 @@ export const LoanSection: FC = () => {
     filters: {},
     page_number: 1,
   });
-  const [error, setError] = useState<boolean>(false);
   const [selectedLoan, setSelectedLoan] = useState<string>("");
-  // const { state, setState } = useGlobalState();
+  const { setState } = useGlobalState();
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryFn: async () => {
-      try {
-        const result = await client.query({
-          query: loanEntities,
-          variables: {
-            sort_by: tableConfig.sort_by,
-            sort_order: tableConfig.sort_order,
-          },
-        });
-        return result.data;
-      } catch (error) {
-        setError(true);
-        throw error;
-      }
+      const result = await client.query({
+        query: loanEntities,
+        variables: {
+          sort_by: tableConfig.sort_by,
+          sort_order: tableConfig.sort_order,
+        },
+      });
+      return result.data;
     },
+    refetchInterval: 10000,
     queryKey: [REQUEST_LOANS_ENTITIES],
   });
-
-  // const loanDataAddresses: string[] =
-  //   data?.loanEntities.map((entity: LoanType) => entity.asset.id) ?? [];
-
-  // const { data: prices, isFetching } = useReadContracts({
-  //   contracts: loanDataAddresses.map((address) => ({
-  //     address,
-  //     abi: abi,
-  //     functionName: "latestRoundData",
-  //   })),
-  //   watch: true,
-  // });
-  //
-  // console.log(prices, isFetching);
 
   const toggleSelectAsset = () => {
     setSelectAssetModal(!selectAssetModal);
     handleBodyScroll();
   };
+
+  useEffect(() => {
+    if (data?.loanEntities && data?.assetEntity) {
+      setState((prevState) => ({
+        ...prevState,
+        Price: new Map([
+          ...(prevState.Price || []),
+          ...data.loanEntities.map((loan: LoanType) => [
+            loan.id,
+            loan.asset.latestPrice,
+          ]),
+          ["latestPriceETH", data?.assetEntity.latestPrice],
+          ["decimalsETH", data?.assetEntity.aggregator.decimals],
+        ]),
+      }));
+    }
+  }, [
+    data?.assetEntity.aggregator.decimals,
+    data?.assetEntity.latestPrice,
+    data,
+    setState,
+  ]);
 
   if (isLoading) {
     return <Loader />;
@@ -141,10 +143,11 @@ export const LoanSection: FC = () => {
         tableData={tableData}
         tableConfig={tableConfig}
         setTableConfig={setTableConfig}
-        isError={error || isError}
+        isError={isError}
         callRefetch={refetch}
         selectLoan={selectLoan}
         selectedID={selectedLoan}
+        assetSymbol={assetETH.symbol}
       />
       <LoanOverview loanID={selectedLoan} assetETH={assetETH} />
       {selectAssetModal && (

@@ -14,6 +14,7 @@ export type SortableTableBodyProps<T> = {
   isError: boolean;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
+  assetSymbol?: string;
 };
 
 export const SortableTableBody = <T,>({
@@ -24,6 +25,7 @@ export const SortableTableBody = <T,>({
   isError,
   selectLoan,
   selectedID,
+  assetSymbol,
 }: SortableTableBodyProps<T>) => {
   const sortedData = useMemo(() => {
     return tableData.slice().sort((a, b) => {
@@ -62,6 +64,7 @@ export const SortableTableBody = <T,>({
                   destructure={title.destructure}
                   dataItem={dataItem}
                   dataKey={title.key}
+                  assetSymbol={assetSymbol}
                 />
               ))}
             </tr>

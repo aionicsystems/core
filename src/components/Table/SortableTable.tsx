@@ -23,6 +23,7 @@ export type SortableTableProps<T> = {
   callRefetch: () => Promise<QueryObserverResult<unknown, DefaultError>>;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
+  assetSymbol?: string;
 };
 
 export const SortableTable = <T,>({
@@ -34,6 +35,7 @@ export const SortableTable = <T,>({
   callRefetch,
   selectLoan,
   selectedID,
+  assetSymbol,
 }: SortableTableProps<T>) => {
   const tableWrapper = useRef<HTMLDivElement | null>(null);
   const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -129,6 +131,7 @@ export const SortableTable = <T,>({
             isError={isError}
             selectLoan={selectLoan}
             selectedID={selectedID}
+            assetSymbol={assetSymbol}
           />
         </table>
       </div>
