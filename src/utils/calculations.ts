@@ -26,7 +26,7 @@ export const selectedLoanCollateralUSD = (
   latestPrice?: number,
   decimals?: number,
 ) => {
-  return (collateralAmount * latestPrice) / (decimals * Math.pow(10, 18));
+  return (collateralAmount * latestPrice) / (Math.pow(10, decimals || 0) * Math.pow(10, 18));
 };
 
 export const loanLiabilityUSD = (
@@ -42,7 +42,7 @@ export const selectedLoanLiabilityUSD = (
   latestPrice?: number,
   decimals?: number,
 ) => {
-  return (liabilityAmount * latestPrice) / (decimals * Math.pow(10, 18));
+  return (liabilityAmount * latestPrice) / (Math.pow(10, decimals || 0) * Math.pow(10, 18));
 };
 
 export const loanCRatio = (collUSD: number, liabUSD: number) => {
