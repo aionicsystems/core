@@ -96,7 +96,7 @@ contract Loan is Ownable {
         // Collateral(USD) = Collateral(ETH) * Price(ETH)
         // Liability(USD) = Liability(Asset) * Price(Asset)
         // Collateral(ETH) = Liability(Asset) * Price(Asset) * BorrowingRatio / Price(ETH)
-        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*AggregatorV3Interface(assetDataFeedAddress).decimals()*precision**4);
+        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * 10**AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*10**AggregatorV3Interface(assetDataFeedAddress).decimals()*precision**4);
         return address(this).balance - collateralEnd;
     }
 
@@ -104,7 +104,7 @@ contract Loan is Ownable {
     function collateralizationRatio() public view returns(uint256) {
         // CR = collateral(USD) / liability(USD)
         // CR = collateral(ETH) * Price(ETH) / (liability(Asset) * price(Asset))
-        return (address(this).balance * dataFeedPrice(etherDataFeedAddress) * AggregatorV3Interface(assetDataFeedAddress).decimals() * 10**precision) / (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * AggregatorV3Interface(etherDataFeedAddress).decimals());
+        return (address(this).balance * dataFeedPrice(etherDataFeedAddress) * 10**AggregatorV3Interface(assetDataFeedAddress).decimals() * 10**precision) / (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * 10**AggregatorV3Interface(etherDataFeedAddress).decimals());
     }
 
     // Payback loan with borrowed assets
@@ -147,7 +147,7 @@ contract Loan is Ownable {
         // Calculate amount of ether redeemed for liquidation payment
         // Collateral(USD) = Liability(USD)
         // Collateral(ETH) = Liability(Asset) * Price(Asset) / Price(ETH)
-        uint256 redemption = payment * dataFeedPrice(assetDataFeedAddress) * AggregatorV3Interface(etherDataFeedAddress).decimals() / (dataFeedPrice(etherDataFeedAddress) * AggregatorV3Interface(assetDataFeedAddress).decimals());
+        uint256 redemption = payment * dataFeedPrice(assetDataFeedAddress) * 10**AggregatorV3Interface(etherDataFeedAddress).decimals() / (dataFeedPrice(etherDataFeedAddress) * 10**AggregatorV3Interface(assetDataFeedAddress).decimals());
         
         // Calculate total liquidator payment redemption plus fee
         uint256 liquidator = redemption + (redemption * window.getParam("liquidatorFee")) / 10**precision;
