@@ -171,7 +171,7 @@ contract Window is Ownable {
         // Liability(Asset) * Price(Asset)  = Collateral(USD) / BorrowingRatio
         // Liability(Asset) = Collateral(USD) / (BorrowingRatio * Price(Asset))
         // Liability(Asset) = (Collateral(ETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
-        uint256 liabilityAmount = (msg.value*dataFeedPrice(etherDataFeed)*10**precision*10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed)*params["borrowingRatio"]*10**etherDataFeed.decimals());
+        uint256 liabilityAmount = ((msg.value * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * params["borrowingRatio"])) / 10**etherDataFeed.decimals();
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
