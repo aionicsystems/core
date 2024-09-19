@@ -89,7 +89,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
             <>
               <SearchInput name={"search-asset"} />
               <div className={modalStyles.loanAssetsList}>
-                {assets.map((asset) => (
+                {assets.filter((asset) => asset.symbol != "ETH").map((asset) => (
                   <LoanAsset
                     selectAsset={selectAsset}
                     key={asset.id}

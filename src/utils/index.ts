@@ -7,6 +7,10 @@ export const formatRatio = (rate: string) => {
   return `${(Number(rate).toFixed(2) / 100).toFixed(2)}%`;
 };
 
+export const formatCoin = (amount: number) => {
+  return (amount * Math.pow(10, -18)).toFixed(6);
+};
+
 export const handleBodyScroll = () => {
   const body = document.body.classList;
 
