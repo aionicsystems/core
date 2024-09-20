@@ -17,6 +17,8 @@
 
 body {
   background-color: #09121F;
+  height: 100%;
+  overflow: hidden;
 }
 
 ._lock {

@@ -22,6 +22,8 @@
 .loanOverview {
     min-height: 220px;
     margin-top: 16px;
+    height: 100vh;
+    overflow-y: scroll;
 }
 
 @media (min-width: 768px) {
