@@ -6,64 +6,13 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 import { Loan } from "./Loan.sol";
+import { Library } from "./Library.sol";
 
 interface AggregatorInterface is AggregatorV3Interface {
     function aggregator() external returns (address);
 }
 
-contract Window is Ownable {
-    event LoanEntity(
-        address indexed loanAddress, 
-        address owner,
-        uint256 collateralAmount,
-        address assetAddress,
-        uint256 liabilityAmount,
-        address dataFeedAddress,
-        uint32 borrowingRatio,
-        uint32 liquidationRatio,
-        uint32 interestRate,
-        uint256 lastCollection
-    );
-
-    function loanEntityEvent(
-        address loanAddress, 
-        address owner,
-        uint256 collateralAmount,
-        address assetAddress,
-        uint256 liabilityAmount,
-        address dataFeedAddress,
-        uint32 borrowingRatio,
-        uint32 liquidationRatio,
-        uint32 interestRate,
-        uint256 lastCollection
-    ) public {
-        require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
-        emit LoanEntity(
-            loanAddress, 
-            owner,
-            collateralAmount,
-            assetAddress,
-            liabilityAmount,
-            dataFeedAddress,
-            borrowingRatio,
-            liquidationRatio,
-            interestRate,
-            lastCollection
-        );
-    }
-
-    event AssetEntity(
-        address indexed token, 
-        string name, 
-        string symbol, 
-        address dataFeedAddress,
-        address aggregatorAddress,
-        uint32 rate,
-        uint32 liquidationRatio,
-        uint8 decimals,
-        int256 latestPrice 
-    );
- 
+contract Window is Ownable, Library {
     // Number of decimal precision used in ratios and rates
     uint8 precision;
 
@@ -210,5 +159,10 @@ contract Window is Ownable {
         );
         
         return liabilityAmount;
+    }
+
+    event Received(address, uint);
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 }

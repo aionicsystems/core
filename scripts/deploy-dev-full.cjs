@@ -124,8 +124,8 @@ async function main() {
     let options = {value: ethers.parseEther("1.0")}
     let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     let result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} ANVDA`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} ANVDA`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
     result = await tx.wait();
@@ -135,8 +135,10 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AAMZN`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AAMZN`);
+
+    let loan1Address = result2.logs[4].args[0];
 
     tx = await window.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
     result = await tx.wait();
@@ -146,8 +148,10 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AAPL`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AAPL`);
+
+    let loan2Address = result2.logs[4].args[0];
 
     tx = await window.approveAsset(assetDataFeedAddress, "Google", "AGOOG", 500, 13000);
     result = await tx.wait();
@@ -157,8 +161,8 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AGOOG`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "Microsoft", "AMCST", 400, 11000);
     result = await tx.wait();
@@ -168,8 +172,8 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AMCST`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AMCST`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "ConocoPhillips", "ACOP", 500, 13000);
     result = await tx.wait();
@@ -179,8 +183,8 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} ACOP`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} ACOP`);
 
     tx = await window.approveAsset(assetDataFeedAddress, "AMD", "AAMD", 500, 13000);
     result = await tx.wait();
@@ -190,16 +194,34 @@ async function main() {
     options = {value: ethers.parseEther(".5")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AAMD`);
-
-    
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AAMD`);
 
     options = {value: ethers.parseEther("1.0")}
     tx2 = await window.issue(assetEntityEvents[0].args[0], options);
     result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[3].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[3].args[4]} AGOOG`);
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
+
+    options = {value: ethers.parseEther("100")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
+
+    options = {value: ethers.parseEther("100")}
+    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
+    result2 = await tx2.wait();
+    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
+    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
+
+    let Loan = await hre.ethers.getContractFactory("Loan");
+    
+    let loan1 = Loan.attach(loan1Address);
+    let collectTx1 = await loan1.collect();
+
+    let loan2 = Loan.attach(loan2Address);
+    let collectTx2 = await loan2.collect();
 
     // Create and deploy the subgraph
     await system.run(`npm run codegen`, { cwd: srcDir });

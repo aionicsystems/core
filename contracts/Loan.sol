@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IERC20 } from '@openzeppelin/contracts/interfaces/IERC20.sol';
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import { Library } from "./Library.sol";
 
 interface IERC20Burnable is IERC20 {
     function burnFrom(address account, uint256 value) external;
@@ -11,21 +12,9 @@ interface IERC20Burnable is IERC20 {
 
 interface WindowInterface {
     function getParam(bytes32) external returns (uint32);
-    function loanEntityEvent(
-        address loanAddress, 
-        address owner,
-        uint256 collateralAmount,
-        address assetAddress,
-        uint256 liabilityAmount,
-        address dataFeedAddress,
-        uint32 borrowingRatio,
-        uint32 liquidationRatio,
-        uint32 interestRate,
-        uint256 lastCollection
-    ) external;
 }
 
-contract Loan is Ownable {
+contract Loan is Ownable, Library {
     WindowInterface window;
     address public asset;
     address public assetDataFeedAddress;
@@ -60,11 +49,11 @@ contract Loan is Ownable {
         etherDataFeedAddress = _etherDataFeedAddress;
         lastCollection = _time;
         precision = _precision;
-        // loanEvent();
+        loanEvent();
     }
 
     function loanEvent() internal {
-        window.loanEntityEvent(
+        emit LoanEntity(
             address(this),
             owner(),
             address(this).balance,
@@ -171,14 +160,17 @@ contract Loan is Ownable {
         // Collateral * Interest Rate = Yearly Interest
         // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
         uint256 interest = (address(this).balance * interestRate * (block.timestamp - lastCollection)) / (31536000 * 10**precision);
-        uint256 collector = (interest * window.getParam("collectorFee")) / 10**precision;
         
+        require(interest > 0, "Interest not greater than zero");
+
+        uint256 collector = (interest * window.getParam("collectorFee")) / 10**precision;
+
         // Pay window interest - collector fee
         payable(address(window)).transfer(interest - collector);
-
+        
         // Pay collector ether
         payable(msg.sender).transfer(collector);
-
+        
         loanEvent();
     }
 
