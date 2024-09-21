@@ -1,5 +1,11 @@
 import { FC } from "react";
-import { loanId, netValue, barrowRate, eth, aionCoin } from "../../static/images.ts";
+import {
+  loanId,
+  netValue,
+  barrowRate,
+  eth,
+  aionCoin,
+} from "../../static/images.ts";
 import styles from "./LoanOverview.module.css";
 import accStyles from "../../App.module.css";
 import { OverviewCard } from "../OverviewCard/OverviewCard.tsx";
@@ -69,16 +75,18 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
     loanData?.asset?.aggregator.decimals,
   ).toFixed(2);
 
-  const netValueUsd = (selectedLoanCollateralUSD(
-    loanData.collateralAmount,
-    assetETH.latestPrice,
-    assetETH.aggregator.decimals,
-  ) - selectedLoanLiabilityUSD(
-    loanData.liabilityAmount,
-    loanData?.asset?.latestPrice,
-    loanData?.asset?.aggregator.decimals,
-  )).toFixed(2)
-
+  const netValueUsd = (
+    selectedLoanCollateralUSD(
+      loanData.collateralAmount,
+      assetETH.latestPrice,
+      assetETH.aggregator.decimals,
+    ) -
+    selectedLoanLiabilityUSD(
+      loanData.liabilityAmount,
+      loanData?.asset?.latestPrice,
+      loanData?.asset?.aggregator.decimals,
+    )
+  ).toFixed(2);
 
   const collRation = selectedLoanCRatio(
     loanData.collateralAmount,
@@ -91,68 +99,70 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
 
   return (
     <div className={styles.loanOverview}>
-      <div className={styles.overviewCardsWrapper}>
-        <OverviewCard
-          value={loanData.id ? `${loanData.id.substring(0, 8)}...` : "No data"}
-          label={"Loan ID"}
-          icon={loanId as string}
-          color={"light-skyBlue"}
-        />
-        <OverviewCard
-          value={netValueUsd ? `$${netValueUsd}` : "$0.00"}
-          label={"Net Value"}
-          icon={netValue as string}
-          color={"light-gold"}
-        />
-        <OverviewCard
-          value={
-            loanData.asset ? loanInterestRate(loanData.asset.rate) : "No data"
-          }
-          label={"Interest rate"}
-          icon={barrowRate as string}
-          color={"light-blue"}
-        />
-      </div>
-      <div className={styles.overviewCardsWrapper}>
-        <OverviewCardSmall
-          value={loanData.asset ? collRation : "No data"}
-          label={"Collateralization Ratio"}
-        />
-        <OverviewCardSmall
-          value={
-            loanData.borrowingRatio
-              ? formatRatio(String(loanData.borrowingRatio))
-              : "No data"
-          }
-          label={"Borrowing Ratio"}
-        />
-        <OverviewCardSmall
-          value={
-            loanData.liquidationRatio
-              ? loanLiquidationRatioRate(loanData.liquidationRatio)
-              : "No data"
-          }
-          label={"Liquidation Ratio"}
-        />
-      </div>
-      <div className={accStyles.accountsWrapper}>
-        {accounts.map((item) => (
-          <AccountsCard
-            balance={item.balance}
-            key={item.id}
-            text={item.text}
-            btnText={item.btnText}
+      <div>
+        <div className={styles.overviewCardsWrapper}>
+          <OverviewCard
+            value={
+              loanData.id ? `${loanData.id.substring(0, 8)}...` : "No data"
+            }
+            label={"Loan ID"}
+            icon={loanId as string}
+            color={"light-skyBlue"}
           />
-        ))}
+          <OverviewCard
+            value={netValueUsd ? `$${netValueUsd}` : "$0.00"}
+            label={"Net Value"}
+            icon={netValue as string}
+            color={"light-gold"}
+          />
+          <OverviewCard
+            value={
+              loanData.asset ? loanInterestRate(loanData.asset.rate) : "No data"
+            }
+            label={"Interest rate"}
+            icon={barrowRate as string}
+            color={"light-blue"}
+          />
+        </div>
+        <div className={styles.overviewCardsWrapper}>
+          <OverviewCardSmall
+            value={loanData.asset ? collRation : "No data"}
+            label={"Collateralization Ratio"}
+          />
+          <OverviewCardSmall
+            value={
+              loanData.borrowingRatio
+                ? formatRatio(String(loanData.borrowingRatio))
+                : "No data"
+            }
+            label={"Borrowing Ratio"}
+          />
+          <OverviewCardSmall
+            value={
+              loanData.liquidationRatio
+                ? loanLiquidationRatioRate(loanData.liquidationRatio)
+                : "No data"
+            }
+            label={"Liquidation Ratio"}
+          />
+        </div>
+        <div className={accStyles.accountsWrapper}>
+          {accounts.map((item) => (
+            <AccountsCard
+              balance={item.balance}
+              key={item.id}
+              text={item.text}
+              btnText={item.btnText}
+            />
+          ))}
+        </div>
       </div>
-      <section
-        className={`${accStyles.mainSection} ${accStyles.positionsSection}`}
-      >
+      <section className={accStyles.positionsSection}>
         <div className={accStyles.positionsCardsWrapper}>
           <PositionsCard
             img={eth as string}
             valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
-            value={loanData? formatCoin(loanData.collateralAmount): ""}
+            value={loanData ? formatCoin(loanData.collateralAmount) : ""}
             coinType={assetETH.symbol}
             badgeType={"text-bg-green"}
             badgeText={"Collateral"}
@@ -160,8 +170,10 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           <PositionsCard
             img={aionCoin as string}
             valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
-            value={loanData? formatCoin(loanData.liabilityAmount): ""}
-            coinType={loanData? loanData.asset? loanData.asset.symbol : "" : ""}
+            value={loanData ? formatCoin(loanData.liabilityAmount) : ""}
+            coinType={
+              loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
+            }
             badgeType={"text-bg-orange"}
             badgeText={"Debt"}
           />
