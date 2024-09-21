@@ -13,6 +13,16 @@ interface AggregatorInterface is AggregatorV3Interface {
 }
 
 contract Window is Ownable, Library {
+    event WindowEntity(
+        address indexed windowAddress, 
+        address owner,
+        address etherDataFeedAddress,
+        uint32 borrowingRatio,
+        uint32 collectorFee,
+        uint32 daoFee,
+        uint32 liquidatorFee
+    );
+
     // Number of decimal precision used in ratios and rates
     uint8 precision;
 
