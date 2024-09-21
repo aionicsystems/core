@@ -7,7 +7,8 @@ import { iIcon } from "../../static/images.ts";
 
 type PositionsCardProps = {
   img: string;
-  volume: string | number;
+  value: string | number;
+  valueUsd: string | number;
   coinType: string;
   badgeText: string;
   badgeType: string;
@@ -17,7 +18,8 @@ export const PositionsCard: FC<PositionsCardProps> = ({
   img,
   badgeText,
   coinType,
-  volume,
+  value,
+  valueUsd,
   badgeType,
 }) => {
   return (
@@ -26,10 +28,10 @@ export const PositionsCard: FC<PositionsCardProps> = ({
         <div className={styles.positionsCardInnerWrapper}>
           <img src={img} alt="eth" className={styles.positionsCardIcon} />
           <div style={{ overflow: "hidden" }}>
-            <h5 className={styles.positionsCardVolume}>${volume}</h5>
+            <h5 className={styles.positionsCardVolume}>${valueUsd}</h5>
             <p className={styles.positionsCardVolumeType}>
               <span className={styles.positionsCardVolumeTypeValue}>
-                {volume}{" "}
+                {value}{" "}
               </span>
               <span style={{ textTransform: "uppercase" }}>{coinType}</span>
               <button type="button" className={styles.positionsCardButton}>
