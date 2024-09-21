@@ -99,63 +99,59 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
 
   return (
     <div className={styles.loanOverview}>
-      <div>
-        <div className={styles.overviewCardsWrapper}>
-          <OverviewCard
-            value={
-              loanData.id ? `${loanData.id.substring(0, 8)}...` : "No data"
-            }
-            label={"Loan ID"}
-            icon={loanId as string}
-            color={"light-skyBlue"}
+      <div className={styles.overviewCardsWrapper}>
+        <OverviewCard
+          value={loanData.id ? `${loanData.id.substring(0, 8)}...` : "No data"}
+          label={"Loan ID"}
+          icon={loanId as string}
+          color={"light-skyBlue"}
+        />
+        <OverviewCard
+          value={netValueUsd ? `$${netValueUsd}` : "$0.00"}
+          label={"Net Value"}
+          icon={netValue as string}
+          color={"light-gold"}
+        />
+        <OverviewCard
+          value={
+            loanData.asset ? loanInterestRate(loanData.asset.rate) : "No data"
+          }
+          label={"Interest rate"}
+          icon={barrowRate as string}
+          color={"light-blue"}
+        />
+      </div>
+      <div className={styles.overviewCardsWrapper}>
+        <OverviewCardSmall
+          value={loanData.asset ? collRation : "No data"}
+          label={"Collateralization Ratio"}
+        />
+        <OverviewCardSmall
+          value={
+            loanData.borrowingRatio
+              ? formatRatio(String(loanData.borrowingRatio))
+              : "No data"
+          }
+          label={"Borrowing Ratio"}
+        />
+        <OverviewCardSmall
+          value={
+            loanData.liquidationRatio
+              ? loanLiquidationRatioRate(loanData.liquidationRatio)
+              : "No data"
+          }
+          label={"Liquidation Ratio"}
+        />
+      </div>
+      <div className={accStyles.accountsWrapper}>
+        {accounts.map((item) => (
+          <AccountsCard
+            balance={item.balance}
+            key={item.id}
+            text={item.text}
+            btnText={item.btnText}
           />
-          <OverviewCard
-            value={netValueUsd ? `$${netValueUsd}` : "$0.00"}
-            label={"Net Value"}
-            icon={netValue as string}
-            color={"light-gold"}
-          />
-          <OverviewCard
-            value={
-              loanData.asset ? loanInterestRate(loanData.asset.rate) : "No data"
-            }
-            label={"Interest rate"}
-            icon={barrowRate as string}
-            color={"light-blue"}
-          />
-        </div>
-        <div className={styles.overviewCardsWrapper}>
-          <OverviewCardSmall
-            value={loanData.asset ? collRation : "No data"}
-            label={"Collateralization Ratio"}
-          />
-          <OverviewCardSmall
-            value={
-              loanData.borrowingRatio
-                ? formatRatio(String(loanData.borrowingRatio))
-                : "No data"
-            }
-            label={"Borrowing Ratio"}
-          />
-          <OverviewCardSmall
-            value={
-              loanData.liquidationRatio
-                ? loanLiquidationRatioRate(loanData.liquidationRatio)
-                : "No data"
-            }
-            label={"Liquidation Ratio"}
-          />
-        </div>
-        <div className={accStyles.accountsWrapper}>
-          {accounts.map((item) => (
-            <AccountsCard
-              balance={item.balance}
-              key={item.id}
-              text={item.text}
-              btnText={item.btnText}
-            />
-          ))}
-        </div>
+        ))}
       </div>
       <section className={accStyles.positionsSection}>
         <div className={accStyles.positionsCardsWrapper}>
