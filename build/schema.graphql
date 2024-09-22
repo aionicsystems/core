@@ -59,3 +59,13 @@ type DataPointEntity @entity {
   blockNumber: BigInt! # uint256
   blockTimestamp: BigInt! # uint256
 }
+
+type WindowEntity @entity {
+  id: Bytes! # Address of Window
+  owner: Bytes! # Owner of the Window
+  etherDataFeedAddress: Bytes! # Ether Data Feed Address
+  borrowingRatio: BigInt! # uint32
+  collectorFee: BigInt! # uint32
+  daoFee: BigInt! # uint32
+  liquidatorFee: BigInt! # uint32
+}

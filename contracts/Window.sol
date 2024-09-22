@@ -13,6 +13,16 @@ interface AggregatorInterface is AggregatorV3Interface {
 }
 
 contract Window is Ownable, Library {
+    event WindowEntity(
+        address indexed windowAddress, 
+        address owner,
+        address etherDataFeedAddress,
+        uint32 borrowingRatio,
+        uint32 collectorFee,
+        uint32 daoFee,
+        uint32 liquidatorFee
+    );
+
     // Number of decimal precision used in ratios and rates
     uint8 precision;
 
@@ -62,6 +72,16 @@ contract Window is Ownable, Library {
             0,
             AggregatorInterface(etherDataFeedAddress).decimals(),
             getChainlinkDataFeedLatestAnswer(etherDataFeed)
+        );
+
+        emit WindowEntity(
+            address(this), 
+            address(owner),
+            etherDataFeedAddress,
+            borrowingRatio,
+            collectorFee,
+            daoFee,
+            liquidatorFee
         );
     }
 

@@ -8,7 +8,7 @@ dataSources:
     name: Window
     network: test
     source:
-      address: "0xa074c7744F3293BF49A4E22d39C1e5Accf929024"
+      address: "0x36c982c74176A667fA32c47Ce20004A7b830cDD4"
       abi: Window
       startBlock: 0
     mapping:
@@ -30,6 +30,8 @@ dataSources:
         - event: LoanEntity(indexed
             address,address,uint256,address,uint256,address,uint32,uint32,uint32,uint256)
           handler: handleLoanEntity
+        - event: WindowEntity(indexed address,address,address,uint32,uint32,uint32,uint32)
+          handler: handleWindowEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
       file: Window/Window.wasm

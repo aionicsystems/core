@@ -158,6 +158,48 @@ export class Received__Params {
   }
 }
 
+export class WindowEntity extends ethereum.Event {
+  get params(): WindowEntity__Params {
+    return new WindowEntity__Params(this);
+  }
+}
+
+export class WindowEntity__Params {
+  _event: WindowEntity;
+
+  constructor(event: WindowEntity) {
+    this._event = event;
+  }
+
+  get windowAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get owner(): Address {
+    return this._event.parameters[1].value.toAddress();
+  }
+
+  get etherDataFeedAddress(): Address {
+    return this._event.parameters[2].value.toAddress();
+  }
+
+  get borrowingRatio(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
+  }
+
+  get collectorFee(): BigInt {
+    return this._event.parameters[4].value.toBigInt();
+  }
+
+  get daoFee(): BigInt {
+    return this._event.parameters[5].value.toBigInt();
+  }
+
+  get liquidatorFee(): BigInt {
+    return this._event.parameters[6].value.toBigInt();
+  }
+}
+
 export class Window extends ethereum.SmartContract {
   static bind(address: Address): Window {
     return new Window("Window", address);
