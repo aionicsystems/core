@@ -24,6 +24,8 @@
     margin-top: 16px;
     flex-grow: 1;
     height: 40%;
+    scrollbar-color: transparent transparent;
+    scrollbar-width: thin;
     overflow-y: auto;
 }
 
