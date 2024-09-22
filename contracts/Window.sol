@@ -73,6 +73,16 @@ contract Window is Ownable, Library {
             AggregatorInterface(etherDataFeedAddress).decimals(),
             getChainlinkDataFeedLatestAnswer(etherDataFeed)
         );
+
+        emit WindowEntity(
+            address(this), 
+            address(owner),
+            etherDataFeedAddress,
+            borrowingRatio,
+            collectorFee,
+            daoFee,
+            liquidatorFee
+        );
     }
 
     function setParam(bytes32 param, uint32 value) public onlyOwner {
