@@ -5,9 +5,10 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
+    min-height: 100dvh;
+    height: 100dvh;
 }
 .mainSection {
-    margin-top: 12px;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -126,17 +127,9 @@
         width: 100%;
     }
     .container {
-        min-height: 100dvh;
         padding: 35px;
-        height: 100dvh;
-    }
-    .mainSection {
-        margin-top: 26px;
     }
     .sectionTitle {
         font-size: 24px;
-    }
-    .positionsSection {
-        padding-bottom: 25px;
     }
 }
