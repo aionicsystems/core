@@ -7,7 +7,7 @@ function App() {
   return (
     <div className={styles.container}>
       <Header />
-      <main>
+      <main className={styles.mainStyles}>
         <section className={styles.mainSection}>
           <LoanSection />
         </section>

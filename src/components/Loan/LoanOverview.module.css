@@ -20,10 +20,11 @@
 }
 
 .loanOverview {
-    min-height: 220px;
+    min-height: 120px;
     margin-top: 16px;
-    height: 100vh;
-    overflow-y: scroll;
+    flex-grow: 1;
+    height: 40%;
+    overflow-y: auto;
 }
 
 @media (min-width: 768px) {

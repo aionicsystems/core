@@ -3,10 +3,15 @@
     margin: 0 auto;
     background-color: #08101B;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
 }
 .mainSection {
     margin-top: 12px;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 .sectionTitle {
     color: #ffffff;
@@ -79,6 +84,12 @@
     margin-top: 8px;
     color: #475467;
 }
+.mainStyles {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+}
 .accountsWrapper {
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
@@ -86,7 +97,7 @@
     margin-top: 14px;
 }
 .positionsCardsWrapper {
-    margin-top: 28px;
+    margin-top: 26px;
     display: grid;
     grid-template-columns: repeat(1, minmax(0, 1fr));
     gap: 16px;
@@ -97,7 +108,6 @@
 
 @media (min-width: 768px) {
     .positionsCardsWrapper {
-        margin-top: 40px;
         gap: 32px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -118,11 +128,15 @@
     .container {
         min-height: 100dvh;
         padding: 35px;
+        height: 100dvh;
     }
     .mainSection {
         margin-top: 26px;
     }
     .sectionTitle {
         font-size: 24px;
+    }
+    .positionsSection {
+        padding-bottom: 25px;
     }
 }

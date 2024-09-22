@@ -105,7 +105,7 @@ export const SortableTable = <T,>({
       tableWrapper.current !== null &&
       "scrollHeight" in tableWrapper.current
     ) {
-      const maxAvailableScreenHeight = screen.height * 0.56;
+      const maxAvailableScreenHeight = screen.height * 0.7;
       const newMaxHeight =
         tableWrapper.current.scrollHeight > maxAvailableScreenHeight
           ? maxAvailableScreenHeight.toFixed(0)
