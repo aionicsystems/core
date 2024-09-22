@@ -8,7 +8,7 @@ import { SearchInput } from "../SearchInput/SearchInput.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { LoanAssetsModalFaq } from "./LoanAssetsModalFaq.tsx";
 import { IssueLoanModal } from "../IssueLoanModal/IssueLoanModal.tsx";
-import { assetEntities, client } from "../../repository/requests.ts";
+import { assetEntities, windowEntities, client } from "../../repository/requests.ts";
 import { useQuery } from "@tanstack/react-query";
 import { LoanAsset } from "./LoanAsset.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";
@@ -38,6 +38,21 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
     queryKey: [REQUEST_ASSET_ENTITIES],
   });
 
+  const { data: dataWindow, isLoading: isLoadingWindow, isError: isErrorWindow } = useQuery({
+    queryFn: async () => {
+      try {
+        const result = await client.query({
+          query: assetEntities,
+        });
+        return result.data;
+      } catch (error) {
+        setError(true);
+        throw error;
+      }
+    },
+    queryKey: [REQUEST_ASSET_ENTITIES],
+  });
+
   const toggleModalFaq = () => {
     setModalFaq(!modalFaq);
   };
@@ -51,11 +66,11 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
     toggleLoanIssue();
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingWindow) {
     return <Loader />;
   }
 
-  if (error || isError) {
+  if (error || isError || isErrorWindow) {
     return (
       <ModalOverlay onClose={onClose} size={size}>
         <div className={styles.modalInner}>
@@ -106,6 +121,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
           onClose={toggleLoanIssue}
           size={size}
           selectedAsset={selectedAsset && selectedAsset.id}
+          dataWindow={dataWindow}
           modalTitle={"Issue Loan"}
         />
       )}

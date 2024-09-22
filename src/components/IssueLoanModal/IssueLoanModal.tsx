@@ -23,6 +23,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   onClose,
   size,
   selectedAsset,
+  dataWindow,
 }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);

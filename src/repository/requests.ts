@@ -92,3 +92,18 @@ export const loanSingleEntity = gql(
   }
 }`,
 );
+
+export const windowEntities = gql(`
+  query WindowEntitiesQuery {
+    windowEntities {
+      id
+      owner
+      etherDataAddress
+      borrowingRatio
+      collectorFee
+      daoFee
+      liquidatorFee
+      __typename
+    }
+  }
+`);
