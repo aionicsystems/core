@@ -20,7 +20,8 @@ contract Window is Ownable, Library {
         uint32 borrowingRatio,
         uint32 collectorFee,
         uint32 daoFee,
-        uint32 liquidatorFee
+        uint32 liquidatorFee,
+        uint8 precision
     );
 
     // Number of decimal precision used in ratios and rates
@@ -81,7 +82,8 @@ contract Window is Ownable, Library {
             borrowingRatio,
             collectorFee,
             daoFee,
-            liquidatorFee
+            liquidatorFee,
+            precision
         );
     }
 

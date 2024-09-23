@@ -45,6 +45,18 @@ export const selectedLoanLiabilityUSD = (
   return (liabilityAmount * latestPrice) / (Math.pow(10, decimals || 0) * Math.pow(10, 18));
 };
 
+export const estimatedLoanLiability = (
+  collateralAmount?: number,
+  latestCollateralPrice?: number,
+  collateralDecimals?: number,
+  latestLiabilityPrice?: number,
+  liabilityDecimals?: number,
+  borrowingRatio?: number,
+  precision?: number,
+) => {
+  return ((collateralAmount * latestCollateralPrice) * Math.pow(10, liabilityDecimals) * Math.pow(10, precision)) / (Math.pow(10, collateralDecimals || 0) * Math.pow(10, 18) * latestLiabilityPrice * borrowingRatio);
+};
+
 export const loanCRatio = (collUSD: number, liabUSD: number) => {
   return `${((collUSD / liabUSD) * 100).toFixed(2)}%`;
 };

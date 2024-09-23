@@ -42,7 +42,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
     queryFn: async () => {
       try {
         const result = await client.query({
-          query: assetEntities,
+          query: windowEntities,
         });
         return result.data;
       } catch (error) {
@@ -121,7 +121,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
           onClose={toggleLoanIssue}
           size={size}
           selectedAsset={selectedAsset && selectedAsset.id}
-          dataWindow={dataWindow}
+          dataWindow={dataWindow[0]}
           modalTitle={"Issue Loan"}
         />
       )}
