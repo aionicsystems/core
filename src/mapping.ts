@@ -105,6 +105,7 @@ export function handleWindowEntity(event: WindowEntityEvent): void {
   window.collectorFee = event.params.collectorFee
   window.daoFee = event.params.daoFee
   window.liquidatorFee = event.params.liquidatorFee
+  window.precision = event.params.precision
 
   window.save()
 }
