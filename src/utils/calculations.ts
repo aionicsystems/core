@@ -2,7 +2,11 @@ export const loanInterestRate = (rate: number) => {
   return `${(rate * (Math.pow(10, -4) * 100)).toFixed(2)}%`;
 };
 export const loanLiquidationRatioRate = (liquidationRatio: number) => {
-  return `${(liquidationRatio * (Math.pow(10, -4) * 100)).toFixed(2)}%`;
+  return `${(liquidationRatio * (Math.pow(10, -4) * 100)).toFixed(0)}%`;
+};
+
+export const borrowingRatioRate = (borrowingRatio: number) => {
+  return `${(borrowingRatio * (Math.pow(10, -4) * 100)).toFixed(0)}%`;
 };
 
 export const loanLiability = (amount: number) => {
@@ -48,13 +52,11 @@ export const selectedLoanLiabilityUSD = (
 export const estimatedLoanLiability = (
   collateralAmount?: number,
   latestCollateralPrice?: number,
-  collateralDecimals?: number,
   latestLiabilityPrice?: number,
-  liabilityDecimals?: number,
   borrowingRatio?: number,
   precision?: number,
 ) => {
-  return ((collateralAmount * latestCollateralPrice) * Math.pow(10, liabilityDecimals) * Math.pow(10, precision)) / (Math.pow(10, collateralDecimals || 0) * Math.pow(10, 18) * latestLiabilityPrice * borrowingRatio);
+  return (collateralAmount * latestCollateralPrice * Math.pow(10, precision)) / (latestLiabilityPrice * borrowingRatio);
 };
 
 export const loanCRatio = (collUSD: number, liabUSD: number) => {

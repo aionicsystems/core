@@ -38,21 +38,6 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
     queryKey: [REQUEST_ASSET_ENTITIES],
   });
 
-  const { data: dataWindow, isLoading: isLoadingWindow, isError: isErrorWindow } = useQuery({
-    queryFn: async () => {
-      try {
-        const result = await client.query({
-          query: windowEntities,
-        });
-        return result.data;
-      } catch (error) {
-        setError(true);
-        throw error;
-      }
-    },
-    queryKey: [REQUEST_ASSET_ENTITIES],
-  });
-
   const toggleModalFaq = () => {
     setModalFaq(!modalFaq);
   };
@@ -66,11 +51,11 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
     toggleLoanIssue();
   };
 
-  if (isLoading || isLoadingWindow) {
+  if (isLoading) {
     return <Loader />;
   }
 
-  if (error || isError || isErrorWindow) {
+  if (error || isError) {
     return (
       <ModalOverlay onClose={onClose} size={size}>
         <div className={styles.modalInner}>
@@ -121,7 +106,6 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
           onClose={toggleLoanIssue}
           size={size}
           selectedAsset={selectedAsset && selectedAsset.id}
-          dataWindow={dataWindow[0]}
           modalTitle={"Issue Loan"}
         />
       )}

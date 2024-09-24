@@ -104,8 +104,8 @@ export const LoanSection: FC = () => {
             loan.id,
             loan.asset.latestPrice,
           ]),
-          ["latestPriceETH", data?.assetEntity.latestPrice],
-          ["decimalsETH", data?.assetEntity.aggregator.decimals],
+          ["collateralPrice", data?.assetEntity.latestPrice],
+          ["collateralDecimals", data?.assetEntity.aggregator.decimals],
         ]),
       }));
     }

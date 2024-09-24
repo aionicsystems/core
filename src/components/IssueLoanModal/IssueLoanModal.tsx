@@ -7,7 +7,6 @@ import { IssueLoanModalFaq } from "./IssueLoanModalFaq.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { assetSingleEntity, client } from "../../repository/requests.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
-import { WindowType } from "../../types/WindowTypes.ts";
 import { IssueAssetInfo } from "./IssueAssetInfo.tsx";
 import { IssueLoanForm } from "./IssueLoanForm.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";
@@ -17,7 +16,6 @@ import { REQUEST_ASSET_ENTITIES } from "../../repository/requestKeys.ts";
 
 export type IssueLoanModalProps = Modal & {
   selectedAsset?: string;
-  dataWindow?: WindowType;
 };
 
 export const IssueLoanModal: FC<IssueLoanModalProps> = ({
@@ -25,9 +23,9 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   onClose,
   size,
   selectedAsset,
-  dataWindow,
 }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
+  const [collateralAmount, setCollateralAmount] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
@@ -81,14 +79,14 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
           modalTitle={modalTitle}
         />
         <div className={styles.modalContent}>
-          {modalFaq ? (
+          { modalFaq ? (
             <IssueLoanModalFaq />
-          ) : (
+          ) : 
             <>
-              <IssueLoanForm assetID={selectedAsset} />
-              <IssueAssetInfo issue={asset as AssetType} />
-            </>
-          )}
+              <IssueLoanForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} />
+              <IssueAssetInfo issue={asset} collateralAmount={collateralAmount} />
+            </> 
+          }
         </div>
       </div>
     </ModalOverlay>

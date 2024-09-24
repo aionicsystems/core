@@ -25,6 +25,12 @@
     text-align: center;
 }
 
+.collateralInput::after {
+    content: 'ETH';
+    font-weight: 500;
+    font-size: 16px;
+}
+
 @media (min-width: 768px) {
     .collateralInput {
         padding: 28px;

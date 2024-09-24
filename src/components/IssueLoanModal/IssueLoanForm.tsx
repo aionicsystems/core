@@ -8,10 +8,11 @@ import { parseEther, Address } from "viem";
 
 export type IssueLoanFormProps = {
   assetID?: string;
+  setCollateralAmount: (collateralAmount:string) => void;
+  collateralAmount: string;
 };
 
-export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
-  const [collateral, setCollateral] = useState<string>("");
+export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount }) => {
   const { data: hash, isPending, writeContractAsync } = useWriteContract();
   const { chain } = useAccount();
 
@@ -19,7 +20,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
     const value = event.target.value;
     const regex = /^\d*\.?\d*$/;
     if (regex.test(value) || value === "") {
-      setCollateral(value);
+      setCollateralAmount(value);
     }
   };
 
@@ -32,7 +33,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
       abi,
       functionName: 'issue',
       args: [assetID as Address],
-      value: parseEther(collateral)
+      value: parseEther(collateralAmount)
     })
   }
 
@@ -47,8 +48,9 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
         type="text"
         name="collateral"
         id="collateral"
+        autoComplete="off"
         className={styles.collateralInput}
-        value={collateral}
+        value={collateralAmount}
         onChange={handleChange}
         placeholder="0.00"
       />
