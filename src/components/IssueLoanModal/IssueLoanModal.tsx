@@ -13,6 +13,7 @@ import { ModalError } from "../ModalError/ModalError.tsx";
 import { Loader } from "../Loader/Loader.tsx";
 import { LoanAssetsModalFaq } from "../LoanAssetsModal/LoanAssetsModalFaq.tsx";
 import { REQUEST_ASSET_ENTITIES } from "../../repository/requestKeys.ts";
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 
 export type IssueLoanModalProps = Modal & {
   selectedAsset?: string;
@@ -27,6 +28,11 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [collateralAmount, setCollateralAmount] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+  const { data: hash, isPending, writeContractAsync } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed } =
+  useWaitForTransactionReceipt({ 
+    hash,
+  })
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
       try {
@@ -47,8 +53,12 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
     setModalFaq(!modalFaq);
   };
 
-  if (isLoading) {
+  if (isLoading || isPending || isConfirming) {
     return <Loader />;
+  }
+
+  if (isConfirmed) {
+    onClose();
   }
 
   if (error || isError) {
@@ -83,7 +93,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
             <IssueLoanModalFaq />
           ) : 
             <>
-              <IssueLoanForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} />
+              <IssueLoanForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} writeContractAsync={writeContractAsync} isPending={isPending} />
               <IssueAssetInfo issue={asset} collateralAmount={collateralAmount} />
             </> 
           }

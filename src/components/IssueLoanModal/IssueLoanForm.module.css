@@ -5,6 +5,7 @@
     justify-content: flex-start;
     gap: 10px;
 }
+
 .issueLoanFormTitle {
     color: #E9E9E9DB;
     font-size: 16px;
@@ -12,7 +13,7 @@
     text-align: center;
 }
 
-.inputWithUnitGrid, .outputWithUnitGrid {
+.inputWithUnitGrid {
     display: grid;
     grid-template-columns: 100px 1fr 100px; /* Three columns: left space, input/output, right label */
     align-items: center;
@@ -22,7 +23,7 @@
     width: 100%;
 }
 
-.collateralInputGrid, .issueInfoValueGrid {
+.collateralInputGrid {
     background-color: transparent;
     color: #ffffff;
     padding: 19px;

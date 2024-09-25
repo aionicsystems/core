@@ -2,18 +2,21 @@ import { FC, useState } from "react";
 import { Button } from "../Button/Button.tsx";
 import styles from "./IssueLoanForm.module.css";
 import { contractAddress } from "../../repository/contracts.ts";
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, Config } from 'wagmi';
 import { abi } from '../../../artifacts/contracts/Window.sol/Window.json'
 import { parseEther, Address } from "viem";
+import { WriteContractMutateAsync } from "wagmi/query";
 
 export type IssueLoanFormProps = {
   assetID?: string;
   setCollateralAmount: (collateralAmount:string) => void;
   collateralAmount: string;
+  writeContractAsync: WriteContractMutateAsync<Config, unknown>;
+  isPending: boolean;
 };
 
-export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount }) => {
-  const { data: hash, isPending, writeContractAsync } = useWriteContract();
+export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount, writeContractAsync, isPending }) => {
+  
   const { chain } = useAccount();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +46,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
       id={assetID}
       className={styles.issueLoanForm}
     >
-      <p className={styles.issueLoanFormTitle}>Collateral (ETH)</p>
+      <p className={styles.issueLoanFormTitle}>Collateral</p>
       <div className={styles.inputWithUnitGrid}>
         <span className={styles.unitLabelLeft}></span> {/* Empty span for grid space */}
         <input
@@ -61,8 +64,6 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
       <Button size={"sm"} type={"submit"} btnType={"primary"} disabled={isPending}>
         Submit
       </Button>
-      {isPending ? 'Confirming...' : 'Issue'}
-      {hash && <div>Transaction Hash: {hash}</div>}
     </form>
   );
 };
