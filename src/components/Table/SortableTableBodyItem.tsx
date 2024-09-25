@@ -70,9 +70,9 @@ export const SortableTableBodyItem = <T,>({
               ? calcCRatio(
                   dataItem["collateralAmount"],
                   dataItem.asset?.latestPrice,
-                  Number(Price?.get("latestPriceETH")),
+                  Number(Price?.get("collateralPrice")),
                   dataItem.asset?.aggregator.decimals,
-                  Number(Price?.get("decimalsETH")),
+                  Number(Price?.get("collateralDecimals")),
                   dataItem["liabilityAmount"],
                 )
               : dataItem[dataKey]}

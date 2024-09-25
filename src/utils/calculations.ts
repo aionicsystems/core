@@ -60,7 +60,7 @@ export const estimatedLoanLiability = (
 };
 
 export const loanCRatio = (collUSD: number, liabUSD: number) => {
-  return `${((collUSD / liabUSD) * 100).toFixed(2)}%`;
+  return `${((collUSD / liabUSD) * 100).toFixed(0)}%`;
 };
 
 export const selectedLoanCRatio = (

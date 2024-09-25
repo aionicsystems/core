@@ -43,17 +43,21 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
       id={assetID}
       className={styles.issueLoanForm}
     >
-      <p className={styles.issueLoanFormTitle}>Collateral</p>
-      <input
-        type="text"
-        name="collateral"
-        id="collateral"
-        autoComplete="off"
-        className={styles.collateralInput}
-        value={collateralAmount}
-        onChange={handleChange}
-        placeholder="0.00"
-      />
+      <p className={styles.issueLoanFormTitle}>Collateral (ETH)</p>
+      <div className={styles.inputWithUnitGrid}>
+        <span className={styles.unitLabelLeft}></span> {/* Empty span for grid space */}
+        <input
+          type="text"
+          name="collateral"
+          id="collateral"
+          autoComplete="off"
+          className={styles.collateralInputGrid}
+          value={collateralAmount}
+          onChange={handleChange}
+          placeholder="0.00"
+        />
+        <span className={styles.unitLabelRight}>ETH</span>
+      </div>
       <Button size={"sm"} type={"submit"} btnType={"primary"} disabled={isPending}>
         Submit
       </Button>
