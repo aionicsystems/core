@@ -869,6 +869,19 @@ export class WindowEntity extends Entity {
   set liquidatorFee(value: BigInt) {
     this.set("liquidatorFee", Value.fromBigInt(value));
   }
+
+  get precision(): BigInt {
+    let value = this.get("precision");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set precision(value: BigInt) {
+    this.set("precision", Value.fromBigInt(value));
+  }
 }
 
 export class LoanEntityLoader extends Entity {

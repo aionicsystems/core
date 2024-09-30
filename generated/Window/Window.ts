@@ -198,6 +198,10 @@ export class WindowEntity__Params {
   get liquidatorFee(): BigInt {
     return this._event.parameters[6].value.toBigInt();
   }
+
+  get precision(): i32 {
+    return this._event.parameters[7].value.toI32();
+  }
 }
 
 export class Window extends ethereum.SmartContract {

@@ -143,16 +143,6 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           label={"Liquidation Ratio"}
         />
       </div>
-      <div className={accStyles.accountsWrapper}>
-        {accounts.map((item) => (
-          <AccountsCard
-            balance={item.balance}
-            key={item.id}
-            text={item.text}
-            btnText={item.btnText}
-          />
-        ))}
-      </div>
       <section className={accStyles.positionsSection}>
         <div className={accStyles.positionsCardsWrapper}>
           <PositionsCard

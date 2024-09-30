@@ -1,7 +1,7 @@
 import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 
 export const APIURL =
-  "http://34.30.203.81:8000/subgraphs/name/AionCoreSubgraph/";
+  "http://34.72.19.102:8000/subgraphs/name/AionCoreSubgraph/";
 export const client = new ApolloClient({
   uri: APIURL,
   cache: new InMemoryCache(),
@@ -24,6 +24,7 @@ export const assetSingleEntity = gql(`
   query AssetEntitiesQuery($id: Bytes) {
     assetEntity(id: $id) {
       id
+      latestPrice
       name
       symbol
       rate
@@ -92,3 +93,18 @@ export const loanSingleEntity = gql(
   }
 }`,
 );
+
+export const windowEntities = gql(`
+  query WindowEntitiesQuery {
+    windowEntities {
+      id
+      owner
+      borrowingRatio
+      collectorFee
+      daoFee
+      etherDataFeedAddress
+      liquidatorFee
+      precision
+    }
+  }
+`);

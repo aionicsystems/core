@@ -2,24 +2,28 @@ import { FC, useState } from "react";
 import { Button } from "../Button/Button.tsx";
 import styles from "./IssueLoanForm.module.css";
 import { contractAddress } from "../../repository/contracts.ts";
-import { useAccount, useWriteContract } from 'wagmi';
+import { useAccount, Config } from 'wagmi';
 import { abi } from '../../../artifacts/contracts/Window.sol/Window.json'
 import { parseEther, Address } from "viem";
+import { WriteContractMutateAsync } from "wagmi/query";
 
 export type IssueLoanFormProps = {
   assetID?: string;
+  setCollateralAmount: (collateralAmount:string) => void;
+  collateralAmount: string;
+  writeContractAsync: WriteContractMutateAsync<Config, unknown>;
+  isPending: boolean;
 };
 
-export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
-  const [collateral, setCollateral] = useState<string>("");
-  const { data: hash, isPending, writeContractAsync } = useWriteContract();
+export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount, writeContractAsync, isPending }) => {
+  
   const { chain } = useAccount();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
     const regex = /^\d*\.?\d*$/;
     if (regex.test(value) || value === "") {
-      setCollateral(value);
+      setCollateralAmount(value);
     }
   };
 
@@ -32,7 +36,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
       abi,
       functionName: 'issue',
       args: [assetID as Address],
-      value: parseEther(collateral)
+      value: parseEther(collateralAmount)
     })
   }
 
@@ -43,20 +47,23 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID }) => {
       className={styles.issueLoanForm}
     >
       <p className={styles.issueLoanFormTitle}>Collateral</p>
-      <input
-        type="text"
-        name="collateral"
-        id="collateral"
-        className={styles.collateralInput}
-        value={collateral}
-        onChange={handleChange}
-        placeholder="0.00"
-      />
+      <div className={styles.inputWithUnitGrid}>
+        <span className={styles.unitLabelLeft}></span> {/* Empty span for grid space */}
+        <input
+          type="text"
+          name="collateral"
+          id="collateral"
+          autoComplete="off"
+          className={styles.collateralInputGrid}
+          value={collateralAmount}
+          onChange={handleChange}
+          placeholder="0.00"
+        />
+        <span className={styles.unitLabelRight}>ETH</span>
+      </div>
       <Button size={"sm"} type={"submit"} btnType={"primary"} disabled={isPending}>
         Submit
       </Button>
-      {isPending ? 'Confirming...' : 'Issue'}
-      {hash && <div>Transaction Hash: {hash}</div>}
     </form>
   );
 };

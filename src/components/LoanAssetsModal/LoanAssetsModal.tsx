@@ -8,7 +8,7 @@ import { SearchInput } from "../SearchInput/SearchInput.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { LoanAssetsModalFaq } from "./LoanAssetsModalFaq.tsx";
 import { IssueLoanModal } from "../IssueLoanModal/IssueLoanModal.tsx";
-import { assetEntities, client } from "../../repository/requests.ts";
+import { assetEntities, windowEntities, client } from "../../repository/requests.ts";
 import { useQuery } from "@tanstack/react-query";
 import { LoanAsset } from "./LoanAsset.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";

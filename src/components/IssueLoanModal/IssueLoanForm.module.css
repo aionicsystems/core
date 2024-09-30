@@ -5,28 +5,54 @@
     justify-content: flex-start;
     gap: 10px;
 }
+
 .issueLoanFormTitle {
     color: #E9E9E9DB;
     font-size: 16px;
     line-height: 24px;
     text-align: center;
 }
-.collateralInput {
-    width: 100%;
+
+.inputWithUnitGrid {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px; /* Three columns: left space, input/output, right label */
+    align-items: center;
     background-color: #08101B6E;
-    padding: 19px;
     border-radius: 16px;
+    padding-right: 10px;
+    width: 100%;
+}
+
+.collateralInputGrid {
+    background-color: transparent;
+    color: #ffffff;
+    padding: 19px;
+    border: none;
+    outline: none;
     font-weight: 500;
     font-size: 16px;
     line-height: 24px;
-    color: #ffffff;
-    outline: none;
-    border: none;
     text-align: center;
+    width: 100%;
+}
+
+.unitLabelLeft {
+    width: 100px; /* Matches the space on the right */
+    background-color: transparent;
+}
+
+.unitLabelRight {
+    padding: 0 15px;
+    background-color: transparent;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    border-left: 1px solid #5a5a6b;
+    width: 100px;
 }
 
 @media (min-width: 768px) {
-    .collateralInput {
+    .collateralInputGrid, .issueInfoValueGrid {
         padding: 28px;
         font-size: 17px;
         line-height: 23px;
