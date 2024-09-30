@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styles from "./Header.module.css";
 import {
   adjustmentsIcon,
@@ -7,19 +7,23 @@ import {
   logo,
 } from "../../static/images.ts";
 import { Button } from "../Button/Button.tsx";
-import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { useAccount } from "wagmi";
+import {
+  useConnectModal,
+  useAccountModal,
+  useChainModal,
+} from '@rainbow-me/rainbowkit';
 
 export const Header: FC = () => {
-  const { open } = useWeb3Modal();
   const { address } = useAccount();
   const isWallet = !!address;
+  const { openConnectModal } = useConnectModal();
 
   return (
     <header className={styles.headerWrapper}>
       <img className={styles.logo} src={logo as string} alt="aion" />
       <div className={styles.headerInner}>
-        <Button size={"sm"} btnType={"primary"} onClick={() => open()}>
+        <Button size={"sm"} btnType={"primary"} onClick={openConnectModal}>
           {isWallet ? "Open" : "Connect"}
         </Button>
         <button type="button" className={styles.coinButton}>
