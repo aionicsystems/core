@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IERC20 } from '@openzeppelin/contracts/interfaces/IERC20.sol';
 import { AggregatorV3Interface } from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import { Library } from "./Library.sol";
 
 interface IERC20Burnable is IERC20 {
     function burnFrom(address account, uint256 value) external;
@@ -11,21 +12,9 @@ interface IERC20Burnable is IERC20 {
 
 interface WindowInterface {
     function getParam(bytes32) external returns (uint32);
-    function loanEntityEvent(
-        address loanAddress, 
-        address owner,
-        uint256 collateralAmount,
-        address assetAddress,
-        uint256 liabilityAmount,
-        address dataFeedAddress,
-        uint32 borrowingRatio,
-        uint32 liquidationRatio,
-        uint32 interestRate,
-        uint256 lastCollection
-    ) external;
 }
 
-contract Loan is Ownable {
+contract Loan is Ownable, Library {
     WindowInterface window;
     address public asset;
     address public assetDataFeedAddress;
@@ -60,11 +49,11 @@ contract Loan is Ownable {
         etherDataFeedAddress = _etherDataFeedAddress;
         lastCollection = _time;
         precision = _precision;
-        // loanEvent();
+        loanEvent();
     }
 
     function loanEvent() internal {
-        window.loanEntityEvent(
+        emit LoanEntity(
             address(this),
             owner(),
             address(this).balance,
@@ -96,7 +85,7 @@ contract Loan is Ownable {
         // Collateral(USD) = Collateral(ETH) * Price(ETH)
         // Liability(USD) = Liability(Asset) * Price(Asset)
         // Collateral(ETH) = Liability(Asset) * Price(Asset) * BorrowingRatio / Price(ETH)
-        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*AggregatorV3Interface(assetDataFeedAddress).decimals()*precision**4);
+        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * 10**AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*10**AggregatorV3Interface(assetDataFeedAddress).decimals()*precision**4);
         return address(this).balance - collateralEnd;
     }
 
@@ -104,7 +93,7 @@ contract Loan is Ownable {
     function collateralizationRatio() public view returns(uint256) {
         // CR = collateral(USD) / liability(USD)
         // CR = collateral(ETH) * Price(ETH) / (liability(Asset) * price(Asset))
-        return (address(this).balance * dataFeedPrice(etherDataFeedAddress) * AggregatorV3Interface(assetDataFeedAddress).decimals() * 10**precision) / (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * AggregatorV3Interface(etherDataFeedAddress).decimals());
+        return ((address(this).balance * dataFeedPrice(etherDataFeedAddress) * 10**AggregatorV3Interface(assetDataFeedAddress).decimals() * 10**precision) / (liabilityAmount * dataFeedPrice(assetDataFeedAddress))) / 10**AggregatorV3Interface(etherDataFeedAddress).decimals();
     }
 
     // Payback loan with borrowed assets
@@ -147,7 +136,7 @@ contract Loan is Ownable {
         // Calculate amount of ether redeemed for liquidation payment
         // Collateral(USD) = Liability(USD)
         // Collateral(ETH) = Liability(Asset) * Price(Asset) / Price(ETH)
-        uint256 redemption = payment * dataFeedPrice(assetDataFeedAddress) * AggregatorV3Interface(etherDataFeedAddress).decimals() / (dataFeedPrice(etherDataFeedAddress) * AggregatorV3Interface(assetDataFeedAddress).decimals());
+        uint256 redemption = (payment * dataFeedPrice(assetDataFeedAddress) * 10**AggregatorV3Interface(etherDataFeedAddress).decimals() / (dataFeedPrice(etherDataFeedAddress))) / 10**AggregatorV3Interface(assetDataFeedAddress).decimals();
         
         // Calculate total liquidator payment redemption plus fee
         uint256 liquidator = redemption + (redemption * window.getParam("liquidatorFee")) / 10**precision;
@@ -171,14 +160,17 @@ contract Loan is Ownable {
         // Collateral * Interest Rate = Yearly Interest
         // (Yearly Interest / 31,536,000 Seconds in Year) * Number of Seconds since Update = Accrued Interest
         uint256 interest = (address(this).balance * interestRate * (block.timestamp - lastCollection)) / (31536000 * 10**precision);
-        uint256 collector = (interest * window.getParam("collectorFee")) / 10**precision;
         
+        require(interest > 0, "Interest not greater than zero");
+
+        uint256 collector = (interest * window.getParam("collectorFee")) / 10**precision;
+
         // Pay window interest - collector fee
         payable(address(window)).transfer(interest - collector);
-
+        
         // Pay collector ether
         payable(msg.sender).transfer(collector);
-
+        
         loanEvent();
     }
 

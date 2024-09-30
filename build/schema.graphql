@@ -68,5 +68,4 @@ type WindowEntity @entity {
   collectorFee: BigInt! # uint32
   daoFee: BigInt! # uint32
   liquidatorFee: BigInt! # uint32
-  precision: BigInt! # uint8
 }

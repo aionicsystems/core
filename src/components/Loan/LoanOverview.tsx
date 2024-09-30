@@ -1,5 +1,11 @@
 import { FC } from "react";
-import { loanId, netValue, barrowRate, eth, dia } from "../../static/images.ts";
+import {
+  loanId,
+  netValue,
+  barrowRate,
+  eth,
+  aionCoin,
+} from "../../static/images.ts";
 import styles from "./LoanOverview.module.css";
 import accStyles from "../../App.module.css";
 import { OverviewCard } from "../OverviewCard/OverviewCard.tsx";
@@ -9,7 +15,7 @@ import { REQUEST_LOANS_ENTITY } from "../../repository/requestKeys.ts";
 import { SmallLoader } from "../Loader/SmallLoader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
-import { formatRatio } from "../../utils";
+import { formatRatio, formatCoin } from "../../utils";
 import {
   loanInterestRate,
   loanLiquidationRatioRate,
@@ -69,6 +75,19 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
     loanData?.asset?.aggregator.decimals,
   ).toFixed(2);
 
+  const netValueUsd = (
+    selectedLoanCollateralUSD(
+      loanData.collateralAmount,
+      assetETH.latestPrice,
+      assetETH.aggregator.decimals,
+    ) -
+    selectedLoanLiabilityUSD(
+      loanData.liabilityAmount,
+      loanData?.asset?.latestPrice,
+      loanData?.asset?.aggregator.decimals,
+    )
+  ).toFixed(2);
+
   const collRation = selectedLoanCRatio(
     loanData.collateralAmount,
     assetETH?.latestPrice,
@@ -88,7 +107,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           color={"light-skyBlue"}
         />
         <OverviewCard
-          value={"$ 0.00"}
+          value={netValueUsd ? `$${netValueUsd}` : "$0.00"}
           label={"Net Value"}
           icon={netValue as string}
           color={"light-gold"}
@@ -124,31 +143,23 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           label={"Liquidation Ratio"}
         />
       </div>
-      <div className={accStyles.accountsWrapper}>
-        {accounts.map((item) => (
-          <AccountsCard
-            balance={item.balance}
-            key={item.id}
-            text={item.text}
-            btnText={item.btnText}
-          />
-        ))}
-      </div>
-      <section
-        className={`${accStyles.mainSection} ${accStyles.positionsSection}`}
-      >
+      <section className={accStyles.positionsSection}>
         <div className={accStyles.positionsCardsWrapper}>
           <PositionsCard
             img={eth as string}
-            volume={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
+            valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
+            value={loanData ? formatCoin(loanData.collateralAmount) : ""}
             coinType={assetETH.symbol}
             badgeType={"text-bg-green"}
             badgeText={"Collateral"}
           />
           <PositionsCard
-            img={dia as string}
-            volume={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
-            coinType={"dia"}
+            img={aionCoin as string}
+            valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
+            value={loanData ? formatCoin(loanData.liabilityAmount) : ""}
+            coinType={
+              loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
+            }
             badgeType={"text-bg-orange"}
             badgeText={"Debt"}
           />

@@ -56,22 +56,29 @@ export const SortableTable = <T,>({
     await callRefetch();
   };
 
-  const startResizing = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    setIsResizing(true);
-    setStartY(e.clientY);
-    if (
-      tableWrapper.current !== null &&
-      "offsetHeight" in tableWrapper.current
-    ) {
-      setStartHeight(tableWrapper.current.offsetHeight);
-    }
-    document.body.classList.add("no-select");
-  }, []);
+  const startResizing = useCallback(
+    (
+      e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+    ) => {
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      setIsResizing(true);
+      setStartY(clientY);
+      if (
+        tableWrapper.current !== null &&
+        "offsetHeight" in tableWrapper.current
+      ) {
+        setStartHeight(tableWrapper.current.offsetHeight);
+      }
+      document.body.classList.add("no-select");
+    },
+    [],
+  );
 
   const handleMouseMove = useCallback(
-    (e: MouseEvent) => {
+    (e: MouseEvent | TouchEvent) => {
       if (isResizing || tableWrapper.current) {
-        const newHeight = startHeight + (e.clientY - startY);
+        const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+        const newHeight = startHeight + (clientY - startY);
         if (tableWrapper.current !== null && "style" in tableWrapper.current) {
           tableWrapper.current.style.height = `${newHeight}px`;
         }
@@ -89,14 +96,20 @@ export const SortableTable = <T,>({
     if (isResizing) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", stopResizing);
+      document.addEventListener("touchmove", handleMouseMove);
+      document.addEventListener("touchend", stopResizing);
     } else {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", stopResizing);
+      document.removeEventListener("touchmove", handleMouseMove);
+      document.removeEventListener("touchend", stopResizing);
     }
 
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", stopResizing);
+      document.removeEventListener("touchmove", handleMouseMove);
+      document.removeEventListener("touchend", stopResizing);
     };
   }, [isResizing, handleMouseMove, stopResizing]);
 
@@ -105,7 +118,7 @@ export const SortableTable = <T,>({
       tableWrapper.current !== null &&
       "scrollHeight" in tableWrapper.current
     ) {
-      const maxAvailableScreenHeight = screen.height * 0.56;
+      const maxAvailableScreenHeight = screen.height * 0.7;
       const newMaxHeight =
         tableWrapper.current.scrollHeight > maxAvailableScreenHeight
           ? maxAvailableScreenHeight.toFixed(0)
@@ -137,6 +150,7 @@ export const SortableTable = <T,>({
       </div>
       <div
         onMouseDown={(e) => startResizing(e)}
+        onTouchStart={(e) => startResizing(e)}
         className={styles.sortableTableResize}
       />
     </>

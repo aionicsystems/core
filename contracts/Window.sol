@@ -6,64 +6,24 @@ import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interf
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 import { Loan } from "./Loan.sol";
+import { Library } from "./Library.sol";
 
 interface AggregatorInterface is AggregatorV3Interface {
     function aggregator() external returns (address);
 }
 
-contract Window is Ownable {
-    event LoanEntity(
-        address indexed loanAddress, 
+contract Window is Ownable, Library {
+    event WindowEntity(
+        address indexed windowAddress, 
         address owner,
-        uint256 collateralAmount,
-        address assetAddress,
-        uint256 liabilityAmount,
-        address dataFeedAddress,
+        address etherDataFeedAddress,
         uint32 borrowingRatio,
-        uint32 liquidationRatio,
-        uint32 interestRate,
-        uint256 lastCollection
+        uint32 collectorFee,
+        uint32 daoFee,
+        uint32 liquidatorFee,
+        uint8 precision
     );
 
-    function loanEntityEvent(
-        address loanAddress, 
-        address owner,
-        uint256 collateralAmount,
-        address assetAddress,
-        uint256 liabilityAmount,
-        address dataFeedAddress,
-        uint32 borrowingRatio,
-        uint32 liquidationRatio,
-        uint32 interestRate,
-        uint256 lastCollection
-    ) public {
-        require(loans[msg.sender].lastCollection() > 0, "loan does not exist");
-        emit LoanEntity(
-            loanAddress, 
-            owner,
-            collateralAmount,
-            assetAddress,
-            liabilityAmount,
-            dataFeedAddress,
-            borrowingRatio,
-            liquidationRatio,
-            interestRate,
-            lastCollection
-        );
-    }
-
-    event AssetEntity(
-        address indexed token, 
-        string name, 
-        string symbol, 
-        address dataFeedAddress,
-        address aggregatorAddress,
-        uint32 rate,
-        uint32 liquidationRatio,
-        uint8 decimals,
-        int256 latestPrice 
-    );
- 
     // Number of decimal precision used in ratios and rates
     uint8 precision;
 
@@ -113,6 +73,17 @@ contract Window is Ownable {
             0,
             AggregatorInterface(etherDataFeedAddress).decimals(),
             getChainlinkDataFeedLatestAnswer(etherDataFeed)
+        );
+
+        emit WindowEntity(
+            address(this), 
+            address(owner),
+            etherDataFeedAddress,
+            borrowingRatio,
+            collectorFee,
+            daoFee,
+            liquidatorFee,
+            precision
         );
     }
 
@@ -171,7 +142,7 @@ contract Window is Ownable {
         // Liability(Asset) * Price(Asset)  = Collateral(USD) / BorrowingRatio
         // Liability(Asset) = Collateral(USD) / (BorrowingRatio * Price(Asset))
         // Liability(Asset) = (Collateral(ETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
-        uint256 liabilityAmount = (msg.value*dataFeedPrice(etherDataFeed)*10**precision*assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed)*params["borrowingRatio"]*etherDataFeed.decimals());
+        uint256 liabilityAmount = ((msg.value * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * params["borrowingRatio"])) / 10**etherDataFeed.decimals();
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
@@ -210,5 +181,10 @@ contract Window is Ownable {
         );
         
         return liabilityAmount;
+    }
+
+    event Received(address, uint);
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 }

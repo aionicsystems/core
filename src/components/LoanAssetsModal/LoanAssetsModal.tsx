@@ -8,7 +8,7 @@ import { SearchInput } from "../SearchInput/SearchInput.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { LoanAssetsModalFaq } from "./LoanAssetsModalFaq.tsx";
 import { IssueLoanModal } from "../IssueLoanModal/IssueLoanModal.tsx";
-import { assetEntities, client } from "../../repository/requests.ts";
+import { assetEntities, windowEntities, client } from "../../repository/requests.ts";
 import { useQuery } from "@tanstack/react-query";
 import { LoanAsset } from "./LoanAsset.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";
@@ -89,7 +89,7 @@ export const LoanAssetsModal: FC<Modal> = ({ modalTitle, size, onClose }) => {
             <>
               <SearchInput name={"search-asset"} />
               <div className={modalStyles.loanAssetsList}>
-                {assets.map((asset) => (
+                {assets.filter((asset) => asset.symbol != "ETH").map((asset) => (
                   <LoanAsset
                     selectAsset={selectAsset}
                     key={asset.id}

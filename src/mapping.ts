@@ -2,14 +2,16 @@ import { log, DataSourceContext } from "@graphprotocol/graph-ts";
 import {
   AssetEntity as AssetEntityEvent,
   LoanEntity as LoanEntityEvent,
-  OwnershipTransferred as OwnershipTransferredEvent
+  OwnershipTransferred as OwnershipTransferredEvent,
+  WindowEntity as WindowEntityEvent
 } from "../generated/Window/Window"
 import {
   AggregatorEntity,
   AssetEntity,
   LoanEntity,
   OwnerEntity,
-  OwnershipTransferred
+  OwnershipTransferred,
+  WindowEntity
 } from "../generated/schema"
 import { Aggregator as AggregatorTemplate } from "../generated/templates";
 
@@ -87,4 +89,23 @@ export function handleOwnershipTransferred(
   entity.transactionHash = event.transaction.hash
 
   entity.save()
+}
+
+export function handleWindowEntity(event: WindowEntityEvent): void {
+  let window = WindowEntity.load(event.params.windowAddress);
+  if (window == null) {
+    window = new WindowEntity(event.params.windowAddress)
+  }
+  
+  log.debug('The Window Address is: {} ', [event.params.windowAddress.toString()]);
+
+  window.owner = event.params.owner
+  window.etherDataFeedAddress = event.params.etherDataFeedAddress
+  window.borrowingRatio = event.params.borrowingRatio
+  window.collectorFee = event.params.collectorFee
+  window.daoFee = event.params.daoFee
+  window.liquidatorFee = event.params.liquidatorFee
+  window.precision = event.params.precision
+
+  window.save()
 }
