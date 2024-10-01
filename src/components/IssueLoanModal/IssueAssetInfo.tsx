@@ -3,10 +3,9 @@ import { AssetType } from "../../types/AssetTypes.ts";
 import { WindowType } from "../../types/WindowTypes.ts";
 import styles from "./IssueAssetInfo.module.css";
 import {
-  loanInterestRate,
-  loanLiquidationRatioRate,
-  borrowingRatioRate,
-  estimatedLoanLiability
+  displayInterestRate,
+  displayRatio,
+  estimatedLiability
 } from "../../utils/calculations.ts";
 import { useQuery } from "@tanstack/react-query";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
@@ -44,7 +43,7 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue, collateralAmoun
 
   useEffect(() => {
     setLiabilityUsd(
-      estimatedLoanLiability(Number(collateralAmount), Number(state.Price?.get("collateralPrice")), issue.latestPrice, window.borrowingRatio, window.precision).toFixed(2)
+      estimatedLiability(Number(collateralAmount), Number(state.Price?.get("collateralPrice")), issue.latestPrice, window.borrowingRatio, window.precision).toFixed(2)
     )
     console.log(liabilityUsd)
   }, [state, issue, window, collateralAmount]);
@@ -57,13 +56,13 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue, collateralAmoun
     <div className={styles.issueInfoWrapper}>
       <p className={styles.issueInfoTitle}>Asset</p>
       <div className={styles.issueInfoValue}>{liabilityUsd} {issue.symbol}</div>
-      <div className={styles.issueInfoValue}>Borrowing Ratio {borrowingRatioRate(window.borrowingRatio)}</div>
+      <div className={styles.issueInfoValue}>Borrowing Ratio {displayRatio(window.borrowingRatio)}</div>
       <div className={styles.issueInfoValue}>
         Liquidation Ratio{" "}
-        {loanLiquidationRatioRate(Number(issue.liquidationRatio))}
+        {displayRatio(Number(issue.liquidationRatio))}
       </div>
       <div className={styles.issueInfoValue}>
-        Annual Interest Rate {loanInterestRate(issue.rate)}
+        Annual Interest Rate {displayInterestRate(issue.rate)}
       </div>
     </div>
   );

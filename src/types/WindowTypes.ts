@@ -1,11 +1,13 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export type WindowType = {
     id: string;
     owner: string;
     etherDataFeedAddress: string;
-    borrowingRatio: number;
-    collectorFee: number;
-    daoFee: number;
-    liquidatorFee: number;
-    precision: number;
+    borrowingRatio: BigInt;
+    collectorFee: BigInt;
+    daoFee: BigInt;
+    liquidatorFee: BigInt;
+    precision: BigInt;
 };
   

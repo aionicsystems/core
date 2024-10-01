@@ -17,14 +17,11 @@ import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
 import { formatRatio, formatCoin } from "../../utils";
 import {
-  loanInterestRate,
-  loanLiquidationRatioRate,
-  selectedLoanCollateralUSD,
-  selectedLoanCRatio,
-  selectedLoanLiabilityUSD,
+  displayInterestRate,
+  displayRatio,
+  displayCoinUSD,
+  collateralizationRatio,
 } from "../../utils/calculations.ts";
-import { accounts } from "../../static/data.ts";
-import { AccountsCard } from "../AccountsCard/AccountsCard.tsx";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 
@@ -63,32 +60,32 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
 
   const loanData: LoanType = data?.loanEntity ?? {};
 
-  const collateralValue = selectedLoanCollateralUSD(
+  const collateralValue = displayCoinUSD(
     loanData.collateralAmount,
     assetETH.latestPrice,
     assetETH.aggregator.decimals,
   ).toFixed(2);
 
-  const liabilityValue = selectedLoanLiabilityUSD(
+  const liabilityValue = displayCoinUSD(
     loanData.liabilityAmount,
     loanData?.asset?.latestPrice,
     loanData?.asset?.aggregator.decimals,
   ).toFixed(2);
 
   const netValueUsd = (
-    selectedLoanCollateralUSD(
+    displayCoinUSD(
       loanData.collateralAmount,
       assetETH.latestPrice,
       assetETH.aggregator.decimals,
     ) -
-    selectedLoanLiabilityUSD(
+    displayCoinUSD(
       loanData.liabilityAmount,
       loanData?.asset?.latestPrice,
       loanData?.asset?.aggregator.decimals,
     )
   ).toFixed(2);
 
-  const collRation = selectedLoanCRatio(
+  const collRation = collateralizationRatio(
     loanData.collateralAmount,
     assetETH?.latestPrice,
     loanData?.asset?.aggregator?.decimals,
@@ -114,7 +111,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
         />
         <OverviewCard
           value={
-            loanData.asset ? loanInterestRate(loanData.asset.rate) : "No data"
+            loanData.asset ? displayInterestRate(loanData.asset.rate) : "No data"
           }
           label={"Interest rate"}
           icon={barrowRate as string}
@@ -137,7 +134,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
         <OverviewCardSmall
           value={
             loanData.liquidationRatio
-              ? loanLiquidationRatioRate(loanData.liquidationRatio)
+              ? displayRatio(loanData.liquidationRatio)
               : "No data"
           }
           label={"Liquidation Ratio"}

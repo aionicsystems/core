@@ -1,14 +1,16 @@
+import { BigInt } from "@graphprotocol/graph-ts";
+
 export const formatAddress = (addr: string) => {
   const upperAfterLastTwo = addr.slice(0, 2) + addr.slice(2);
   return `${upperAfterLastTwo.substring(0, 5)}...${upperAfterLastTwo.substring(39)}`;
 };
 
-export const formatRatio = (rate: string) => {
-  return `${(Number(rate).toFixed(2) / 100).toFixed(2)}%`;
+export const formatRatio = (rate: BigInt) => {
+  return `${(Number(rate) / 100).toFixed(2)}%`;
 };
 
-export const formatCoin = (amount: number) => {
-  return (amount * Math.pow(10, -18)).toFixed(6);
+export const formatCoin = (amount: BigInt) => {
+  return (Number(amount) * Math.pow(10, -18)).toFixed(6);
 };
 
 export const handleBodyScroll = () => {

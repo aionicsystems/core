@@ -1,59 +1,48 @@
 import { SortableTableDataType } from "../../types/TableTypes.ts";
 import styles from "./SortableTable.module.css";
 import {
-  loanCollateralUSD,
-  loanCRatio,
-  loanLiabilityUSD,
+  collateralizationRatio,
+  displayCoin,
+  displayRatio,
 } from "../../utils/calculations.ts";
-import { useGlobalState } from "../../hooks/useGlobalState.tsx";
+import { AssetType } from "../../types/AssetTypes.ts";
+import { BigInt } from "@graphprotocol/graph-ts";
+
 
 export type SortableTableBodyItemProps<T> = {
   dataItem: SortableTableDataType<T>;
   dataKey: string;
-  mutateValue?: (v: string | number | T, join?: string) => string | number;
+  mutateValue?: (v: string | BigInt | T, join?: string) => string | BigInt;
   destructure?: (o: T) => T[keyof T];
-  assetSymbol?: string;
+  collateral?: AssetType;
 };
 
 export const SortableTableBodyItem = <T,>({
   dataItem,
   dataKey,
-  mutateValue,
-  destructure,
-  assetSymbol,
+  collateral,
 }: SortableTableBodyItemProps<T>) => {
-  const {
-    state: { Price },
-  } = useGlobalState();
 
-  const calcCRatio = (
-    collateralAmount?: number,
-    latestPrice?: number,
-    latestPriceETH?: number,
-    decimals?: number,
-    decimalsETH?: number,
-    liabilityAmount?: number,
-  ) => {
-    const collateralUSD = loanCollateralUSD(
-      collateralAmount,
-      latestPriceETH,
-      decimalsETH,
-    );
-    const liabilityUSD = loanLiabilityUSD(
-      liabilityAmount,
-      latestPrice,
-      decimals,
-    );
 
-    return loanCRatio(collateralUSD, liabilityUSD);
-  };
-
-  const takeMutableValueJoin = (key: string) => {
+  const value = (key: string) => {
     switch (key) {
+      case "id":
+        return `${String(dataItem.id).substring(0, 8)}...`
       case "liabilityAmount":
-        return dataItem?.asset?.symbol;
+        return `${displayCoin(dataItem["liabilityAmount"])} ${dataItem.asset?.symbol}`;
       case "collateralAmount":
-        return assetSymbol;
+        return `${displayCoin(dataItem["collateralAmount"])} ${collateral?.symbol}`;
+      case "cRatio":
+        return collateralizationRatio(
+          dataItem["collateralAmount"],
+          collateral?.latestPrice,
+          collateral?.aggregator?.decimals,
+          dataItem["liabilityAmount"],
+          dataItem.asset?.latestPrice,
+          dataItem.asset?.aggregator?.decimals,
+        );
+      case "liquidationRatio":
+        return `${displayRatio(dataItem["liquidationRatio"])}`;
       default:
         return "";
     }
@@ -62,20 +51,7 @@ export const SortableTableBodyItem = <T,>({
   return (
     <td className={styles.sortableTableTBodyItem}>
       <div className={styles.sortableTableTBodyItemInner}>
-        {mutateValue
-          ? mutateValue(dataItem[dataKey], takeMutableValueJoin(dataKey))
-          : destructure
-            ? destructure(dataItem)
-            : dataKey === "cRatio"
-              ? calcCRatio(
-                  dataItem["collateralAmount"],
-                  dataItem.asset?.latestPrice,
-                  Number(Price?.get("collateralPrice")),
-                  dataItem.asset?.aggregator.decimals,
-                  Number(Price?.get("collateralDecimals")),
-                  dataItem["liabilityAmount"],
-                )
-              : dataItem[dataKey]}
+        {dataKey ? value(dataKey) : ""}
       </div>
     </td>
   );
