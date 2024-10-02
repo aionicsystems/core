@@ -5,6 +5,7 @@ import {
 import { SortableTableBodyItem } from "./SortableTableBodyItem.tsx";
 import styles from "./SortableTable.module.css";
 import { Fragment, useMemo } from "react";
+import { AssetType } from "../../types/AssetTypes.ts";
 
 export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
@@ -14,7 +15,7 @@ export type SortableTableBodyProps<T> = {
   isError: boolean;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
-  assetSymbol?: string;
+  collateral?: AssetType;
 };
 
 export const SortableTableBody = <T,>({
@@ -25,7 +26,7 @@ export const SortableTableBody = <T,>({
   isError,
   selectLoan,
   selectedID,
-  assetSymbol,
+  collateral,
 }: SortableTableBodyProps<T>) => {
   const sortedData = useMemo(() => {
     return tableData.slice().sort((a, b) => {
@@ -64,7 +65,7 @@ export const SortableTableBody = <T,>({
                   destructure={title.destructure}
                   dataItem={dataItem}
                   dataKey={title.key}
-                  assetSymbol={assetSymbol}
+                  collateral={collateral}
                 />
               ))}
             </tr>

@@ -8,6 +8,7 @@ import { SortableTableHead } from "./SortableTableHead.tsx";
 import { SortableTableBody } from "./SortableTableBody.tsx";
 import { DefaultError, QueryObserverResult } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AssetType } from "../../types/AssetTypes.ts";
 
 export type SortableTableProps<T> = {
   titles: SortableTableHeadType<T>[];
@@ -23,7 +24,7 @@ export type SortableTableProps<T> = {
   callRefetch: () => Promise<QueryObserverResult<unknown, DefaultError>>;
   selectLoan?: (itemID: string) => void;
   selectedID?: string;
-  assetSymbol?: string;
+  collateral?: AssetType;
 };
 
 export const SortableTable = <T,>({
@@ -35,7 +36,7 @@ export const SortableTable = <T,>({
   callRefetch,
   selectLoan,
   selectedID,
-  assetSymbol,
+  collateral,
 }: SortableTableProps<T>) => {
   const tableWrapper = useRef<HTMLDivElement | null>(null);
   const [isResizing, setIsResizing] = useState<boolean>(false);
@@ -144,7 +145,7 @@ export const SortableTable = <T,>({
             isError={isError}
             selectLoan={selectLoan}
             selectedID={selectedID}
-            assetSymbol={assetSymbol}
+            collateral={collateral}
           />
         </table>
       </div>

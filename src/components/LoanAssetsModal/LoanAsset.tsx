@@ -3,8 +3,8 @@ import styles from "./LoanAsset.module.css";
 import { aionCoin } from "../../static/images.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
 import {
-  loanInterestRate,
-  loanLiquidationRatioRate,
+  displayInterestRate,
+  displayRatio,
 } from "../../utils/calculations.ts";
 
 export type LoanAssetProps = {
@@ -18,11 +18,11 @@ export const LoanAsset: FC<LoanAssetProps> = ({ item, selectAsset }) => {
       <div>
         <p className={styles.loanAssetSymbol}>{item.symbol}</p>
         <p className={styles.loanAssetValue}>
-          Interest Rate: {loanInterestRate(item.rate)}
+          Interest Rate: {displayInterestRate(item.rate)}
         </p>
         <p className={styles.loanAssetValue}>
           Liquidation Ratio:{" "}
-          {loanLiquidationRatioRate(Number(item.liquidationRatio))}
+          {displayRatio(Number(item.liquidationRatio))}
         </p>
       </div>
       <img

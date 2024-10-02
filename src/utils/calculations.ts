@@ -1,79 +1,43 @@
-export const loanInterestRate = (rate: number) => {
-  return `${(rate * (Math.pow(10, -4) * 100)).toFixed(2)}%`;
+import { BigInt } from "@graphprotocol/graph-ts"
+
+export const displayInterestRate = (rate: BigInt) => {
+  return `${(Number(rate) * 100 * Math.pow(10, -4)).toFixed(2)}%`;
 };
-export const loanLiquidationRatioRate = (liquidationRatio: number) => {
-  return `${(liquidationRatio * (Math.pow(10, -4) * 100)).toFixed(0)}%`;
+export const displayRatio = (ratio: BigInt) => {
+  return `${(Number(ratio) * 100 * (Math.pow(10, -4))).toFixed(0)}%`;
 };
 
-export const borrowingRatioRate = (borrowingRatio: number) => {
-  return `${(borrowingRatio * (Math.pow(10, -4) * 100)).toFixed(0)}%`;
-};
-
-export const loanLiability = (amount: number) => {
-  return (amount * Math.pow(10, -18)).toFixed(6);
-};
-
-export const loanCollateral = (amount: number) => {
-  return (amount * Math.pow(10, -18)).toFixed(6);
-};
-
-export const loanCollateralUSD = (
-  collateralAmount?: number,
-  latestPrice?: number,
-  decimals?: number,
+export const displayCoin = (
+  amount: BigInt
 ) => {
-  return (collateralAmount * latestPrice) / Math.pow(10, decimals || 0);
+  return (Number(amount) / Math.pow(10, 18)).toFixed(6);
 };
 
-export const selectedLoanCollateralUSD = (
-  collateralAmount?: number,
-  latestPrice?: number,
-  decimals?: number,
+export const displayCoinUSD = (
+  amount?: BigInt,
+  latestPrice?: BigInt,
+  decimals?: BigInt,
 ) => {
-  return (collateralAmount * latestPrice) / (Math.pow(10, decimals || 0) * Math.pow(10, 18));
+  return (Number(amount) / Math.pow(10, 18)) * (Number(latestPrice) / Math.pow(10, Number(decimals)));
 };
 
-export const loanLiabilityUSD = (
-  liabilityAmount?: number,
-  latestPrice?: number,
-  decimals?: number,
+export const estimatedLiability = (
+  collateralAmount?: string,
+  latestCollateralPrice?: BigInt,
+  latestLiabilityPrice?: BigInt,
+  borrowingRatio?: BigInt,
+  precision?: BigInt,
 ) => {
-  return (liabilityAmount * latestPrice) / Math.pow(10, decimals || 0);
+  return Number(collateralAmount) * (Number(latestCollateralPrice) / Number(latestLiabilityPrice)) * (Number(borrowingRatio) / Math.pow(10, Number(precision)));
 };
 
-export const selectedLoanLiabilityUSD = (
-  liabilityAmount?: number,
-  latestPrice?: number,
-  decimals?: number,
+export const collateralizationRatio = (
+  collateralAmount?: BigInt,
+  latestPriceETH?: BigInt,
+  decimalsETH?: BigInt,
+  liabilityAmount?: BigInt,
+  assetLatestPrice?: BigInt,
+  assetDecimals?: BigInt,
 ) => {
-  return (liabilityAmount * latestPrice) / (Math.pow(10, decimals || 0) * Math.pow(10, 18));
-};
-
-export const estimatedLoanLiability = (
-  collateralAmount?: number,
-  latestCollateralPrice?: number,
-  latestLiabilityPrice?: number,
-  borrowingRatio?: number,
-  precision?: number,
-) => {
-  return (collateralAmount * latestCollateralPrice * Math.pow(10, precision)) / (latestLiabilityPrice * borrowingRatio);
-};
-
-export const loanCRatio = (collUSD: number, liabUSD: number) => {
-  return `${((collUSD / liabUSD) * 100).toFixed(0)}%`;
-};
-
-export const selectedLoanCRatio = (
-  collateralAmount?: number,
-  latestPriceETH?: number,
-  decimals?: number,
-  liabilityAmount?: number,
-  latestPrice?: number,
-  decimalsETH?: number,
-) => {
-  return `${(
-    ((collateralAmount * latestPriceETH * decimals) /
-      (liabilityAmount * latestPrice * decimalsETH)) *
-    100
-  ).toFixed(2)}%`;
+  return `${((100 * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals)))).toFixed(0)}%`;
 };

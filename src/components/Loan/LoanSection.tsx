@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
@@ -14,13 +14,9 @@ import { LoanType } from "../../types/LoanTypes.ts";
 import { handleBodyScroll } from "../../utils";
 import sectionStyles from "./LoanOverview.module.css";
 import { LoanOverview } from "./LoanOverview.tsx";
-import {
-  loanCollateral,
-  loanLiability,
-  loanLiquidationRatioRate,
-} from "../../utils/calculations.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
-import { useGlobalState } from "../../hooks/useGlobalState.tsx";
+
+
 
 const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   {
@@ -30,23 +26,14 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
     mutateValue: (v) => `${String(v).substring(0, 8)}...`,
   },
   {
-    title: "Asset",
-    key: "assetName",
-    sortable: false,
-    destructure: (o) => o.asset.symbol,
-  },
-  {
     title: "Liability",
     key: "liabilityAmount",
     sortable: true,
-    mutateValue: (v, join) => `${loanLiability(Number(v))} ${join ? join : ""}`,
   },
   {
     title: "Collateral",
     key: "collateralAmount",
     sortable: true,
-    mutateValue: (v, join) =>
-      `${loanCollateral(Number(v))} ${join ? join : ""}`,
   },
   {
     title: "C Ratio",
@@ -57,7 +44,6 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
     title: "L Ratio",
     key: "liquidationRatio",
     sortable: true,
-    mutateValue: (v) => loanLiquidationRatioRate(Number(v)),
   },
 ];
 
@@ -71,8 +57,8 @@ export const LoanSection: FC = () => {
     filters: {},
     page_number: 1,
   });
+
   const [selectedLoan, setSelectedLoan] = useState<string>("");
-  const { setState } = useGlobalState();
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryFn: async () => {
@@ -94,34 +80,12 @@ export const LoanSection: FC = () => {
     handleBodyScroll();
   };
 
-  useEffect(() => {
-    if (data?.loanEntities && data?.assetEntity) {
-      setState((prevState) => ({
-        ...prevState,
-        Price: new Map([
-          ...(prevState.Price || []),
-          ...data.loanEntities.map((loan: LoanType) => [
-            loan.id,
-            loan.asset.latestPrice,
-          ]),
-          ["collateralPrice", data?.assetEntity.latestPrice],
-          ["collateralDecimals", data?.assetEntity.aggregator.decimals],
-        ]),
-      }));
-    }
-  }, [
-    data?.assetEntity.aggregator.decimals,
-    data?.assetEntity.latestPrice,
-    data,
-    setState,
-  ]);
-
   if (isLoading) {
     return <Loader />;
   }
 
   const tableData: LoanType[] = data?.loanEntities ?? [];
-  const assetETH: AssetType = data?.assetEntity ?? {};
+  const collateral: AssetType = data?.assetEntity ?? {};
 
   const selectLoan = (id: string) => {
     setSelectedLoan(id);
@@ -147,9 +111,9 @@ export const LoanSection: FC = () => {
         callRefetch={refetch}
         selectLoan={selectLoan}
         selectedID={selectedLoan}
-        assetSymbol={assetETH.symbol}
+        collateral={collateral}
       />
-      <LoanOverview loanID={selectedLoan} assetETH={assetETH} />
+      <LoanOverview loanID={selectedLoan} assetETH={collateral} />
       {selectAssetModal && (
         <LoanAssetsModal
           onClose={toggleSelectAsset}

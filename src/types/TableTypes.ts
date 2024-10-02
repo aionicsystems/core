@@ -1,10 +1,11 @@
+import { BigInt } from "@graphprotocol/graph-ts";
 import { AssetType } from "./AssetTypes";
 
 export type SortableTableHeadType<T> = {
   title: string;
   sortable?: boolean;
   key: string;
-  mutateValue?: (v: string | number | T, join?: string) => string | number;
+  mutateValue?: (v: string | BigInt | T, join?: string) => string | BigInt;
   destructure?: (o: T) => T[keyof T];
 };
 
@@ -17,7 +18,10 @@ export type SortableTableConfigType<T> = {
 
 export type SortableTableDataType<T> = {
   [K in keyof T]: T[K];
-} & { id: string; asset?: AssetType };
+} & { 
+  id: string; 
+  asset?: AssetType;
+};
 
 export type SortableTableMetaType = {
   current_page: number;
