@@ -54,17 +54,22 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue, collateralAmoun
   }
 
   return (
-    <div className={styles.issueInfoWrapper}>
-      <p className={styles.issueInfoTitle}>Asset</p>
-      <div className={styles.issueInfoValue}>{liabilityUsd} {issue.symbol}</div>
-      <div className={styles.issueInfoValue}>Borrowing Ratio {displayRatio(window.borrowingRatio)}</div>
-      <div className={styles.issueInfoValue}>
-        Liquidation Ratio{" "}
-        {displayRatio(issue.liquidationRatio)}
+    <>
+      <div className={styles.issueInfoWrapper}>
+          <p className={styles.issueInfoTitle}>Asset</p>
+          <div className={styles.issueInfoValue}>{liabilityUsd} {issue.symbol}</div>
       </div>
-      <div className={styles.issueInfoValue}>
-        Annual Interest Rate {displayInterestRate(issue.rate)}
+      <div className={styles.issueInfoWrapper}>
+          <p className={styles.issueInfoTitle}>Terms</p>
+          <div className={styles.issueInfoValue}>Borrowing Ratio {displayRatio(window.borrowingRatio)}</div>
+          <div className={styles.issueInfoValue}>
+            Liquidation Ratio{" "}
+            {displayRatio(issue.liquidationRatio)}
+          </div>
+          <div className={styles.issueInfoValue}>
+            Annual Interest Rate {displayInterestRate(issue.rate)}
+          </div>
       </div>
-    </div>
+    </>
   );
 };

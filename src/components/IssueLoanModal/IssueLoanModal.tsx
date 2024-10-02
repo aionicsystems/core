@@ -9,6 +9,7 @@ import { assetSingleEntity, client } from "../../repository/requests.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { IssueAssetInfo } from "./IssueAssetInfo.tsx";
 import { IssueLoanForm } from "./IssueLoanForm.tsx";
+import { IssueLoanSuccess } from "./IssueLoanSuccess.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";
 import { Loader } from "../Loader/Loader.tsx";
 import { LoanAssetsModalFaq } from "../LoanAssetsModal/LoanAssetsModalFaq.tsx";
@@ -28,7 +29,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [collateralAmount, setCollateralAmount] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
-  const { data: hash, isPending, writeContractAsync } = useWriteContract();
+  const { data: hash, isPending, writeContract } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
   useWaitForTransactionReceipt({ 
     hash,
@@ -52,14 +53,6 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
   const toggleModalFaq = () => {
     setModalFaq(!modalFaq);
   };
-
-  if (isLoading || isPending || isConfirming) {
-    return <Loader />;
-  }
-
-  if (isConfirmed) {
-    onClose();
-  }
 
   if (error || isError) {
     return (
@@ -93,7 +86,14 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
             <IssueLoanModalFaq />
           ) : 
             <>
-              <IssueLoanForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} writeContractAsync={writeContractAsync} isPending={isPending} />
+              {isLoading || isPending || isConfirming ? (
+                <Loader />
+              ) : isConfirmed && hash ? (
+                <IssueLoanSuccess hash={hash} collateralAmount={collateralAmount} />
+              ) :
+              (
+                <IssueLoanForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} writeContract={writeContract} isConfirmed={isConfirmed} />
+              )}
               <IssueAssetInfo issue={asset} collateralAmount={collateralAmount} />
             </> 
           }

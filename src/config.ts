@@ -15,6 +15,6 @@ export const config = createConfig({
   transports: {
     [arbitrum.id]: http(),
     [arbitrumSepolia.id]: http(),
-    [hardhat.id]: http('http://34.30.203.81:8545'),
+    [hardhat.id]: http(),
   },
 });

@@ -5,17 +5,16 @@ import { contractAddress } from "../../repository/contracts.ts";
 import { useAccount, Config } from 'wagmi';
 import { abi } from '../../../artifacts/contracts/Window.sol/Window.json'
 import { parseEther, Address } from "viem";
-import { WriteContractMutateAsync } from "wagmi/query";
+import { WriteContractMutate } from "wagmi/query";
 
 export type IssueLoanFormProps = {
   assetID?: string;
   setCollateralAmount: (collateralAmount:string) => void;
   collateralAmount: string;
-  writeContractAsync: WriteContractMutateAsync<Config, unknown>;
-  isPending: boolean;
+  writeContract: WriteContractMutate<any, any>
 };
 
-export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount, writeContractAsync, isPending }) => {
+export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount, writeContract }) => {
   
   const { chain } = useAccount();
 
@@ -31,11 +30,11 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
     e.preventDefault()
     // Add error handling
     console.log(assetID);
-    writeContractAsync({
-      address: contractAddress("window", chain?.id) as Address,
+    writeContract({
       abi,
+      address: contractAddress("window", chain?.id) as Address,
       functionName: 'issue',
-      args: [assetID as Address],
+      args: ["0x7ADd5dC8683974ed4a7199aCf2AfA66E01684c04"],
       value: parseEther(collateralAmount)
     })
   }
@@ -61,7 +60,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
         />
         <span className={styles.unitLabelRight}>ETH</span>
       </div>
-      <Button size={"sm"} type={"submit"} btnType={"primary"} disabled={isPending}>
+      <Button size={"sm"} type={"submit"} btnType={"primary"}>
         Submit
       </Button>
     </form>
