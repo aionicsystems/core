@@ -15,6 +15,7 @@ import { handleBodyScroll } from "../../utils";
 import sectionStyles from "./LoanOverview.module.css";
 import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
+import { useAccount } from "wagmi";
 
 
 
@@ -58,6 +59,7 @@ export const LoanSection: FC = () => {
     page_number: 1,
   });
 
+  const { isConnected } = useAccount();
   const [selectedLoan, setSelectedLoan] = useState<string>("");
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -93,14 +95,17 @@ export const LoanSection: FC = () => {
 
   return (
     <>
+      
       <div className={sectionStyles.overviewHeading}>
-        <Button
-          size={"sm"}
-          btnType={"primary"}
-          onClick={() => toggleSelectAsset()}
-        >
-          Issue Loan
-        </Button>
+        {isConnected && (
+          <Button
+            size={"sm"}
+            btnType={"primary"}
+            onClick={() => toggleSelectAsset()}
+          >
+            Issue Loan
+          </Button>
+        )}
       </div>
       <SortableTable<LoanType>
         titles={loanTableTitles}

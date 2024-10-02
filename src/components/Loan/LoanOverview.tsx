@@ -126,7 +126,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
         <OverviewCardSmall
           value={
             loanData.borrowingRatio
-              ? formatRatio(String(loanData.borrowingRatio))
+              ? displayRatio(loanData.borrowingRatio)
               : "No data"
           }
           label={"Borrowing Ratio"}
