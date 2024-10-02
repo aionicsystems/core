@@ -96,6 +96,14 @@ export const loanSingleEntity = gql(
 
 export const windowEntities = gql(`
   query WindowEntitiesQuery {
+    assetEntity (id: "0x0000000000000000000000000000000000000000") {
+      id
+      symbol
+      latestPrice
+      aggregator {
+        decimals
+      }
+    }
     windowEntities {
       id
       owner

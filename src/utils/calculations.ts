@@ -22,7 +22,7 @@ export const displayCoinUSD = (
 };
 
 export const estimatedLiability = (
-  collateralAmount?: BigInt,
+  collateralAmount?: string,
   latestCollateralPrice?: BigInt,
   latestLiabilityPrice?: BigInt,
   borrowingRatio?: BigInt,

@@ -22,7 +22,7 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue, collateralAmoun
   
   const { state } = useGlobalState();
   const [error, setError] = useState<boolean>(false);
-  const [liabilityUsd, setLiabilityUsd] = useState<string>(0)
+  const [liabilityUsd, setLiabilityUsd] = useState<string>("0")
   
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
@@ -40,10 +40,11 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue, collateralAmoun
   });
 
   let window: WindowType = data?.windowEntities[0] ?? [];
+  let collateral: AssetType = data?.assetEntity ?? [];
 
   useEffect(() => {
     setLiabilityUsd(
-      estimatedLiability(Number(collateralAmount), Number(state.Price?.get("collateralPrice")), issue.latestPrice, window.borrowingRatio, window.precision).toFixed(2)
+      estimatedLiability(collateralAmount, collateral.latestPrice, issue.latestPrice, window.borrowingRatio, window.precision).toFixed(2)
     )
     console.log(liabilityUsd)
   }, [state, issue, window, collateralAmount]);
@@ -59,7 +60,7 @@ export const IssueAssetInfo: FC<IssueAssetInfoProps> = ({ issue, collateralAmoun
       <div className={styles.issueInfoValue}>Borrowing Ratio {displayRatio(window.borrowingRatio)}</div>
       <div className={styles.issueInfoValue}>
         Liquidation Ratio{" "}
-        {displayRatio(Number(issue.liquidationRatio))}
+        {displayRatio(issue.liquidationRatio)}
       </div>
       <div className={styles.issueInfoValue}>
         Annual Interest Rate {displayInterestRate(issue.rate)}
