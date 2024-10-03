@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
@@ -48,7 +48,12 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   },
 ];
 
-export const LoanSection: FC = () => {
+export type LoanSectionProps = {
+  userType: string;
+  setUserType: (userType: string) => void;
+};
+
+export const LoanSection: FC<LoanSectionProps> = ({ userType, setUserType}) => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
   const [tableConfig, setTableConfig] = useState<
     SortableTableConfigType<LoanType>
@@ -59,7 +64,11 @@ export const LoanSection: FC = () => {
     page_number: 1,
   });
 
-  const { isConnected } = useAccount();
+   useEffect(() => {
+
+   },[]);
+
+  const { isConnected, address } = useAccount();
   const [selectedLoan, setSelectedLoan] = useState<string>("");
 
   const { data, isLoading, isError, refetch } = useQuery({
@@ -69,6 +78,7 @@ export const LoanSection: FC = () => {
         variables: {
           sort_by: tableConfig.sort_by,
           sort_order: tableConfig.sort_order,
+          filters: tableConfig.filters,
         },
       });
       return result.data;

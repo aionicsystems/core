@@ -12,6 +12,10 @@
 .logo {
     height: 30px;
 }
+.userTypeWrapper {
+    position: relative; /* Ensure the dropdown is positioned relative to this container */
+    display: inline-block;
+}
 .coinButton {
     display: flex;
     align-items: center;

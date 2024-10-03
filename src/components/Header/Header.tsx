@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import styles from "./Header.module.css";
 import {
   chevron,
@@ -11,14 +11,28 @@ import {
   useAccountModal,
   useChainModal,
 } from '@rainbow-me/rainbowkit';
+import { UserTypeContext } from "../../hooks/useUserType.tsx";
+import { UserTypeDropdown } from "../UserType/UserTypeDropdown.tsx";
+import { userTypes } from "../../hooks/useUserType.tsx";
+
 
 export const Header: FC = () => {
   const { isConnected, chain } = useAccount();
-  const [ userType, setUserType ] = useState<string>("Borrower");
+  const { userType, setUserType } = useContext(UserTypeContext);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const { openConnectModal } = useConnectModal();
   const { openAccountModal } = useAccountModal();
   const { openChainModal } = useChainModal();
+
+  const handleUserTypeClick = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  const handleUserTypeSelect = (type: string) => {
+    setUserType(type);
+    setShowDropdown(false);
+  };
 
   return (
     <header className={styles.headerWrapper}>
@@ -36,12 +50,17 @@ export const Header: FC = () => {
           </Button>
         )}
         { isConnected && (
-          <Button size={"sm"} btnType={"primary"} onClick={isConnected ? openAccountModal : openConnectModal}>
-            {userType}&nbsp;&nbsp;&nbsp;
-            <span className={styles.coinSelectOpener}>
-              <img src={chevron as string} alt="chevron" />
-            </span>
-          </Button>
+          <div className={styles.userTypeWrapper}>
+            <Button size={"sm"} btnType={"primary"} onClick={handleUserTypeClick}>
+              {userType}&nbsp;&nbsp;&nbsp;
+              <span className={styles.coinSelectOpener}>
+                <img src={chevron as string} alt="chevron" />
+              </span>
+            </Button>
+            {showDropdown && (
+              <UserTypeDropdown userTypes={userTypes} onSelect={handleUserTypeSelect} />
+            )}
+          </div>
         )}
       </div>
     </header>

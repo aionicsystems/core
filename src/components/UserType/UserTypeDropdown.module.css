@@ -1,0 +1,44 @@
+.dropdown {
+  position: absolute;
+  top: 100%; /* Position directly below the button */
+  left: 0; /* Align to the left of the button */
+  background-color: #08101B; /* Match app background color */
+  border: 1px solid #333; /* Match app border color */
+  border-radius: 6px; /* Match button border radius */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  width: 100%; /* Ensure the dropdown is the same width as the button */
+  min-width: 100px; /* Ensure minimum width */
+  max-width: 125px; /* Ensure maximum width */
+  overflow: hidden; /* Prevent content overflow */
+  max-height: 200px; /* Limit the height to prevent overflow */
+  overflow-y: auto; /* Add vertical scroll if content exceeds max height */
+}
+
+.dropdownItem {
+  padding: 10px;
+  cursor: pointer;
+  color: #36C5FB; /* Match button primary color */
+  background: linear-gradient(96.71deg, rgba(68, 204, 255, 0.1) 0%, rgba(0, 173, 238, 0.1) 101.64%); /* Match button primary background */
+  font-weight: 700; /* Match button font weight */
+  font-size: 14px; /* Match button font size */
+}
+
+.dropdownItem:hover {
+  color: #ffffff; /* Match button hover color */
+  background-color: #36C5FB; /* Match button hover background */
+}
+
+.dropdownItem {
+  padding: 10px;
+  cursor: pointer;
+  color: #36C5FB; /* Match button primary color */
+  background: linear-gradient(96.71deg, rgba(68, 204, 255, 0.1) 0%, rgba(0, 173, 238, 0.1) 101.64%); /* Match button primary background */
+  font-weight: 700; /* Match button font weight */
+  font-size: 14px; /* Match button font size */
+}
+
+.dropdownItem:hover {
+  color: #ffffff; /* Match button hover color */
+  background-color: #36C5FB; /* Match button hover background */
+}
