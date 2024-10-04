@@ -10,6 +10,7 @@ export type SortableTableHeadType<T> = {
 };
 
 export type SortableTableConfigType<T> = {
+  owner: any;
   sort_by?: keyof T;
   sort_order?: "asc" | "desc" | null;
   filters?: Record<string, string>;

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
@@ -7,7 +7,7 @@ import {
   SortableTableHeadType,
 } from "../../types/TableTypes.ts";
 import { useQuery } from "@tanstack/react-query";
-import { client, loanEntities } from "../../repository/requests.ts";
+import { client, loanEntities, loanEntitiesByOwner } from "../../repository/requests.ts";
 import { REQUEST_LOANS_ENTITIES } from "../../repository/requestKeys.ts";
 import { Loader } from "../Loader/Loader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
@@ -16,6 +16,7 @@ import sectionStyles from "./LoanOverview.module.css";
 import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
+import { UserTypeContext } from "../../hooks/useUserType.tsx";
 
 
 
@@ -53,8 +54,11 @@ export type LoanSectionProps = {
   setUserType: (userType: string) => void;
 };
 
-export const LoanSection: FC<LoanSectionProps> = ({ userType, setUserType}) => {
+export const LoanSection: FC<LoanSectionProps> = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
+  const { userType } = useContext(UserTypeContext);
+  const { isConnected, address } = useAccount();
+  const [selectedLoan, setSelectedLoan] = useState<string>("");
   const [tableConfig, setTableConfig] = useState<
     SortableTableConfigType<LoanType>
   >({
@@ -62,29 +66,50 @@ export const LoanSection: FC<LoanSectionProps> = ({ userType, setUserType}) => {
     sort_by: "id",
     filters: {},
     page_number: 1,
+    owner: null,
   });
 
-   useEffect(() => {
-
-   },[]);
-
-  const { isConnected, address } = useAccount();
-  const [selectedLoan, setSelectedLoan] = useState<string>("");
+  useEffect(() => {
+    if (address && userType === "Borrower") {
+      setTableConfig((prevConfig) => ({
+        ...prevConfig,
+        owner: address,
+      }));
+    } else {
+      setTableConfig((prevConfig) => ({
+        ...prevConfig,
+        owner: null,
+      }));
+    }
+  }, [userType, address]);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryFn: async () => {
-      const result = await client.query({
-        query: loanEntities,
-        variables: {
-          sort_by: tableConfig.sort_by,
-          sort_order: tableConfig.sort_order,
-          filters: tableConfig.filters,
-        },
-      });
-      return result.data;
+      if (userType === "Borrower") {
+        const result = await client.query({
+          query: loanEntitiesByOwner,
+          variables: {
+            sort_by: tableConfig.sort_by,
+            sort_order: tableConfig.sort_order,
+            owner: tableConfig.owner,
+          },
+        });
+        return result.data;
+      }
+      if (userType === "Collector" || userType === "Liquidator") {
+        const result = await client.query({
+          query: loanEntities,
+          variables: {
+            sort_by: tableConfig.sort_by,
+            sort_order: tableConfig.sort_order,
+          },
+        });
+        return result.data;
+      }
+      return null;
     },
     refetchInterval: 10000,
-    queryKey: [REQUEST_LOANS_ENTITIES],
+    queryKey: [REQUEST_LOANS_ENTITIES, tableConfig],
   });
 
   const toggleSelectAsset = () => {
@@ -107,7 +132,7 @@ export const LoanSection: FC<LoanSectionProps> = ({ userType, setUserType}) => {
     <>
       
       <div className={sectionStyles.overviewHeading}>
-        {isConnected && (
+        {isConnected && userType === "Borrower" && (
           <Button
             size={"sm"}
             btnType={"primary"}
@@ -128,7 +153,7 @@ export const LoanSection: FC<LoanSectionProps> = ({ userType, setUserType}) => {
         selectedID={selectedLoan}
         collateral={collateral}
       />
-      <LoanOverview loanID={selectedLoan} assetETH={collateral} />
+      {collateral ? <LoanOverview loanID={selectedLoan} assetETH={collateral} /> : <> </>}
       {selectAssetModal && (
         <LoanAssetsModal
           onClose={toggleSelectAsset}

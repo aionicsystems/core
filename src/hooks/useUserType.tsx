@@ -6,18 +6,18 @@ interface UserTypeContextProps {
 }
 
 export const UserTypeContext = createContext<UserTypeContextProps>({
-  userType: "borrower",
+  userType: "Borrower",
   setUserType: () => {},
 });
 
 export const UserTypeProvider = ({ children }: { children: ReactNode }) => {
-    const [userType, setUserType] = useState("borrower");
-  
-    return (
-      <UserTypeContext.Provider value={{userType, setUserType }}>
-        {children}
-      </UserTypeContext.Provider>
-    );
-  };
+  const [userType, setUserType] = useState("Borrower");
 
-  export const userTypes = ["borrower", "collector", "liquidator"];
+  return (
+    <UserTypeContext.Provider value={{userType, setUserType }}>
+      {children}
+    </UserTypeContext.Provider>
+  );
+};
+
+export const userTypes = ["Borrower", "Collector", "Liquidator"];
