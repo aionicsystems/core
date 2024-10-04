@@ -51,7 +51,7 @@ export const SortableTableBody = <T,>({
 
   return (
     <tbody className={styles.sortableTableTBody}>
-      {sortedData.length > 0 || !isError ? (
+      {sortedData.length > 0 && !isError ? (
         sortedData.map((dataItem, index) => (
           <Fragment key={dataItem.id}>
             <tr

@@ -104,7 +104,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           color={"light-skyBlue"}
         />
         <OverviewCard
-          value={netValueUsd ? `$${netValueUsd}` : "$0.00"}
+          value={netValueUsd != "NaN" ? `$${netValueUsd}` : "$0.00"}
           label={"Net Value"}
           icon={netValue as string}
           color={"light-gold"}
@@ -145,7 +145,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           <PositionsCard
             img={eth as string}
             valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
-            value={loanData ? formatCoin(loanData.collateralAmount) : ""}
+            value={loanData.collateralAmount ? formatCoin(loanData.collateralAmount) : ""}
             coinType={assetETH.symbol}
             badgeType={"text-bg-green"}
             badgeText={"Collateral"}
@@ -153,7 +153,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           <PositionsCard
             img={aionCoin as string}
             valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
-            value={loanData ? formatCoin(loanData.liabilityAmount) : ""}
+            value={loanData.liabilityAmount ? formatCoin(loanData.liabilityAmount) : ""}
             coinType={
               loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
             }
