@@ -870,17 +870,17 @@ export class WindowEntity extends Entity {
     this.set("liquidatorFee", Value.fromBigInt(value));
   }
 
-  get precision(): BigInt {
+  get precision(): i32 {
     let value = this.get("precision");
     if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
+      return 0;
     } else {
-      return value.toBigInt();
+      return value.toI32();
     }
   }
 
-  set precision(value: BigInt) {
-    this.set("precision", Value.fromBigInt(value));
+  set precision(value: i32) {
+    this.set("precision", Value.fromI32(value));
   }
 }
 

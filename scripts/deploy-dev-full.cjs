@@ -12,7 +12,6 @@ const fetchSubgraph = createApolloFetch({
 
 const waitForSubgraphToBeSynced = async () =>
   new Promise((resolve, reject) => {
-    // Wait for 10s
     const deadline = Date.now() + 10 * 1000;
 
     const checkSubgraphSynced = async () => {
@@ -20,7 +19,6 @@ const waitForSubgraphToBeSynced = async () =>
         reject('Timeout while waiting for the subgraph to be synced');
       }
 
-      // Query the subgraph meta data for the indexing status
       const result = await fetchSubgraphs({
         query: `
           {
@@ -43,35 +41,60 @@ const waitForSubgraphToBeSynced = async () =>
     setTimeout(checkSubgraphSynced, 0);
   });
 
+async function deployMockAggregator() {
+  const Aggregator = await hre.ethers.getContractFactory("MockAggregator");
+  const aggregator = await Aggregator.deploy();
+  await aggregator.waitForDeployment();
+  return aggregator;
+}
+
+async function deployMockDataFeed(decimals, initialPrice, aggregatorAddress) {
+  const DataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
+  const dataFeed = await DataFeed.deploy(decimals, initialPrice, aggregatorAddress);
+  await dataFeed.waitForDeployment();
+  return dataFeed;
+}
+
+async function approveAsset(window, dataFeedAddress, name, symbol, collateralFactor, liquidationFactor) {
+  const tx = await window.approveAsset(dataFeedAddress, name, symbol, collateralFactor, liquidationFactor);
+  const result = await tx.wait();
+  const assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
+  return assetEntityEvents[0].args[0];
+}
+
+async function issueLoan(window, assetAddress, etherAmount) {
+  const options = { value: ethers.parseEther(etherAmount) };
+  const tx = await window.issue(assetAddress, options);
+  const result = await tx.wait();
+  return {
+    loanAddress: result.logs[4].args[0],
+    amountIssued: result.logs[4].args[4]
+  };
+}
+
+async function simulatePriceChange(dataFeeds, symbol, newPrice) {
+  const dataFeed = dataFeeds[symbol];
+  const tx = await dataFeed.updateAnswer(newPrice);
+  await tx.wait();
+  console.log(`Price for ${symbol} updated to ${newPrice}`);
+}
+
 async function main() {
   try {
-    
     const precision = BigInt(4);
     const borrowingRatio = BigInt(15000);
     const liquidationRatio = BigInt(12500);
     const daoFee = BigInt(300);
-    const liquidatorFee = BigInt(200);
     const collectorFee = BigInt(100);
-
     const decimals = BigInt(8);
     const initialEthPrice = BigInt(250000000000);
-    const initialAssetPrice = BigInt(20000000000);
 
-    // Contracts are deployed using the first signer/account by default
-    const [owner, otherAccount] = await hre.ethers.getSigners();
+    const [owner] = await hre.ethers.getSigners();
 
-    const EthDataAgg = await hre.ethers.getContractFactory("MockAggregator");
-    const ethDataAgg = await EthDataAgg.deploy();
-
-    await ethDataAgg.waitForDeployment();
-
+    const ethDataAgg = await deployMockAggregator();
     console.log(`Mock ETH Aggregator deployed to: ${await ethDataAgg.getAddress()}`);
 
-    const EthDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
-    const ethDataFeed = await EthDataFeed.deploy(decimals, initialEthPrice, await ethDataAgg.getAddress());
-
-    await ethDataFeed.waitForDeployment();
-
+    const ethDataFeed = await deployMockDataFeed(decimals, initialEthPrice, await ethDataAgg.getAddress());
     console.log(`Mock ETH Data Feed deployed to: ${await ethDataFeed.getAddress()}`);
 
     const Window = await hre.ethers.getContractFactory("Window");
@@ -84,151 +107,66 @@ async function main() {
       collectorFee,
       ethDataFeed.getAddress()
     );
-
     await window.waitForDeployment();
-
     console.log(`Window deployed to: ${await window.getAddress()}`);
 
     filesystem.copy('template-subgraph.yaml', 'subgraph.yaml', { overwrite: true });
-    // Insert its address into subgraph manifest
     await patching.replace(
       path.join(srcDir, 'subgraph.yaml'),
       'DEPLOYED_CONTRACT_ADDRESS',
       window.target,
     );
 
-    const latestRoundData = await ethDataFeed.latestRoundData();
+    const assets = [
+      { name: "Nvidia", symbol: "ANVDA", collateralFactor: 200, liquidationFactor: 12500, etherAmount: "1.0", initialPrice: BigInt(20000000000) },
+      { name: "Amazon", symbol: "AAMZN", collateralFactor: 300, liquidationFactor: 12000, etherAmount: ".5", initialPrice: BigInt(15000000000) },
+      { name: "Apple", symbol: "AAAPL", collateralFactor: 400, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(18000000000) },
+      { name: "Google", symbol: "AGOOG", collateralFactor: 500, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(22000000000) },
+      { name: "Microsoft", symbol: "AMCST", collateralFactor: 400, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(21000000000) },
+      { name: "ConocoPhillips", symbol: "ACOP", collateralFactor: 500, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(17000000000) },
+      { name: "AMD", symbol: "AAMD", collateralFactor: 500, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(16000000000) }
+    ];
 
-    console.log(`${latestRoundData}`);
+    const loanAddresses = [];
+    const dataFeeds = {};
 
-    const AssetDataAgg = await hre.ethers.getContractFactory("MockAggregator");
-    const assetDataAgg = await AssetDataAgg.deploy();
+    for (const asset of assets) {
+      const assetDataAgg = await deployMockAggregator();
+      console.log(`Mock ${asset.name} Aggregator deployed to: ${await assetDataAgg.getAddress()}`);
 
-    await assetDataAgg.waitForDeployment();
+      const assetDataFeed = await deployMockDataFeed(decimals, asset.initialPrice, await assetDataAgg.getAddress());
+      const assetDataFeedAddress = await assetDataFeed.getAddress();
+      console.log(`Mock ${asset.name} Data Feed deployed to: ${assetDataFeedAddress}`);
 
-    console.log(`Mock Asset Aggregator deployed to: ${await assetDataAgg.getAddress()}`);
+      dataFeeds[asset.symbol] = assetDataFeed;
 
-    const AssetDataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
-    const assetDataFeed = await AssetDataFeed.deploy(decimals, initialAssetPrice, await assetDataAgg.getAddress());
+      const assetAddress = await approveAsset(window, assetDataFeedAddress, asset.name, asset.symbol, asset.collateralFactor, asset.liquidationFactor);
+      console.log(`Asset Address: ${assetAddress}`);
 
-    await assetDataFeed.waitForDeployment();
+      const loan = await issueLoan(window, assetAddress, asset.etherAmount);
+      console.log(`Loan Address: ${loan.loanAddress}`);
+      console.log(`Amount Asset Issued: ${loan.amountIssued} ${asset.symbol}`);
 
-    const assetDataFeedAddress = await assetDataFeed.getAddress();
-    console.log(`Mock Asset Data Feed deployed to: ${assetDataFeedAddress}`);
-    
-    let tx = await window.approveAsset(assetDataFeedAddress, "Nvidia", "ANVDA", 200, 12500);
-    let result = await tx.wait();
-    let assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+      loanAddresses.push(loan.loanAddress);
+    }
 
-    let options = {value: ethers.parseEther("1.0")}
-    let tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    let result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} ANVDA`);
+    console.log("Loan Addresses:", loanAddresses);
 
-    tx = await window.approveAsset(assetDataFeedAddress, "Amazon", "AAMZN", 300, 12000);
-    result = await tx.wait();
-    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
+    const Loan = await hre.ethers.getContractFactory("Loan");
+    const loan1 = Loan.attach(loanAddresses[0]);
+    await loan1.collect();
 
-    options = {value: ethers.parseEther(".5")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AAMZN`);
+    const loan2 = Loan.attach(loanAddresses[1]);
+    await loan2.collect();
 
-    let loan1Address = result2.logs[4].args[0];
+    // Simulate price changes
+    await simulatePriceChange(dataFeeds, "ANVDA", BigInt(21000000000));
+    await simulatePriceChange(dataFeeds, "AAMZN", BigInt(16000000000));
 
-    tx = await window.approveAsset(assetDataFeedAddress, "Apple", "AAAPL", 400, 11000);
-    result = await tx.wait();
-    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
-
-    options = {value: ethers.parseEther(".5")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AAPL`);
-
-    let loan2Address = result2.logs[4].args[0];
-
-    tx = await window.approveAsset(assetDataFeedAddress, "Google", "AGOOG", 500, 13000);
-    result = await tx.wait();
-    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
-
-    options = {value: ethers.parseEther(".5")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
-
-    tx = await window.approveAsset(assetDataFeedAddress, "Microsoft", "AMCST", 400, 11000);
-    result = await tx.wait();
-    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
-
-    options = {value: ethers.parseEther(".5")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AMCST`);
-
-    tx = await window.approveAsset(assetDataFeedAddress, "ConocoPhillips", "ACOP", 500, 13000);
-    result = await tx.wait();
-    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
-
-    options = {value: ethers.parseEther(".5")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} ACOP`);
-
-    tx = await window.approveAsset(assetDataFeedAddress, "AMD", "AAMD", 500, 13000);
-    result = await tx.wait();
-    assetEntityEvents = result.logs.filter((event) => event.fragment.name == "AssetEntity");
-    console.log('Asset Address: ', assetEntityEvents[0].args[0]);
-
-    options = {value: ethers.parseEther(".5")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AAMD`);
-
-    options = {value: ethers.parseEther("1.0")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
-
-    options = {value: ethers.parseEther("100")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
-
-    options = {value: ethers.parseEther("100")}
-    tx2 = await window.issue(assetEntityEvents[0].args[0], options);
-    result2 = await tx2.wait();
-    console.log(`Loan Address: ${result2.logs[4].args[0]}`);
-    console.log(`Amount Asset Issued: ${result2.logs[4].args[4]} AGOOG`);
-
-    let Loan = await hre.ethers.getContractFactory("Loan");
-    
-    let loan1 = Loan.attach(loan1Address);
-    let collectTx1 = await loan1.collect();
-
-    let loan2 = Loan.attach(loan2Address);
-    let collectTx2 = await loan2.collect();
-
-    // Create and deploy the subgraph
     await system.run(`npm run codegen`, { cwd: srcDir });
     await system.run(`npm run create-test`, { cwd: srcDir });
     await system.run(`npm run deploy-test`, { cwd: srcDir });
 
-    // Wait for the subgraph to be indexed
     await waitForSubgraphToBeSynced();
 
   } catch (error) {
