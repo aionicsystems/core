@@ -7,7 +7,7 @@ import { WagmiProvider } from 'wagmi'
 import { config } from './config'
 import { RainbowKitProvider, darkTheme, Theme } from '@rainbow-me/rainbowkit';
 import merge from 'lodash.merge';
-import { UserTypeProvider } from "./hooks/useUserType.tsx";
+import { GlobalStateProvider } from "./hooks/GlobalStateProvider.tsx";
 
 const myTheme = merge(darkTheme(), {
   colors: {
@@ -28,9 +28,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             modalSize="compact"
             theme={myTheme}
           >
-            <UserTypeProvider>
+            <GlobalStateProvider>
               <App />
-            </UserTypeProvider>
+            </GlobalStateProvider>
           </RainbowKitProvider>
         </QueryClientProvider> 
       </WagmiProvider>

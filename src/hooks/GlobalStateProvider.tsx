@@ -5,24 +5,36 @@ import {
   useState,
   ReactNode,
 } from "react";
+import { WindowType } from "../types/WindowTypes";
+import { AssetType } from "../types/AssetTypes";
 
 export interface GlobalStateInterface {
-  Price: Map<string, bigint>;
+  BigInts: Map<string, bigint>;
+  Window: WindowType;
+  Collateral: AssetType;
+  userType: string;
+  userTypes: string[];
+  error: boolean;
 }
 
-export const GlobalStateContext = createContext({
-  state: {} as Partial<GlobalStateInterface>,
-  setState: {} as Dispatch<SetStateAction<Partial<GlobalStateInterface>>>,
+export const GlobalStateContext = createContext<{
+  state: Partial<GlobalStateInterface>;
+  setState: Dispatch<SetStateAction<Partial<GlobalStateInterface>>>;
+}>({
+  state: {},
+  setState: () => {},
 });
 
-export const GlobalStateProvider = ({
-  children,
-  value = {} as GlobalStateInterface,
-}: {
+interface GlobalStateProviderProps {
   children: ReactNode;
-  value?: Partial<GlobalStateInterface>;
-}) => {
-  const [state, setState] = useState(value);
+}
+
+export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
+  const [state, setState] = useState<Partial<GlobalStateInterface>>({
+    Window: {} as WindowType,
+    userTypes: ["Borrower", "Collector", "Liquidator"],
+    error: false,
+  });
 
   return (
     <GlobalStateContext.Provider value={{ state, setState }}>

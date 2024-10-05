@@ -1,4 +1,4 @@
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
@@ -16,7 +16,7 @@ import sectionStyles from "./LoanOverview.module.css";
 import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
-import { UserTypeContext } from "../../hooks/useUserType.tsx";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 
 
@@ -56,7 +56,7 @@ export type LoanSectionProps = {
 
 export const LoanSection: FC<LoanSectionProps> = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
-  const { userType } = useContext(UserTypeContext);
+  const { state } = useGlobalState();
   const { isConnected, address } = useAccount();
   const [selectedLoan, setSelectedLoan] = useState<string>("");
   const [tableConfig, setTableConfig] = useState<
@@ -70,7 +70,7 @@ export const LoanSection: FC<LoanSectionProps> = () => {
   });
 
   useEffect(() => {
-    if (address && userType === "Borrower") {
+    if (address && state.userType === "Borrower") {
       setTableConfig((prevConfig) => ({
         ...prevConfig,
         owner: address,
@@ -81,11 +81,11 @@ export const LoanSection: FC<LoanSectionProps> = () => {
         owner: null,
       }));
     }
-  }, [userType, address]);
+  }, [state.userType, address]);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryFn: async () => {
-      if (userType === "Borrower") {
+      if (state.userType === "Borrower") {
         const result = await client.query({
           query: loanEntitiesByOwner,
           variables: {
@@ -96,7 +96,7 @@ export const LoanSection: FC<LoanSectionProps> = () => {
         });
         return result.data;
       }
-      if (userType === "Collector" || userType === "Liquidator") {
+      if (state.userType === "Collector" || state.userType === "Liquidator") {
         const result = await client.query({
           query: loanEntities,
           variables: {
@@ -132,7 +132,7 @@ export const LoanSection: FC<LoanSectionProps> = () => {
     <>
       
       <div className={sectionStyles.overviewHeading}>
-        {isConnected && userType === "Borrower" && (
+        {isConnected && state.userType === "Borrower" && (
           <Button
             size={"sm"}
             btnType={"primary"}

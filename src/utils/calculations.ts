@@ -41,3 +41,16 @@ export const collateralizationRatio = (
 ) => {
   return `${((100 * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals)))).toFixed(0)}%`;
 };
+
+export const liquidationCheck = (
+  liquidationRatio?: BigInt,
+  collateralAmount?: BigInt,
+  latestPriceETH?: BigInt,
+  decimalsETH?: BigInt,
+  liabilityAmount?: BigInt,
+  assetLatestPrice?: BigInt,
+  assetDecimals?: BigInt,
+  precision?: BigInt,
+) => {
+  return Number(liquidationRatio) > (Math.pow(10, Number(precision) * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals))))
+};

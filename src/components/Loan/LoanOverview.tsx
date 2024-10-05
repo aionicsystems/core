@@ -15,7 +15,7 @@ import { REQUEST_LOANS_ENTITY } from "../../repository/requestKeys.ts";
 import { SmallLoader } from "../Loader/SmallLoader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
-import { formatRatio, formatCoin } from "../../utils";
+import { formatCoin } from "../../utils";
 import {
   displayInterestRate,
   displayRatio,
@@ -60,39 +60,47 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
 
   const loanData: LoanType = data?.loanEntity ?? {};
 
-  const collateralValue = displayCoinUSD(
-    loanData.collateralAmount,
-    assetETH.latestPrice,
-    assetETH.aggregator.decimals,
-  ).toFixed(2);
+  const collateralValue = loanData.collateralAmount && assetETH.latestPrice && assetETH.aggregator?.decimals
+    ? displayCoinUSD(
+        loanData.collateralAmount,
+        assetETH.latestPrice,
+        assetETH.aggregator.decimals,
+      ).toFixed(2)
+    : "0.00";
 
-  const liabilityValue = displayCoinUSD(
-    loanData.liabilityAmount,
-    loanData?.asset?.latestPrice,
-    loanData?.asset?.aggregator.decimals,
-  ).toFixed(2);
+  const liabilityValue = loanData.liabilityAmount && loanData?.asset?.latestPrice && loanData?.asset?.aggregator?.decimals
+    ? displayCoinUSD(
+        loanData.liabilityAmount,
+        loanData?.asset?.latestPrice,
+        loanData?.asset?.aggregator.decimals,
+      ).toFixed(2)
+    : "0.00";
 
-  const netValueUsd = (
-    displayCoinUSD(
-      loanData.collateralAmount,
-      assetETH.latestPrice,
-      assetETH.aggregator.decimals,
-    ) -
-    displayCoinUSD(
-      loanData.liabilityAmount,
-      loanData?.asset?.latestPrice,
-      loanData?.asset?.aggregator.decimals,
-    )
-  ).toFixed(2);
+  const netValueUsd = loanData.collateralAmount && assetETH.latestPrice && assetETH.aggregator?.decimals && loanData.liabilityAmount && loanData?.asset?.latestPrice && loanData?.asset?.aggregator?.decimals
+    ? (
+        displayCoinUSD(
+          loanData.collateralAmount,
+          assetETH.latestPrice,
+          assetETH.aggregator.decimals,
+        ) -
+        displayCoinUSD(
+          loanData.liabilityAmount,
+          loanData?.asset?.latestPrice,
+          loanData?.asset?.aggregator.decimals,
+        )
+      ).toFixed(2)
+    : "0.00";
 
-  const collRation = collateralizationRatio(
-    loanData.collateralAmount,
-    assetETH?.latestPrice,
-    loanData?.asset?.aggregator?.decimals,
-    loanData?.liabilityAmount,
-    loanData?.asset?.latestPrice,
-    assetETH?.aggregator?.decimals,
-  );
+  const collRation = loanData.collateralAmount && assetETH?.latestPrice && loanData?.asset?.aggregator?.decimals && loanData?.liabilityAmount && loanData?.asset?.latestPrice && assetETH?.aggregator?.decimals
+    ? collateralizationRatio(
+        loanData.collateralAmount,
+        assetETH?.latestPrice,
+        loanData?.asset?.aggregator?.decimals,
+        loanData?.liabilityAmount,
+        loanData?.asset?.latestPrice,
+        assetETH?.aggregator?.decimals,
+      )
+    : "No data";
 
   return (
     <div className={styles.loanOverview}>
@@ -104,7 +112,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           color={"light-skyBlue"}
         />
         <OverviewCard
-          value={netValueUsd != "NaN" ? `$${netValueUsd}` : "$0.00"}
+          value={netValueUsd !== "NaN" ? `$${netValueUsd}` : "$0.00"}
           label={"Net Value"}
           icon={netValue as string}
           color={"light-gold"}

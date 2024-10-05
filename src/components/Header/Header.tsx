@@ -1,4 +1,4 @@
-import { FC, useContext, useState } from "react";
+import { FC, useState } from "react";
 import styles from "./Header.module.css";
 import {
   chevron,
@@ -11,16 +11,16 @@ import {
   useAccountModal,
   useChainModal,
 } from '@rainbow-me/rainbowkit';
-import { UserTypeContext } from "../../hooks/useUserType.tsx";
+
 import { UserTypeDropdown } from "../UserType/UserTypeDropdown.tsx";
-import { userTypes } from "../../hooks/useUserType.tsx";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 
 export const Header: FC = () => {
   const { isConnected, chain } = useAccount();
-  const { userType, setUserType } = useContext(UserTypeContext);
+  
   const [showDropdown, setShowDropdown] = useState(false);
-
+  const {state, setState} = useGlobalState();
   const { openConnectModal } = useConnectModal();
   const { openAccountModal } = useAccountModal();
   const { openChainModal } = useChainModal();
@@ -29,8 +29,8 @@ export const Header: FC = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const handleUserTypeSelect = (type: string) => {
-    setUserType(type);
+  const handleUserTypeSelect = (type: string) => {  
+    setState({ ...state, userType: type });
     setShowDropdown(false);
   };
 
@@ -52,13 +52,13 @@ export const Header: FC = () => {
         { isConnected && (
           <div className={styles.userTypeWrapper}>
             <Button size={"sm"} btnType={"primary"} onClick={handleUserTypeClick}>
-              {userType}&nbsp;&nbsp;&nbsp;
+              {state.userType}&nbsp;&nbsp;&nbsp;
               <span className={styles.coinSelectOpener}>
                 <img src={chevron as string} alt="chevron" />
               </span>
             </Button>
             {showDropdown && (
-              <UserTypeDropdown userTypes={userTypes} onSelect={handleUserTypeSelect} />
+              <UserTypeDropdown userTypes={state.userTypes || []} onSelect={handleUserTypeSelect} />
             )}
           </div>
         )}

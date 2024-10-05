@@ -22,7 +22,7 @@ export const LoanAsset: FC<LoanAssetProps> = ({ item, selectAsset }) => {
         </p>
         <p className={styles.loanAssetValue}>
           Liquidation Ratio:{" "}
-          {displayRatio(Number(item.liquidationRatio))}
+          {displayRatio(item.liquidationRatio)}
         </p>
       </div>
       <img
