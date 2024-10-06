@@ -15,12 +15,16 @@ import { REQUEST_LOANS_ENTITY } from "../../repository/requestKeys.ts";
 import { SmallLoader } from "../Loader/SmallLoader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
-import { formatCoin } from "../../utils";
+
+import numeral from "numeral";
+
 import {
   displayInterestRate,
   displayRatio,
   displayCoinUSD,
-  collateralizationRatio,
+  collateralizationRatioPercent,
+  displayCoin,
+  formatNumberWithCommas,
 } from "../../utils/calculations.ts";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
@@ -92,7 +96,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
     : "0.00";
 
   const collRation = loanData.collateralAmount && assetETH?.latestPrice && loanData?.asset?.aggregator?.decimals && loanData?.liabilityAmount && loanData?.asset?.latestPrice && assetETH?.aggregator?.decimals
-    ? collateralizationRatio(
+    ? collateralizationRatioPercent(
         loanData.collateralAmount,
         assetETH?.latestPrice,
         loanData?.asset?.aggregator?.decimals,
@@ -153,7 +157,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           <PositionsCard
             img={eth as string}
             valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
-            value={loanData.collateralAmount ? formatCoin(loanData.collateralAmount) : ""}
+            value={loanData.collateralAmount ? displayCoin(loanData.collateralAmount,2) : ""}
             coinType={assetETH.symbol}
             badgeType={"text-bg-green"}
             badgeText={"Collateral"}
@@ -161,7 +165,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
           <PositionsCard
             img={aionCoin as string}
             valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
-            value={loanData.liabilityAmount ? formatCoin(loanData.liabilityAmount) : ""}
+            value={loanData.liabilityAmount ? displayCoin(loanData.liabilityAmount,2) : ""}
             coinType={
               loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
             }

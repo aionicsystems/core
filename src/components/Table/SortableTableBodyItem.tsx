@@ -1,7 +1,7 @@
 import { SortableTableDataType } from "../../types/TableTypes.ts";
 import styles from "./SortableTable.module.css";
 import {
-  collateralizationRatio,
+  collateralizationRatioPercent,
   displayCoin,
   displayRatio,
 } from "../../utils/calculations.ts";
@@ -29,11 +29,11 @@ export const SortableTableBodyItem = <T,>({
       case "id":
         return `${String(dataItem.id).substring(0, 8)}...`
       case "liabilityAmount":
-        return `${displayCoin(dataItem["liabilityAmount"])} ${dataItem.asset?.symbol}`;
+        return `${displayCoin(dataItem["liabilityAmount"],6)} ${dataItem.asset?.symbol}`;
       case "collateralAmount":
-        return `${displayCoin(dataItem["collateralAmount"])} ${collateral?.symbol}`;
+        return `${displayCoin(dataItem["collateralAmount"],6)} ${collateral?.symbol}`;
       case "cRatio":
-        return collateralizationRatio(
+        return collateralizationRatioPercent(
           dataItem["collateralAmount"],
           collateral?.latestPrice,
           collateral?.aggregator?.decimals,

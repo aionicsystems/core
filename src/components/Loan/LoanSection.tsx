@@ -17,6 +17,7 @@ import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
+import { liquidationCheck } from "../../utils/calculations.ts";
 
 
 
@@ -49,12 +50,7 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   },
 ];
 
-export type LoanSectionProps = {
-  userType: string;
-  setUserType: (userType: string) => void;
-};
-
-export const LoanSection: FC<LoanSectionProps> = () => {
+export const LoanSection: FC = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
   const { state } = useGlobalState();
   const { isConnected, address } = useAccount();
@@ -121,8 +117,23 @@ export const LoanSection: FC<LoanSectionProps> = () => {
     return <Loader />;
   }
 
-  const tableData: LoanType[] = data?.loanEntities ?? [];
+  let tableData: LoanType[] = data?.loanEntities ?? [];
   const collateral: AssetType = data?.assetEntity ?? {};
+
+  if (collateral && state.userType === "Liquidator") {
+    tableData = tableData.filter((dataItem) => {
+      return liquidationCheck(
+        dataItem?.liquidationRatio,
+        dataItem?.collateralAmount,
+        collateral?.latestPrice,
+        collateral.aggregator?.decimals,
+        dataItem.liabilityAmount,
+        dataItem.asset?.latestPrice,
+        dataItem.asset?.aggregator?.decimals,
+        state.Window?.precision,
+      );
+    });
+  }
 
   const selectLoan = (id: string) => {
     setSelectedLoan(id);

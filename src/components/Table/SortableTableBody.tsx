@@ -4,10 +4,8 @@ import {
 } from "../../types/TableTypes.ts";
 import { SortableTableBodyItem } from "./SortableTableBodyItem.tsx";
 import styles from "./SortableTable.module.css";
-import { Fragment, useContext, useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { AssetType } from "../../types/AssetTypes.ts";
-import { liquidationCheck } from "../../utils/calculations.ts";
-import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
@@ -30,7 +28,6 @@ export const SortableTableBody = <T,>({
   selectedID,
   collateral,
 }: SortableTableBodyProps<T>) => {
-  const {state} = useGlobalState();
   const sortedData = useMemo(() => {
     return tableData.slice().sort((a, b) => {
       if (!sortBy || sortOrder === null) return 0;
@@ -56,20 +53,6 @@ export const SortableTableBody = <T,>({
     <tbody className={styles.sortableTableTBody}>
       {sortedData.length > 0 && !isError ? (
         sortedData.map((dataItem, index) => {
-          if (state.userType === "Liquidator") {
-            if (!liquidationCheck(
-              dataItem["liquidationRatio"],
-              dataItem["collateralAmount"],
-              collateral?.latestPrice,
-              collateral?.aggregator?.decimals,
-              dataItem["liabilityAmount"],
-              dataItem.asset?.latestPrice,
-              dataItem.asset?.aggregator?.decimals,
-              state.Window?.precision,
-            )) {
-              return null;
-            }
-          }
           return (
           <Fragment key={dataItem.id}>
             <tr

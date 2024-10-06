@@ -1,17 +1,20 @@
 import { BigInt } from "@graphprotocol/graph-ts"
+import numeral from "numeral";
 
 export const displayInterestRate = (rate: BigInt) => {
   return `${(Number(rate) * 100 * Math.pow(10, -4)).toFixed(2)}%`;
 };
-export const displayRatio = (ratio: BigInt) => {
+export const displayRatio = (ratio?: BigInt) => {
   return `${(Number(ratio) * 100 * (Math.pow(10, -4))).toFixed(0)}%`;
 };
 
 export const displayCoin = (
-  amount: BigInt
+  amount: BigInt,
+  decimals: number
 ) => {
-  return (Number(amount) / Math.pow(10, 18)).toFixed(6);
+  return (Number(amount) / Math.pow(10, 18)).toFixed(decimals);
 };
+
 
 export const displayCoinUSD = (
   amount?: BigInt,
@@ -31,7 +34,7 @@ export const estimatedLiability = (
   return Number(collateralAmount) * (Number(latestCollateralPrice) / Number(latestLiabilityPrice)) * (Number(borrowingRatio) / Math.pow(10, Number(precision)));
 };
 
-export const collateralizationRatio = (
+export const collateralizationRatioPercent = (
   collateralAmount?: BigInt,
   latestPriceETH?: BigInt,
   decimalsETH?: BigInt,
@@ -40,6 +43,18 @@ export const collateralizationRatio = (
   assetDecimals?: BigInt,
 ) => {
   return `${((100 * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals)))).toFixed(0)}%`;
+};
+
+export const collateralizationRatio = (
+  collateralAmount?: BigInt,
+  latestPriceETH?: BigInt,
+  decimalsETH?: BigInt,
+  liabilityAmount?: BigInt,
+  assetLatestPrice?: BigInt,
+  assetDecimals?: BigInt,
+  precision?: BigInt,
+) => {
+  return (Math.pow(10, Number(precision)) * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals)));
 };
 
 export const liquidationCheck = (
@@ -52,5 +67,5 @@ export const liquidationCheck = (
   assetDecimals?: BigInt,
   precision?: BigInt,
 ) => {
-  return Number(liquidationRatio) > (Math.pow(10, Number(precision) * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals))))
+  return Number(liquidationRatio) > collateralizationRatio(collateralAmount, latestPriceETH, decimalsETH, liabilityAmount, assetLatestPrice, assetDecimals, precision);
 };
