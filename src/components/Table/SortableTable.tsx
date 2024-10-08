@@ -22,8 +22,6 @@ export type SortableTableProps<T> = {
   }: SortableTableConfigType<T>) => void;
   tableConfig: SortableTableConfigType<T>;
   callRefetch: () => Promise<QueryObserverResult<unknown, DefaultError>>;
-  selectLoan?: (itemID: string) => void;
-  selectedID?: string;
   collateral?: AssetType;
 };
 
@@ -34,8 +32,6 @@ export const SortableTable = <T,>({
   tableConfig,
   isError,
   callRefetch,
-  selectLoan,
-  selectedID,
   collateral,
 }: SortableTableProps<T>) => {
   const tableWrapper = useRef<HTMLDivElement | null>(null);
@@ -143,8 +139,6 @@ export const SortableTable = <T,>({
             tableData={tableData}
             titles={titles}
             isError={isError}
-            selectLoan={selectLoan}
-            selectedID={selectedID}
             collateral={collateral}
           />
         </table>

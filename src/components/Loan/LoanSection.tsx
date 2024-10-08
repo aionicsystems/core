@@ -109,11 +109,6 @@ export const LoanSection: FC = () => {
     queryKey: [REQUEST_LOANS_ENTITIES, tableConfig],
   });
 
-  const toggleSelectAsset = () => {
-    setSelectAssetModal(!selectAssetModal);
-    handleBodyScroll();
-  };
-
   if (isLoading) {
     return <Loader />;
   }
@@ -136,10 +131,6 @@ export const LoanSection: FC = () => {
     });
   }
 
-  const selectLoan = (id: string) => {
-    setSelectedLoan(id);
-  };
-
   return (
     <>
       
@@ -161,8 +152,6 @@ export const LoanSection: FC = () => {
         setTableConfig={setTableConfig}
         isError={isError}
         callRefetch={refetch}
-        selectLoan={selectLoan}
-        selectedID={selectedLoan}
         collateral={collateral}
       />
       {collateral ? <LoanOverview loanID={selectedLoan} assetETH={collateral} /> : <> </>}

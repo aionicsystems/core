@@ -24,23 +24,19 @@ import {
   displayCoin,
 } from "../../utils/calculations.ts";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
-import { AssetType } from "../../types/AssetTypes.ts";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
-export type LoanOverviewProps = {
-  loanID: string;
-  assetETH: AssetType;
-};
-
-export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
+export const LoanOverview: FC = () => {
+  const { state } = useGlobalState();
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
       const result = await client.query({
         query: loanSingleEntity,
-        variables: { id: loanID },
+        variables: { id: state.loanId },
       });
       return result.data;
     },
-    queryKey: [`${REQUEST_LOANS_ENTITY}_${loanID}`],
+    queryKey: [`${REQUEST_LOANS_ENTITY}_${state.loanId}`],
   });
 
   if (isLoading) {
@@ -61,11 +57,11 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
 
   const loanData: LoanType = data?.loanEntity ?? {};
 
-  const collateralValue = loanData.collateralAmount && assetETH.latestPrice && assetETH.aggregator?.decimals
+  const collateralValue = loanData.collateralAmount && state?.Collateral?.latestPrice && state?.Collateral?.aggregator?.decimals
     ? displayCoinUSD(
         loanData.collateralAmount,
-        assetETH.latestPrice,
-        assetETH.aggregator.decimals,
+        state?.Collateral?.latestPrice,
+        state?.Collateral?.aggregator.decimals,
       ).toFixed(2)
     : "0.00";
 
@@ -77,12 +73,12 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
       ).toFixed(2)
     : "0.00";
 
-  const netValueUsd = loanData.collateralAmount && assetETH.latestPrice && assetETH.aggregator?.decimals && loanData.liabilityAmount && loanData?.asset?.latestPrice && loanData?.asset?.aggregator?.decimals
+  const netValueUsd = loanData.collateralAmount && state?.Collateral?.latestPrice && state?.Collateral?.aggregator?.decimals && loanData.liabilityAmount && loanData?.asset?.latestPrice && loanData?.asset?.aggregator?.decimals
     ? (
         displayCoinUSD(
           loanData.collateralAmount,
-          assetETH.latestPrice,
-          assetETH.aggregator.decimals,
+          state?.Collateral?.latestPrice,
+          state?.Collateral?.aggregator.decimals,
         ) -
         displayCoinUSD(
           loanData.liabilityAmount,
@@ -92,14 +88,14 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
       ).toFixed(2)
     : "0.00";
 
-  const collRation = loanData.collateralAmount && assetETH?.latestPrice && loanData?.asset?.aggregator?.decimals && loanData?.liabilityAmount && loanData?.asset?.latestPrice && assetETH?.aggregator?.decimals
+  const collRation = loanData.collateralAmount && state?.Collateral?.latestPrice && loanData?.asset?.aggregator?.decimals && loanData?.liabilityAmount && loanData?.asset?.latestPrice && state?.Collateral?.aggregator?.decimals
     ? collateralizationRatioPercent(
         loanData.collateralAmount,
-        assetETH?.latestPrice,
+        state?.Collateral?.latestPrice,
         loanData?.asset?.aggregator?.decimals,
         loanData?.liabilityAmount,
         loanData?.asset?.latestPrice,
-        assetETH?.aggregator?.decimals,
+        state?.Collateral?.aggregator?.decimals,
       )
     : "No data";
 
@@ -155,7 +151,7 @@ export const LoanOverview: FC<LoanOverviewProps> = ({ loanID, assetETH }) => {
             img={eth as string}
             valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
             value={loanData.collateralAmount ? displayCoin(loanData.collateralAmount,2) : ""}
-            coinType={assetETH.symbol}
+            coinType={state.Collateral?.symbol ? state.Collateral.symbol : ""}
             badgeType={"text-bg-green"}
             badgeText={"Collateral"}
           />
