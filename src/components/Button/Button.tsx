@@ -12,6 +12,7 @@ export const Button = ({
   size,
   btnType,
   className,
+  onClick,
   ...props
 }: PropsWithChildren<ButtonProps>) => {
   return (
@@ -19,6 +20,7 @@ export const Button = ({
       type="button"
       {...props}
       className={`${styles.btnMain} ${size ? styles[size] : ""} ${btnType ? styles[btnType] : ""} ${className}`}
+      onClick={onClick}
     >
       {children}
     </button>

@@ -16,15 +16,12 @@ import { SmallLoader } from "../Loader/SmallLoader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
 
-import numeral from "numeral";
-
 import {
   displayInterestRate,
   displayRatio,
   displayCoinUSD,
   collateralizationRatioPercent,
   displayCoin,
-  formatNumberWithCommas,
 } from "../../utils/calculations.ts";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";

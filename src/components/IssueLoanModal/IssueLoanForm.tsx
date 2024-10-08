@@ -34,7 +34,7 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
       abi,
       address: contractAddress("window", chain?.id) as Address,
       functionName: 'issue',
-      args: ["0x7ADd5dC8683974ed4a7199aCf2AfA66E01684c04"],
+      args: [assetID],
       value: parseEther(collateralAmount)
     })
   }

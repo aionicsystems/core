@@ -18,6 +18,7 @@ import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 import { liquidationCheck } from "../../utils/calculations.ts";
+import { CollectInterestModal } from "../CollectInterestModal/CollectInterestModal.tsx";
 
 
 
@@ -52,7 +53,7 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
 
 export const LoanSection: FC = () => {
   const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
-  const { state } = useGlobalState();
+  const { state, setState } = useGlobalState();
   const { isConnected, address } = useAccount();
   const [selectedLoan, setSelectedLoan] = useState<string>("");
   const [tableConfig, setTableConfig] = useState<
@@ -147,7 +148,7 @@ export const LoanSection: FC = () => {
           <Button
             size={"sm"}
             btnType={"primary"}
-            onClick={() => toggleSelectAsset()}
+            onClick={() => setState && setState({ ...state, isModalOpen: true, modalType: "issue" })}
           >
             Issue Loan
           </Button>
@@ -165,12 +166,20 @@ export const LoanSection: FC = () => {
         collateral={collateral}
       />
       {collateral ? <LoanOverview loanID={selectedLoan} assetETH={collateral} /> : <> </>}
-      {selectAssetModal && (
+      {state.isModalOpen && state.modalType === "issue" && (
         <LoanAssetsModal
-          onClose={toggleSelectAsset}
-          size={488}
           modalTitle={"Select Asset"}
+          onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
+          size={488}
         />
+      )}
+      {state.isModalOpen && state.modalType === "collect" && state.loanId && (
+          <CollectInterestModal
+            modalTitle={"Collect Interest"}
+            onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
+            loanId={state.loanId} 
+            size={400}
+          />
       )}
     </>
   );

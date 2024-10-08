@@ -89,7 +89,7 @@ export const IssueLoanModal: FC<IssueLoanModalProps> = ({
               {isLoading || isPending || isConfirming ? (
                 <Loader />
               ) : isConfirmed && hash ? (
-                <IssueLoanSuccess hash={hash} collateralAmount={collateralAmount} />
+                <IssueLoanSuccess asset={asset} hash={hash} collateralAmount={collateralAmount} />
               ) :
               (
                 <IssueLoanForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} writeContract={writeContract} isConfirmed={isConfirmed} />

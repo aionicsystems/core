@@ -6,6 +6,7 @@ import { SortableTableBodyItem } from "./SortableTableBodyItem.tsx";
 import styles from "./SortableTable.module.css";
 import { Fragment, useMemo } from "react";
 import { AssetType } from "../../types/AssetTypes.ts";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 export type SortableTableBodyProps<T> = {
   tableData: SortableTableDataType<T>[];
@@ -13,8 +14,6 @@ export type SortableTableBodyProps<T> = {
   sortOrder?: "asc" | "desc" | null;
   sortBy?: keyof T;
   isError: boolean;
-  selectLoan?: (itemID: string) => void;
-  selectedID?: string;
   collateral?: AssetType;
 };
 
@@ -24,10 +23,9 @@ export const SortableTableBody = <T,>({
   sortBy,
   sortOrder,
   isError,
-  selectLoan,
-  selectedID,
   collateral,
 }: SortableTableBodyProps<T>) => {
+  const { state, setState } = useGlobalState();
   const sortedData = useMemo(() => {
     return tableData.slice().sort((a, b) => {
       if (!sortBy || sortOrder === null) return 0;
@@ -56,8 +54,8 @@ export const SortableTableBody = <T,>({
           return (
           <Fragment key={dataItem.id}>
             <tr
-              onClick={() => (selectLoan ? selectLoan(dataItem.id) : null)}
-              className={`${selectedID === dataItem.id ? styles.selectedRow : ""}`}
+              onClick={() => (setState ? setState({...state, loanId: dataItem.id}) : null)}
+              className={`${state.loanId === dataItem.id ? styles.selectedRow : ""}`}
             >
               {titles.map((title) => (
                 <SortableTableBodyItem

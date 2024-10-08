@@ -19,6 +19,9 @@ export interface GlobalStateInterface {
   userType: string;
   userTypes: string[];
   error: boolean;
+  isModalOpen: boolean;
+  modalType: string;
+  loanId: string;
 }
 
 export const GlobalStateContext = createContext<{
@@ -39,6 +42,9 @@ export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
     userType: "Borrower",
     userTypes: ["Borrower", "Collector", "Liquidator"],
     error: false,
+    isModalOpen: false,
+    modalType: "",
+    loanId: "",
   });
 
   const { data } = useQuery({

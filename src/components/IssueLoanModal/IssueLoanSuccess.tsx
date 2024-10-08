@@ -1,9 +1,7 @@
 import { FC } from "react";
-import { AssetType } from "../../types/AssetTypes.ts";
 import styles from "./IssueAssetInfo.module.css";
 
 export type IssueLoanSuccessProps = {
-  issue: AssetType;
   collateralAmount: string;
   hash: string;
 };

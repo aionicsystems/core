@@ -4,6 +4,8 @@ import { Card } from "../Card/Card.tsx";
 import { Button } from "../Button/Button.tsx";
 import { Badge } from "../Badge/Badge.tsx";
 import { iIcon } from "../../static/images.ts";
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
+import { PositionsButton } from "./PositionsButton.tsx";
 
 type PositionsCardProps = {
   img: string;
@@ -22,6 +24,8 @@ export const PositionsCard: FC<PositionsCardProps> = ({
   valueUsd,
   badgeType,
 }) => {
+  const { state } = useGlobalState();
+
   return (
     <Card className={styles.positionsCard}>
       <div className={styles.positionsCardInner}>
@@ -47,13 +51,7 @@ export const PositionsCard: FC<PositionsCardProps> = ({
         </Badge>
       </div>
       <div className={styles.positionsCardActions}>
-        <Button
-          btnType={"primary"}
-          className={styles.positionsCardActionButton}
-          size={"lg"}
-        >
-          {badgeText === "Debt" ? "Pay-Back" : "Withdraw"}
-        </Button>
+          <PositionsButton badgeText={badgeText} />
       </div>
     </Card>
   );
