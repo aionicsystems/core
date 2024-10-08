@@ -69,3 +69,22 @@ export const liquidationCheck = (
 ) => {
   return Number(liquidationRatio) > collateralizationRatio(collateralAmount, latestPriceETH, decimalsETH, liabilityAmount, assetLatestPrice, assetDecimals, precision);
 };
+
+export const calculateInterest = (
+  collateralBalance: BigInt,
+  interestRate: BigInt,
+  lastCollection: BigInt,
+  currentTimestamp: BigInt,
+  precision: BigInt
+): number => {
+  const SECONDS_IN_YEAR = 31536000;
+  return (Number(collateralBalance) * Number(interestRate) * (Number(currentTimestamp) - Number(lastCollection))) / (SECONDS_IN_YEAR * Math.pow(10, Number(precision)));
+};
+
+export const calculateCollectorFee = (
+  interest: number,
+  collectorFee: BigInt,
+  precision: BigInt
+): number => {
+  return (interest * Number(collectorFee)) / Math.pow(10, Number(precision));
+};

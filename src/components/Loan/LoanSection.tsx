@@ -11,7 +11,6 @@ import { client, loanEntities, loanEntitiesByOwner } from "../../repository/requ
 import { REQUEST_LOANS_ENTITIES } from "../../repository/requestKeys.ts";
 import { Loader } from "../Loader/Loader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
-import { handleBodyScroll } from "../../utils";
 import sectionStyles from "./LoanOverview.module.css";
 import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
@@ -52,10 +51,8 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
 ];
 
 export const LoanSection: FC = () => {
-  const [selectAssetModal, setSelectAssetModal] = useState<boolean>(false);
   const { state, setState } = useGlobalState();
   const { isConnected, address } = useAccount();
-  const [selectedLoan, setSelectedLoan] = useState<string>("");
   const [tableConfig, setTableConfig] = useState<
     SortableTableConfigType<LoanType>
   >({
@@ -154,7 +151,7 @@ export const LoanSection: FC = () => {
         callRefetch={refetch}
         collateral={collateral}
       />
-      {collateral ? <LoanOverview loanID={selectedLoan} assetETH={collateral} /> : <> </>}
+      {collateral ? <LoanOverview/> : <> </>}
       {state.isModalOpen && state.modalType === "issue" && (
         <LoanAssetsModal
           modalTitle={"Select Asset"}
