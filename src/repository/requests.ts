@@ -53,6 +53,8 @@ export const loanEntities = gql(`
   liabilityAmount
   liquidationRatio
   borrowingRatio
+  interestRate
+  lastCollection
   asset {
     id
     latestPrice
@@ -111,6 +113,8 @@ export const loanSingleEntity = gql(
     liabilityAmount
     liquidationRatio
     borrowingRatio
+    interestRate
+    lastCollection
     asset {
       id
       latestPrice

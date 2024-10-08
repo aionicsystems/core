@@ -16,12 +16,11 @@ import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
-import { liquidationCheck } from "../../utils/calculations.ts";
-import { CollectInterestModal } from "../CollectInterestModal/CollectInterestModal.tsx";
+import { collectorReward, interest, liquidationCheck, timestamp } from "../../utils/calculations.ts";
+import { timeStamp } from "console";
 
 
-
-const loanTableTitles: SortableTableHeadType<LoanType>[] = [
+const borrowerTableTitles: SortableTableHeadType<LoanType>[] = [
   {
     title: "Loan ID",
     key: "id",
@@ -50,9 +49,75 @@ const loanTableTitles: SortableTableHeadType<LoanType>[] = [
   },
 ];
 
+const collectorTableTitles: SortableTableHeadType<LoanType>[] = [
+  {
+    title: "Loan ID",
+    key: "id",
+    sortable: true,
+    mutateValue: (v) => `${String(v).substring(0, 8)}...`,
+  },
+  {
+    title: "Interest Rate",
+    key: "interestRate",
+    sortable: true,
+  },
+  {
+    title: "Interest",
+    key: "interest",
+    sortable: true,
+  },
+  {
+    title: "Collector Reward",
+    key: "collectorAward",
+    sortable: true,
+  },
+];
+
+const liquidatorTableTitles: SortableTableHeadType<LoanType>[] = [
+  {
+    title: "Loan ID",
+    key: "id",
+    sortable: true,
+    mutateValue: (v) => `${String(v).substring(0, 8)}...`,
+  },
+  {
+    title: "Collateral Amount",
+    key: "collateralAmount",
+    sortable: true,
+  },
+  {
+    title: "Liability Amount",
+    key: "liabilityAmount",
+    sortable: true,
+  },
+  {
+    title: "Liquidation Amount",
+    key: "liquidationAmount",
+    sortable: true,
+  },
+  {
+    title: "Liquidator Reward",
+    key: "liquidatorReward",
+    sortable: true,
+  },
+];
+
+const getTableTitles = (userType: string): SortableTableHeadType<LoanType>[] => {
+  switch (userType) {
+    case "Borrower":
+      return borrowerTableTitles;
+    case "Collector":
+      return collectorTableTitles;
+    case "Liquidator":
+      return liquidatorTableTitles;
+    default:
+      return [];
+  }
+};
+
 export const LoanSection: FC = () => {
   const { state, setState } = useGlobalState();
-  const { isConnected, address } = useAccount();
+  const { address, isConnected } = useAccount();
   const [tableConfig, setTableConfig] = useState<
     SortableTableConfigType<LoanType>
   >({
@@ -128,6 +193,31 @@ export const LoanSection: FC = () => {
     });
   }
 
+  if (collateral && state?.Window?.precision && state.userType === "Collector") {
+    tableData = tableData.map(dataItem => {
+      if (state.Window && state.Window.precision) {
+        const newDataItem = { ...dataItem }; // Create a new object
+        newDataItem.interest = interest(
+          dataItem.collateralAmount,
+          dataItem.interestRate,
+          dataItem.lastCollection,
+          timestamp,
+          state.Window.precision
+        );
+        console.log(dataItem.lastCollection);
+        console.log(timestamp);
+        newDataItem.collectorReward = collectorReward(
+          newDataItem.interest,
+          state.Window.collectorFee,
+          state.Window.precision
+        );
+        return newDataItem;
+      }
+      return dataItem;
+    });
+  }
+  
+
   return (
     <>
       
@@ -143,7 +233,7 @@ export const LoanSection: FC = () => {
         )}
       </div>
       <SortableTable<LoanType>
-        titles={loanTableTitles}
+        titles={getTableTitles(state.userType ?? "")}
         tableData={tableData}
         tableConfig={tableConfig}
         setTableConfig={setTableConfig}

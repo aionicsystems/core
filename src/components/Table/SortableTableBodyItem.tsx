@@ -3,6 +3,7 @@ import styles from "./SortableTable.module.css";
 import {
   collateralizationRatioPercent,
   displayCoin,
+  displayNumber,
   displayRatio,
 } from "../../utils/calculations.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
@@ -43,6 +44,12 @@ export const SortableTableBodyItem = <T,>({
         );
       case "liquidationRatio":
         return `${displayRatio(dataItem["liquidationRatio"])}`;
+      case "interestRate":
+        return `${displayRatio(dataItem["interestRate"])}`;
+      case "interest":
+        return `${displayNumber(dataItem["interest"], 6)} ${collateral?.symbol}`;
+      case "collectorAward":
+        return `${displayNumber(dataItem["collectorReward"], 6)} ${collateral?.symbol}`;
       default:
         return "";
     }

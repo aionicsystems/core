@@ -11,4 +11,9 @@ export type LoanType = {
   liquidationRatio: BigInt;
   borrowingRatio: BigInt;
   interestRate: BigInt;
+  lastCollection: BigInt;
+  interest: number;
+  collectorReward: number;
+  liquidationAmount: number;
+  liquidatorReward: number;
 };

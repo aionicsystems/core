@@ -1,5 +1,4 @@
 import { BigInt } from "@graphprotocol/graph-ts"
-import numeral from "numeral";
 
 export const displayInterestRate = (rate: BigInt) => {
   return `${(Number(rate) * 100 * Math.pow(10, -4)).toFixed(2)}%`;
@@ -70,21 +69,31 @@ export const liquidationCheck = (
   return Number(liquidationRatio) > collateralizationRatio(collateralAmount, latestPriceETH, decimalsETH, liabilityAmount, assetLatestPrice, assetDecimals, precision);
 };
 
-export const calculateInterest = (
+export const interest = (
   collateralBalance: BigInt,
   interestRate: BigInt,
   lastCollection: BigInt,
-  currentTimestamp: BigInt,
+  currentTimestamp: number,
   precision: BigInt
 ): number => {
   const SECONDS_IN_YEAR = 31536000;
-  return (Number(collateralBalance) * Number(interestRate) * (Number(currentTimestamp) - Number(lastCollection))) / (SECONDS_IN_YEAR * Math.pow(10, Number(precision)));
+  return (Number(collateralBalance) * Number(interestRate) * (currentTimestamp - Number(lastCollection))) / (SECONDS_IN_YEAR * Math.pow(10, Number(precision)));
 };
 
-export const calculateCollectorFee = (
+export const collectorReward = (
   interest: number,
   collectorFee: BigInt,
   precision: BigInt
 ): number => {
   return (interest * Number(collectorFee)) / Math.pow(10, Number(precision));
+};
+
+const currentDate = new Date(); 
+export const timestamp = (currentDate.getTime() / 1000);
+
+export const displayNumber = (
+  amount: number,
+  decimals: number
+) => {
+  return (amount / Math.pow(10, 18)).toFixed(decimals);
 };
