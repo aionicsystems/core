@@ -118,13 +118,13 @@ async function main() {
     );
 
     const assets = [
-      { name: "Nvidia", symbol: "ANVDA", collateralFactor: 200, liquidationFactor: 12500, etherAmount: "1.0", initialPrice: BigInt(20000000000) },
-      { name: "Amazon", symbol: "AAMZN", collateralFactor: 300, liquidationFactor: 12000, etherAmount: ".5", initialPrice: BigInt(15000000000) },
-      { name: "Apple", symbol: "AAAPL", collateralFactor: 400, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(18000000000) },
-      { name: "Google", symbol: "AGOOG", collateralFactor: 500, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(22000000000) },
-      { name: "Microsoft", symbol: "AMCST", collateralFactor: 400, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(21000000000) },
-      { name: "ConocoPhillips", symbol: "ACOP", collateralFactor: 500, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(17000000000) },
-      { name: "AMD", symbol: "AAMD", collateralFactor: 500, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(16000000000) }
+      { name: "Nvidia", symbol: "ANVDA", collateralFactor: 2000, liquidationFactor: 12500, etherAmount: "1.0", initialPrice: BigInt(20000000000) },
+      { name: "Amazon", symbol: "AAMZN", collateralFactor: 3000, liquidationFactor: 12000, etherAmount: ".5", initialPrice: BigInt(15000000000) },
+      { name: "Apple", symbol: "AAAPL", collateralFactor: 4000, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(18000000000) },
+      { name: "Google", symbol: "AGOOG", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(22000000000) },
+      { name: "Microsoft", symbol: "AMCST", collateralFactor: 4000, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(21000000000) },
+      { name: "ConocoPhillips", symbol: "ACOP", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(17000000000) },
+      { name: "AMD", symbol: "AAMD", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(16000000000) }
     ];
 
     const loanAddresses = [];
@@ -160,7 +160,7 @@ async function main() {
     await loan2.collect();
 
     // Simulate price changes
-    await simulatePriceChange(dataFeeds, "ANVDA", BigInt(21000000000));
+    await simulatePriceChange(dataFeeds, "ANVDA", BigInt(25000000000));
     await simulatePriceChange(dataFeeds, "AAMZN", BigInt(16000000000));
 
     await system.run(`npm run codegen`, { cwd: srcDir });
