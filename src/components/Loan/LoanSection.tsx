@@ -257,7 +257,6 @@ export const LoanSection: FC = () => {
           <CollectModal
             modalTitle={"Collect Interest"}
             onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
-            loanId={state.loanId} 
             size={400}
           />
       )}

@@ -81,7 +81,7 @@ export const CollectModal: FC<CollectModalProps> = ({
               (
                 <CollectModalForm loan={state.Loan} writeContract={writeContract} />
               )}
-              <CollectAssetInfo loan={state.Loan} />
+              <CollectAssetInfo state={state} />
             </> 
           }
         </div>
