@@ -5,9 +5,9 @@ import { type Chain } from 'viem'
 
 const projectId = "287f2bbc9d09a05d96ade9636d01f17c";
 
-export const aionTestnet = {
+export const aionicDao = {
   id: 56700,
-  name: 'AionicDAO Testnet',
+  name: 'AionicDAO',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
     default: { http: ['http://34.72.19.102:8545'] },
@@ -15,7 +15,7 @@ export const aionTestnet = {
 } as const satisfies Chain
 
 export const config = createConfig({
-  chains: [arbitrum, arbitrumSepolia, aionTestnet],
+  chains: [arbitrum, arbitrumSepolia, aionicDao],
   connectors: [
     injected(),
     walletConnect({ projectId }),
@@ -25,6 +25,6 @@ export const config = createConfig({
   transports: {
     [arbitrum.id]: http(),
     [arbitrumSepolia.id]: http(),
-    [aionTestnet.id]: http(),
+    [aionicDao.id]: http('http://34.72.19.102:8545'),
   },
 });

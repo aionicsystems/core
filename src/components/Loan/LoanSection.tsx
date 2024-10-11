@@ -17,7 +17,8 @@ import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 import { collectorReward, interest, liquidationCheck, timestamp } from "../../utils/calculations.ts";
-import { timeStamp } from "console";
+import { CollectModal } from "../CollectModal/CollectModal.tsx";
+
 
 
 const borrowerTableTitles: SortableTableHeadType<LoanType>[] = [
@@ -26,6 +27,11 @@ const borrowerTableTitles: SortableTableHeadType<LoanType>[] = [
     key: "id",
     sortable: true,
     mutateValue: (v) => `${String(v).substring(0, 8)}...`,
+  },
+  {
+    title: "Asset",
+    key: "asset.symbol",
+    sortable: true,
   },
   {
     title: "Liability",
@@ -204,8 +210,6 @@ export const LoanSection: FC = () => {
           timestamp,
           state.Window.precision
         );
-        console.log(dataItem.lastCollection);
-        console.log(timestamp);
         newDataItem.collectorReward = collectorReward(
           newDataItem.interest,
           state.Window.collectorFee,
@@ -250,7 +254,7 @@ export const LoanSection: FC = () => {
         />
       )}
       {state.isModalOpen && state.modalType === "collect" && state.loanId && (
-          <CollectInterestModal
+          <CollectModal
             modalTitle={"Collect Interest"}
             onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
             loanId={state.loanId} 

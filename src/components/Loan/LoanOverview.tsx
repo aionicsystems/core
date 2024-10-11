@@ -147,24 +147,69 @@ export const LoanOverview: FC = () => {
       </div>
       <section className={accStyles.positionsSection}>
         <div className={accStyles.positionsCardsWrapper}>
-          <PositionsCard
-            img={eth as string}
-            valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
-            value={loanData.collateralAmount ? displayCoin(loanData.collateralAmount,2) : ""}
-            coinType={state.Collateral?.symbol ? state.Collateral.symbol : ""}
-            badgeType={"text-bg-green"}
-            badgeText={"Collateral"}
-          />
-          <PositionsCard
-            img={aionCoin as string}
-            valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
-            value={loanData.liabilityAmount ? displayCoin(loanData.liabilityAmount,2) : ""}
-            coinType={
-              loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
-            }
-            badgeType={"text-bg-orange"}
-            badgeText={"Debt"}
-          />
+          { state.userType === "Borrower" ? (
+            <>
+              <PositionsCard
+                img={eth as string}
+                valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
+                value={loanData.collateralAmount ? displayCoin(loanData.collateralAmount,2) : ""}
+                coinType={state.Collateral?.symbol ? state.Collateral.symbol : ""}
+                badgeType={"text-bg-green"}
+                badgeText={"Collateral"}
+              />
+              <PositionsCard
+                img={aionCoin as string}
+                valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
+                value={loanData.liabilityAmount ? displayCoin(loanData.liabilityAmount,2) : ""}
+                coinType={
+                  loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
+                }
+                badgeType={"text-bg-orange"}
+                badgeText={"Debt"}
+              />
+            </>
+          ) : ( state.userType === "Collector" ? (
+              <>
+              <PositionsCard
+                img={eth as string}
+                valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
+                value={loanData.collateralAmount ? displayCoin(loanData.collateralAmount,2) : ""}
+                coinType={state.Collateral?.symbol ? state.Collateral.symbol : ""}
+                badgeType={"text-bg-green"}
+                badgeText={"Collateral"}
+              />
+              <PositionsCard
+                img={aionCoin as string}
+                valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
+                value={loanData.liabilityAmount ? displayCoin(loanData.liabilityAmount,2) : ""}
+                coinType={
+                  loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
+                }
+                badgeType={"text-bg-orange"}
+                badgeText={"Debt"}
+              />
+            </>) : state.userType === "Liquidator" ? (
+              <>
+                <PositionsCard
+                  img={eth as string}
+                  valueUsd={isNaN(Number(collateralValue)) ? "0.00" : collateralValue}
+                  value={loanData.collateralAmount ? displayCoin(loanData.collateralAmount,2) : ""}
+                  coinType={state.Collateral?.symbol ? state.Collateral.symbol : ""}
+                  badgeType={"text-bg-green"}
+                  badgeText={"Collateral"}
+                />
+                <PositionsCard
+                  img={aionCoin as string}
+                  valueUsd={isNaN(Number(liabilityValue)) ? "0.00" : liabilityValue}
+                  value={loanData.liabilityAmount ? displayCoin(loanData.liabilityAmount,2) : ""}
+                  coinType={
+                    loanData ? (loanData.asset ? loanData.asset.symbol : "") : ""
+                  }
+                  badgeType={"text-bg-orange"}
+                  badgeText={"Debt"}
+                />
+              </>) : null
+          )}
         </div>
       </section>
     </div>

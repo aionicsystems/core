@@ -1,7 +1,6 @@
 import { FC } from "react";
 import styles from "./PositionsCard.module.css";
 import { Card } from "../Card/Card.tsx";
-import { Button } from "../Button/Button.tsx";
 import { Badge } from "../Badge/Badge.tsx";
 import { iIcon } from "../../static/images.ts";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";

@@ -29,6 +29,8 @@ export const SortableTableBodyItem = <T,>({
     switch (key) {
       case "id":
         return `${String(dataItem.id).substring(0, 8)}...`
+      case "asset.symbol":
+        return dataItem.asset?.symbol;
       case "liabilityAmount":
         return `${displayCoin(dataItem["liabilityAmount"],6)} ${dataItem.asset?.symbol}`;
       case "collateralAmount":

@@ -1,20 +1,20 @@
 import { FC, useState } from "react";
 import { Button } from "../Button/Button.tsx";
-import styles from "./IssueLoanForm.module.css";
+import styles from "./CollectModalForm.module.css";
 import { contractAddress } from "../../repository/contracts.ts";
 import { useAccount, useTransactionCount } from 'wagmi';
-import { abi } from '../../../artifacts/contracts/Window.sol/Window.json'
+import { abi } from '../../../artifacts/contracts/Loan.sol/Loan.json'
 import { parseEther, Address } from "viem";
 import { WriteContractMutate } from "wagmi/query";
 
-export type IssueLoanFormProps = {
+export type CollectModalFormProps = {
   assetID?: string;
   setCollateralAmount: (collateralAmount:string) => void;
   collateralAmount: string;
   writeContract: WriteContractMutate<any, any>
 };
 
-export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAmount, collateralAmount, writeContract }) => {
+export const CollectModalForm: FC<CollectModalFormProps> = ({ assetID, setCollateralAmount, collateralAmount, writeContract }) => {
   
   const { chain, address } = useAccount();
   const currentNonce = useTransactionCount({address: address});
@@ -32,8 +32,8 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
     try {
       writeContract({
         abi,
-        address: contractAddress("window", chain?.id) as Address,
-        functionName: 'issue',
+        address: contractAddress("loan", chain?.id) as Address,
+        functionName: 'collect',
         args: [assetID as Address],
         value: parseEther(collateralAmount),
         nonce: currentNonce.data ?? undefined,
@@ -47,9 +47,9 @@ export const IssueLoanForm: FC<IssueLoanFormProps> = ({ assetID, setCollateralAm
     <form
       onSubmit={submit}
       id={assetID}
-      className={styles.issueLoanForm}
+      className={styles.collectModalForm}
     >
-      <p className={styles.issueLoanFormTitle}>Collateral</p>
+      <p className={styles.collectModalFormTitle}>Collateral</p>
       <div className={styles.inputWithUnitGrid}>
         <span className={styles.unitLabelLeft}></span> {/* Empty span for grid space */}
         <input

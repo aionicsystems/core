@@ -1,9 +1,8 @@
 import { FC } from "react";
 import styles from "./PositionsCard.module.css";
-import { Card } from "../Card/Card.tsx";
 import { Button } from "../Button/Button.tsx";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
-import { CollectInterestModal } from "../CollectInterestModal/CollectInterestModal.tsx";
+
 
 type PositionsButtonProps = {
   badgeText: string;
@@ -27,7 +26,7 @@ export const PositionsButton: FC<PositionsButtonProps> = ({
         </Button>
       ) : null;
     case "Collateral":
-        return state.userType === "Collector" ? (
+        return state.loanId && state.userType === "Collector" ? (
             <Button
             btnType={"primary"}
             className={styles.positionsCardActionButton}
