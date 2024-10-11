@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import {
   loanId,
   netValue,
@@ -27,7 +27,7 @@ import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 export const LoanOverview: FC = () => {
-  const { state } = useGlobalState();
+  const { state, setState } = useGlobalState();
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
       const result = await client.query({
@@ -38,6 +38,10 @@ export const LoanOverview: FC = () => {
     },
     queryKey: [`${REQUEST_LOANS_ENTITY}_${state.loanId}`],
   });
+
+  useEffect(() => {
+    setState({...state, Loan: data?.loanEntity });
+  }, [data]);
 
   if (isLoading) {
     return (

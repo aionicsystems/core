@@ -14,6 +14,7 @@ import { ModalError } from "../ModalError/ModalError.tsx";
 import { Loader } from "../Loader/Loader.tsx";
 import { REQUEST_ASSET_ENTITIES } from "../../repository/requestKeys.ts";
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 export type CollectModalProps = Modal & {
   selectedAsset?: string;
@@ -22,31 +23,16 @@ export type CollectModalProps = Modal & {
 export const CollectModal: FC<CollectModalProps> = ({
   modalTitle,
   onClose,
-  size,
-  selectedAsset,
+  size
 }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const [collateralAmount, setCollateralAmount] = useState<string>("");
   const [error, setError] = useState<boolean>(false);
+  const { state } = useGlobalState();
   const { data: hash, isPending, writeContract } = useWriteContract();
   
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
-  
-  const { data, isLoading, isError } = useQuery({
-    queryFn: async () => {
-      try {
-        const result = await client.query({
-          query: assetSingleEntity,
-          variables: { id: selectedAsset },
-        });
-        return result.data;
-      } catch (error) {
-        setError(true);
-        throw error;
-      }
-    },
-    queryKey: [`${REQUEST_ASSET_ENTITIES}_${selectedAsset}`],
-  });
+
 
   const toggleModalFaq = () => {
     setModalFaq(!modalFaq);
@@ -57,7 +43,7 @@ export const CollectModal: FC<CollectModalProps> = ({
     console.log("hash:", hash);
   }, [isConfirmed, hash]);
 
-  if (error || isError) {
+  if (error) {
     return (
       <ModalOverlay onClose={onClose} size={size}>
         <div className={styles.modalInner}>
@@ -74,8 +60,6 @@ export const CollectModal: FC<CollectModalProps> = ({
     );
   }
 
-  const asset: AssetType = data?.assetEntity ?? [];
-
   return (
     <ModalOverlay onClose={onClose} size={size}>
       <div className={styles.modalInner}>
@@ -89,15 +73,15 @@ export const CollectModal: FC<CollectModalProps> = ({
             <CollectModalFaq />
           ) : 
             <>
-              {isLoading || isPending || isConfirming ? (
+              {isPending || isConfirming ? (
                 <Loader />
               ) : isConfirmed && hash ? (
                 <CollectModalSuccess hash={hash} collateralAmount={collateralAmount} />
               ) :
               (
-                <CollectModalForm assetID={selectedAsset} setCollateralAmount={setCollateralAmount} collateralAmount={collateralAmount} writeContract={writeContract} />
+                <CollectModalForm loan={state.Loan} writeContract={writeContract} />
               )}
-              <CollectAssetInfo issue={asset} collateralAmount={collateralAmount} />
+              <CollectAssetInfo loan={state.Loan} />
             </> 
           }
         </div>

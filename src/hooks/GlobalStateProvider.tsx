@@ -11,6 +11,7 @@ import { AssetType } from "../types/AssetTypes";
 import { useQuery } from "@tanstack/react-query";
 import { client, windowEntities } from "../repository/requests";
 import { REQUEST_WINDOW_ENTITIES } from "../repository/requestKeys";
+import { LoanType } from "../types/LoanTypes";
 
 export interface GlobalStateInterface {
   BigInts: Map<string, bigint>;
@@ -22,6 +23,7 @@ export interface GlobalStateInterface {
   isModalOpen: boolean;
   modalType: string;
   loanId: string;
+  Loan: LoanType;
 }
 
 export const GlobalStateContext = createContext<{

@@ -1,46 +1,30 @@
 import { FC, useState, useEffect } from "react";
-import { AssetType } from "../../types/AssetTypes.ts";
+
 import styles from "./CollectAssetInfo.module.css";
-import {
-  displayInterestRate,
-  displayRatio,
-  estimatedLiability
-} from "../../utils/calculations.ts";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 export type CollectAssetInfoProps = {
-  issue: AssetType;
-  collateralAmount: string;
+  loan: LoanType;
 };
 
-export const CollectAssetInfo: FC<CollectAssetInfoProps> = ({ issue, collateralAmount }) => {
+export const CollectAssetInfo: FC<CollectAssetInfoProps> = ({ loan }) => {
   
   const { state } = useGlobalState();
-  const [liabilityUsd, setLiabilityUsd] = useState<string>("0")
-
-  useEffect(() => {
-    setLiabilityUsd(
-      estimatedLiability(collateralAmount, state?.Collateral?.latestPrice, issue.latestPrice, state?.Window?.borrowingRatio, state?.Window?.precision).toFixed(2)
-    )
-    console.log(liabilityUsd)
-  }, [state, issue, window, collateralAmount]);
+  
 
   return (
     <>
       <div className={styles.collectInfoWrapper}>
-          <p className={styles.collectInfoTitle}>Asset</p>
-          <div className={styles.collectInfoValue}>{liabilityUsd} {issue.symbol}</div>
+          <p className={styles.collectInfoTitle}>Interest</p>
+          <div className={styles.collectInfoValue}>{liabilityUsd} {state.Collateral?.symbol}</div>
       </div>
       <div className={styles.collectInfoWrapper}>
-          <p className={styles.collectInfoTitle}>Terms</p>
-          <div className={styles.collectInfoValue}>Borrowing Ratio {displayRatio(state?.Window?.borrowingRatio)}</div>
-          <div className={styles.collectInfoValue}>
-            Liquidation Ratio{" "}
-            {displayRatio(issue.liquidationRatio)}
-          </div>
-          <div className={styles.collectInfoValue}>
-            Annual Interest Rate {displayInterestRate(issue.rate)}
-          </div>
+          <p className={styles.collectInfoTitle}>Reward</p>
+          <div className={styles.collectInfoValue}>{liabilityUsd} {state.Collateral?.symbol}</div>
+          <p className={styles.collectInfoTitle}>TX Fee</p>
+          <div className={styles.collectInfoValue}>{liabilityUsd} {state.Collateral?.symbol}</div>
+          <p className={styles.collectInfoTitle}>Net Reward</p>
+          <div className={styles.collectInfoValue}>{liabilityUsd} {state.Collateral?.symbol}</div>
       </div>
     </>
   );
