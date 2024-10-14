@@ -11,7 +11,7 @@ import accStyles from "../../App.module.css";
 import { OverviewCard } from "../OverviewCard/OverviewCard.tsx";
 import { useQuery } from "@tanstack/react-query";
 import { client, loanSingleEntity } from "../../repository/requests.ts";
-import { REQUEST_LOANS_ENTITY } from "../../repository/requestKeys.ts";
+import { REQUEST_LOAN_ENTITY } from "../../repository/requestKeys.ts";
 import { SmallLoader } from "../Loader/SmallLoader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { OverviewCardSmall } from "../OverviewCard/OverviewCardSmall.tsx";
@@ -22,12 +22,16 @@ import {
   displayCoinUSD,
   collateralizationRatioPercent,
   displayCoin,
+  interest,
+  timestamp,
+  collectorReward,
 } from "../../utils/calculations.ts";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 
 export const LoanOverview: FC = () => {
   const { state, setState } = useGlobalState();
+  
   const { data, isLoading, isError } = useQuery({
     queryFn: async () => {
       const result = await client.query({
@@ -36,12 +40,28 @@ export const LoanOverview: FC = () => {
       });
       return result.data;
     },
-    queryKey: [`${REQUEST_LOANS_ENTITY}_${state.loanId}`],
+    queryKey: [`${REQUEST_LOAN_ENTITY}_${state.loanId}`],
   });
 
   useEffect(() => {
-    setState({...state, Loan: data?.loanEntity });
-  }, [data]);
+    if (data && state.Window) {
+      let loanEntity = { ...data?.loanEntity };
+      loanEntity.interest = interest(
+        loanEntity.collateralAmount,
+        loanEntity.interestRate,
+        loanEntity.lastCollection,
+        timestamp, // Assuming current timestamp
+        state.Window.precision
+      )
+      loanEntity.collectorReward = collectorReward(
+        loanEntity.interest,
+        state.Window.collectorFee,
+        state.Window.precision
+      )
+      console.log(loanEntity)
+      setState({...state, Loan: loanEntity });
+    }
+}, [data, state.Window]);
 
   if (isLoading) {
     return (
