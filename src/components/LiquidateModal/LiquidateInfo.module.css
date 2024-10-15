@@ -1,0 +1,40 @@
+.liquidateInfoWrapper {
+    margin-top: 20px;
+}
+.liquidateInfoTitle {
+    color: #E9E9E9DB;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+.liquidateInfoValue {
+    background-color: #08101B38;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+.liquidateInfoValue:not(:first-child) {
+    margin-top: 5px;
+}
+@media (min-width: 768px) {
+    .liquidateInfoValue {
+        font-size: 17px;
+        line-height: 23px;
+        padding: 28px;
+    }
+    .liquidateInfoValue:not(:first-child) {
+        margin-top: 15px;
+    }
+    .liquidateInfoWrapper {
+        margin-top: 35px;
+    }
+}
