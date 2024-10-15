@@ -25,6 +25,9 @@ import {
   interest,
   timestamp,
   collectorReward,
+  maxLiquidationAmount,
+  liquidationReward,
+  liquidationPayment,
 } from "../../utils/calculations.ts";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
@@ -44,8 +47,8 @@ export const LoanOverview: FC = () => {
   });
 
   useEffect(() => {
-    if (data && state.Window) {
-      let loanEntity = { ...data?.loanEntity };
+    if (data && state.Window && state.Collateral) {
+      let loanEntity: LoanType = { ...data?.loanEntity };
       loanEntity.interest = interest(
         loanEntity.collateralAmount,
         loanEntity.interestRate,
@@ -58,6 +61,24 @@ export const LoanOverview: FC = () => {
         state.Window.collectorFee,
         state.Window.precision
       )
+      if (state.userType === "Liquidator") {
+        loanEntity.liquidationAmount = maxLiquidationAmount(
+          loanEntity.collateralAmount,
+          state.Collateral.latestPrice,
+          state.Collateral.aggregator.decimals,
+          loanEntity.liabilityAmount,
+          loanEntity.asset.latestPrice,
+          loanEntity.asset.aggregator.decimals,
+          loanEntity.liquidationRatio,
+          state.Window.precision
+        )
+
+        loanEntity.liquidatorReward = liquidationReward(
+          liquidationPayment(loanEntity.liquidationAmount, loanEntity.asset.latestPrice, state.Collateral.latestPrice, loanEntity.asset.aggregator.decimals, state.Collateral.aggregator.decimals, state.Window.liquidatorFee, state.Window.precision),
+          state.Window.liquidatorFee,
+          state.Window.precision,
+        )
+      }
       console.log(loanEntity)
       setState({...state, Loan: loanEntity });
     }

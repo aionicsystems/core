@@ -52,6 +52,10 @@ export const SortableTableBodyItem = <T,>({
         return `${displayNumber(dataItem["interest"], 6)} ${collateral?.symbol}`;
       case "collectorAward":
         return `${displayNumber(dataItem["collectorReward"], 6)} ${collateral?.symbol}`;
+      case "liquidationAmount":
+        return `${displayCoin(dataItem["liquidationAmount"], 6)} ${dataItem.asset?.symbol}`;
+      case "liquidatorReward":
+        return `${displayNumber(dataItem["liquidatorReward"], 6)} ${collateral?.symbol}`;
       default:
         return "";
     }

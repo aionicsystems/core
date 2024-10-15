@@ -97,3 +97,51 @@ export const displayNumber = (
 ) => {
   return (amount / Math.pow(10, 18)).toFixed(decimals);
 };
+
+export const maxLiquidationAmount = (
+  collateralAmount: BigInt,
+  latestPriceETH: BigInt,
+  decimalsETH: BigInt,
+  liabilityAmount: BigInt,
+  assetLatestPrice: BigInt,
+  assetDecimals: BigInt,
+  liquidationRatio: BigInt,
+  precision: BigInt
+): number => {
+  // Target collateralization ratio (liquidation ratio)
+  const targetCR = Number(liquidationRatio) / Math.pow(10, Number(precision));
+
+  // Calculate the maximum liability amount that can be liquidated
+  const maxLiability = (Number(collateralAmount) * Number(latestPriceETH) * Math.pow(10, Number(assetDecimals))) / (targetCR * Number(assetLatestPrice) * Math.pow(10, Number(decimalsETH)));
+
+  // Maximum amount of asset that can be liquidated
+  const maxLiquidation = Number(liabilityAmount) - maxLiability;
+
+  return Math.max(0, maxLiquidation); // Ensure the result is not negative
+};
+
+export const liquidationPayment = (
+  payment: number,
+  assetPrice: BigInt,
+  etherPrice: BigInt,
+  assetDecimals: BigInt,
+  etherDecimals: BigInt,
+  liquidatorFee: BigInt,
+  precision: BigInt
+): number => {
+  // Calculate the redemption amount
+  const redemption = (payment * Number(assetPrice) * Math.pow(10, Number(etherDecimals))) / (Number(etherPrice) * Math.pow(10, Number(assetDecimals)));
+
+  // Calculate the liquidator payment
+  const liquidator = redemption + (redemption * Number(liquidatorFee)) / Math.pow(10, Number(precision));
+
+  return liquidator;
+};
+
+export const liquidationReward = (
+  collateralAmount: number,
+  liquidatorFee: BigInt,
+  precision: BigInt
+): number => {
+  return (collateralAmount * Number(liquidatorFee)) / Math.pow(10, Number(precision));
+};

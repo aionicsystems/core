@@ -16,7 +16,7 @@ import { LoanOverview } from "./LoanOverview.tsx";
 import { AssetType } from "../../types/AssetTypes.ts";
 import { useAccount } from "wagmi";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
-import { collectorReward, interest, liquidationCheck, timestamp } from "../../utils/calculations.ts";
+import { collectorReward, interest, liquidationCheck, liquidationPayment, liquidationReward, maxLiquidationAmount, timestamp } from "../../utils/calculations.ts";
 import { CollectModal } from "../CollectModal/CollectModal.tsx";
 
 
@@ -197,6 +197,36 @@ export const LoanSection: FC = () => {
         state.Window?.precision,
       );
     });
+    tableData = tableData.map(dataItem => {
+      if (state.Window) {
+        const newDataItem = { ...dataItem }; // Create a new object
+        newDataItem.liquidationAmount = maxLiquidationAmount(
+          newDataItem.collateralAmount,
+          collateral.latestPrice,
+          collateral.aggregator.decimals,
+          newDataItem.liabilityAmount,
+          newDataItem.asset.latestPrice,
+          newDataItem.asset.aggregator.decimals,
+          newDataItem.liquidationRatio,
+          state.Window.precision
+        );
+        newDataItem.liquidatorReward = liquidationReward(
+          liquidationPayment(
+            newDataItem.liquidationAmount, 
+            newDataItem.asset.latestPrice, 
+            collateral.latestPrice, 
+            newDataItem.asset.aggregator.decimals, 
+            collateral.aggregator.decimals, 
+            state.Window.liquidatorFee, 
+            state.Window.precision
+          ),
+          state.Window.liquidatorFee,
+          state.Window.precision,
+        )
+        return newDataItem;
+      }
+      return dataItem;
+    });
   }
 
   if (collateral && state?.Window?.precision && state.userType === "Collector") {
@@ -220,7 +250,6 @@ export const LoanSection: FC = () => {
       return dataItem;
     });
   }
-  
 
   return (
     <>
