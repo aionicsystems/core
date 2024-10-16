@@ -26,15 +26,17 @@ export const LiquidateInfo: FC<LiquidateInfoProps> = ({ loan, window, collateral
         window.precision
       )
   
-  const price = (redemption * Number(collateral.latestPrice)) / (Number(liquidationAmount) * Number(collateral.aggregator.decimals));
+  console.log(redemption);
+  
+  const price = (redemption * Number(collateral.latestPrice)) / (Number(liquidationAmount) * Math.pow(10, Number(collateral.aggregator.decimals)));
   
   return (
     <>
       <div className={styles.liquidateInfoWrapper}>
           <p className={styles.liquidateInfoTitle}>Net Redemption</p>
-          <div className={styles.liquidateInfoValue}>{(redemption / Math.pow(10, 18)).toFixed(6)} {collateral.symbol}</div>
+          <div className={styles.liquidateInfoValue}>{(redemption).toFixed(6)} {collateral.symbol}</div>
           <p className={styles.liquidateInfoTitle}>Effective Price</p>
-          <div className={styles.liquidateInfoValue}>${(price / Math.pow(10, 18)).toFixed(2)}</div>
+          <div className={styles.liquidateInfoValue}>${price ? (price).toFixed(2): ""}</div>
       </div>
     </>
   );
