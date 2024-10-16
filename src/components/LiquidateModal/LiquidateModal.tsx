@@ -4,7 +4,6 @@ import { ModalOverlay } from "../modalBaseComponents/ModalOverlay.tsx";
 import styles from "../modalBaseComponents/Modal.module.css";
 import { ModalHeading } from "../modalBaseComponents/ModalHeading.tsx";
 import { LiquidateModalFaq } from "./LiquidateModalFaq.tsx";
-import { LiquidateInfo } from "./LiquidateInfo.tsx";
 import { LiquidateForm } from "./LiquidateForm.tsx";
 import { LiquidateSuccess } from "./LiquidateSuccess.tsx";
 import { ModalError } from "../ModalError/ModalError.tsx";
@@ -26,20 +25,19 @@ export const LiquidateModal: FC<LiquidateModalProps> = ({
   const { state } = useGlobalState();
   
   const [error, setError] = useState<boolean>(false);
-  const { data: hash, isPending, writeContract } = useWriteContract();
+  const { isPending: isPendingApprove, writeContractAsync: writeContractAsyncApprove } = useWriteContract();
+  const { data: hashLiquidate, isPending: isPendingLiquidate, writeContractAsync: writeContractAsyncLiquidate } = useWriteContract();
   
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash })
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: hashLiquidate })
   
-  
-
   const toggleModalFaq = () => {
     setModalFaq(!modalFaq);
   };
 
   useEffect(() => {
     console.log("isConfirmed:", isConfirmed);
-    console.log("hash:", hash);
-  }, [isConfirmed, hash]);
+    console.log("hash:", hashLiquidate);
+  }, [isConfirmed, hashLiquidate]);
 
   if (error) {
     return (
@@ -71,13 +69,13 @@ export const LiquidateModal: FC<LiquidateModalProps> = ({
             <LiquidateModalFaq />
           ) : 
             <>
-              { isPending || isConfirming ? (
+              { isPendingApprove || isPendingLiquidate || isConfirming ? (
                 <Loader />
-              ) : isConfirmed && hash ? (
-                <LiquidateSuccess hash={hash} />
+              ) : isConfirmed && hashLiquidate ? (
+                <LiquidateSuccess hash={hashLiquidate} />
               ) : state.Loan && state.Collateral && state.Window &&
               ( <>
-                  <LiquidateForm collateral= {state.Collateral} loan={state.Loan} window={state.Window} writeContract={writeContract} />
+                  <LiquidateForm collateral= {state.Collateral} loan={state.Loan} window={state.Window} asyncApprove={writeContractAsyncApprove} asyncLiquidate={writeContractAsyncLiquidate} setError={setError} />
                 </>
               )}
             </> 

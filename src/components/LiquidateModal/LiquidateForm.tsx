@@ -1,11 +1,11 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useState } from "react";
 import { Button } from "../Button/Button.tsx";
 import styles from "./LiquidateForm.module.css";
-import { contractAddress } from "../../repository/contracts.ts";
 import { useAccount, useTransactionCount } from 'wagmi';
-import { abi } from '../../../artifacts/contracts/Window.sol/Window.json'
+import { abi as loanAbi } from '../../../artifacts/contracts/Loan.sol/Loan.json'
+import { abi as assetAbi } from '../../../artifacts/contracts/Asset.sol/Asset.json'
 import { parseEther, Address } from "viem";
-import { WriteContractMutate } from "wagmi/query";
+import { WriteContractMutateAsync } from "wagmi/query";
 import { LoanType } from "../../types/LoanTypes.ts";
 import { liquidationPayment } from "../../utils/calculations.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
@@ -15,12 +15,14 @@ export type LiquidateFormProps = {
   loan: LoanType;
   collateral: AssetType;
   window: WindowType;
-  writeContract: WriteContractMutate<any, any>
+  asyncApprove: WriteContractMutateAsync<any, any>;
+  asyncLiquidate: WriteContractMutateAsync<any, any>;
+  setError: (error: string) => void;
 };
 
-export const LiquidateForm: FC<LiquidateFormProps> = ({ loan, collateral, window, writeContract }) => {
+export const LiquidateForm: FC<LiquidateFormProps> = ({ loan, collateral, window, asyncApprove, asyncLiquidate, setError }) => {
   
-  const { chain, address } = useAccount();
+  const { address } = useAccount();
   const currentNonce = useTransactionCount({address: address});
   const [liquidationAmount, setLiquidationAmount] = useState<string>("");
   
@@ -34,18 +36,34 @@ export const LiquidateForm: FC<LiquidateFormProps> = ({ loan, collateral, window
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    try {
-      writeContract({
-        abi,
-        address: contractAddress("window", chain?.id) as Address,
+
+    await asyncApprove({
+      abi: assetAbi,
+      address: loan.asset.id as Address,
+      functionName: 'approve',
+      args: [loan.id as Address, parseEther(liquidationAmount)],
+      nonce: currentNonce.data ?? undefined,
+    },
+    {
+      onError: (error) => {
+        setError(error.message)
+      }
+    });
+    
+    const nonce = currentNonce.data ? currentNonce.data + 1 : undefined;
+
+    await asyncLiquidate({
+        abi: loanAbi,
         functionName: 'liquidate',
-        args: [loan.id as Address],
-        value: parseEther(liquidationAmount),
-        nonce: currentNonce.data ?? undefined,
-      });
-    } catch (error) {
-      console.error("Contract call failed:", error);
-    }
+        args: [parseEther(liquidationAmount)],
+        address: loan.id as Address,
+        nonce: nonce ?? undefined,
+    },
+    {
+      onError: (error) => {
+        setError(error.message)
+      }
+    });
   }
 
   const redemption = liquidationPayment(
@@ -68,7 +86,7 @@ export const LiquidateForm: FC<LiquidateFormProps> = ({ loan, collateral, window
         id={loan.id}
         className={styles.liquidateForm}
       >
-        <p className={styles.liquidateFormTitle}>Liquidate</p>
+        <p className={styles.liquidateFormTitle}>Redeem</p>
         <div className={styles.inputWithUnitGrid}>
           <span className={styles.unitLabelLeft}></span> {/* Empty span for grid space */}
           <input
@@ -88,7 +106,7 @@ export const LiquidateForm: FC<LiquidateFormProps> = ({ loan, collateral, window
         </Button>
       </form>
         <div className={styles.liquidateInfoWrapper}>
-        <p className={styles.liquidateInfoTitle}>Net Redemption</p>
+        <p className={styles.liquidateInfoTitle}>Redemption</p>
         <div className={styles.liquidateInfoValue}>{(redemption).toFixed(6)} {collateral.symbol}</div>
         <p className={styles.liquidateInfoTitle}>Protocol Price</p>
         <div className={styles.liquidateInfoValue}>${price ? (price).toFixed(2): ""}</div>
