@@ -1,12 +1,11 @@
 import { FC } from "react";
-import styles from "./LiquidateInfo.module.css";
+import styles from "./LiquidateForm.module.css";
 
 export type LiquidateSuccessProps = {
-  collateralAmount: string;
   hash: string;
 };
 
-export const LiquidateSuccess: FC<LiquidateSuccessProps> = ({ hash, collateralAmount }) => {
+export const LiquidateSuccess: FC<LiquidateSuccessProps> = ({ hash }) => {
 
   return (
     <>
@@ -16,7 +15,7 @@ export const LiquidateSuccess: FC<LiquidateSuccessProps> = ({ hash, collateralAm
       </div>
       <div className={styles.issueInfoWrapper}>
         <p className={styles.issueInfoTitle}>Collateral</p>
-        <div className={styles.issueInfoValue}>{collateralAmount} ETH</div>
+        <div className={styles.issueInfoValue}>{} ETH</div>
       </div>
     </>
   );

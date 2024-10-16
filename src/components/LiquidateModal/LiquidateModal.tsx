@@ -24,7 +24,7 @@ export const LiquidateModal: FC<LiquidateModalProps> = ({
 }) => {
   const [modalFaq, setModalFaq] = useState<boolean>(false);
   const { state } = useGlobalState();
-  const [liquidationAmount, setLiquidationAmount] = useState<string>("");
+  
   const [error, setError] = useState<boolean>(false);
   const { data: hash, isPending, writeContract } = useWriteContract();
   
@@ -74,11 +74,10 @@ export const LiquidateModal: FC<LiquidateModalProps> = ({
               { isPending || isConfirming ? (
                 <Loader />
               ) : isConfirmed && hash ? (
-                <LiquidateSuccess hash={hash} collateralAmount={collateralAmount} />
+                <LiquidateSuccess hash={hash} />
               ) : state.Loan && state.Collateral && state.Window &&
               ( <>
-                  <LiquidateForm loan={state.Loan} writeContract={writeContract} setLiquidationAmount={setLiquidationAmount} liquidationAmount={liquidationAmount} />
-                  <LiquidateInfo collateral={state.Collateral} loan={state.Loan} window={state.Window} liquidationAmount={liquidationAmount}  />
+                  <LiquidateForm collateral= {state.Collateral} loan={state.Loan} window={state.Window} writeContract={writeContract} />
                 </>
               )}
             </> 
