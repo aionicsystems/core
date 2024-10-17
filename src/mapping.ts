@@ -13,7 +13,7 @@ import {
   OwnershipTransferred,
   WindowEntity
 } from "../generated/schema"
-import { Aggregator as AggregatorTemplate } from "../generated/templates";
+import { Aggregator as AggregatorTemplate, Loan as LoanTemplate } from "../generated/templates";
 
 const ID = "id";
 
@@ -34,12 +34,12 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.transactionHash = event.transaction.hash
   asset.latestPrice = event.params.latestPrice
   
+  asset.save()
+
   // Create the new Price Data Feed Template
   let context = new DataSourceContext();
   context.setString(ID, event.params.aggregatorAddress.toHexString());
   AggregatorTemplate.createWithContext(event.params.aggregatorAddress, context);
-
-  asset.save()
 
   let aggregator = new AggregatorEntity(event.params.aggregatorAddress);
   aggregator.asset = event.params.token;
@@ -50,12 +50,16 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
 export function handleLoanEntity(event: LoanEntityEvent): void {
   let loan = LoanEntity.load(event.params.loanAddress);
   if (loan == null) {
+    let context = new DataSourceContext();
+    context.setString(ID, event.params.loanAddress.toHexString());
+    LoanTemplate.createWithContext(event.params.loanAddress, context);
     loan = new LoanEntity(event.params.loanAddress)
   }
 
   let owner = OwnerEntity.load(event.params.owner); 
   if (owner == null) {
     owner = new OwnerEntity(event.params.owner)
+    owner.save()
   }
   
   log.debug('The LoanID is: {} ', [event.params.loanAddress.toString()]);

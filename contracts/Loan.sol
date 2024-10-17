@@ -49,7 +49,6 @@ contract Loan is Ownable, Library {
         etherDataFeedAddress = _etherDataFeedAddress;
         lastCollection = _time;
         precision = _precision;
-        loanEvent();
     }
 
     function loanEvent() internal {
@@ -124,7 +123,6 @@ contract Loan is Ownable, Library {
         require(payment > 0, "payment must be greater than zero");
         require(payment <= liabilityAmount, "payment must less than or equal to loan liability");
         
-        require(liabilityAmount >= payment);
         require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability

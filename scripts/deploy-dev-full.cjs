@@ -66,10 +66,19 @@ async function issueLoan(window, assetAddress, etherAmount) {
   const options = { value: ethers.parseEther(etherAmount) };
   const tx = await window.issue(assetAddress, options);
   const result = await tx.wait();
+  
   return {
-    loanAddress: result.logs[4].args[0],
-    amountIssued: result.logs[4].args[4]
+    loanAddress: result.logs[3].args[0],
+    amountIssued: result.logs[3].args[4]
   };
+}
+
+async function liquidate(loan, asset, amount) {
+  const tx = await asset.approve(loan.address, amount);
+  const result = await tx.wait();
+
+  const tx2 = await loan.liquidate(amount);
+  const result2 = await tx2.wait();
 }
 
 async function simulatePriceChange(dataFeeds, symbol, newPrice) {
@@ -128,6 +137,7 @@ async function main() {
     ];
 
     const loanAddresses = [];
+    const assetAddresses = {};
     const dataFeeds = {};
 
     for (const asset of assets) {
@@ -142,6 +152,8 @@ async function main() {
 
       const assetAddress = await approveAsset(window, assetDataFeedAddress, asset.name, asset.symbol, asset.collateralFactor, asset.liquidationFactor);
       console.log(`Asset Address: ${assetAddress}`);
+
+      assetAddresses[asset.symbol] = assetAddress;
 
       const loan = await issueLoan(window, assetAddress, asset.etherAmount);
       console.log(`Loan Address: ${loan.loanAddress}`);
@@ -161,7 +173,24 @@ async function main() {
 
     // Simulate price changes
     await simulatePriceChange(dataFeeds, "ANVDA", BigInt(25000000000));
-    await simulatePriceChange(dataFeeds, "AAMZN", BigInt(16000000000));
+    await simulatePriceChange(dataFeeds, "AAMZN", BigInt(30000000000));
+
+
+    const Asset = await hre.ethers.getContractFactory("Asset");
+    const asset1 = Asset.attach(assetAddresses["AAMZN"]);
+    
+    let asset1Balance = await asset1.balanceOf(owner.address);
+    console.log(`Owner balance before: ${ethers.formatUnits(asset1Balance, 8)}`);
+    let liabilityAmount = await loan2.liabilityAmount();
+    console.log(`Liability Amount balance before: ${ethers.formatUnits(liabilityAmount, 8)}`);
+    
+    await asset1.approve(loanAddresses[1], ethers.parseEther("1"));
+    await loan2.liquidate(ethers.parseEther("1"));
+    
+    asset1Balance = await asset1.balanceOf(owner.address);
+    console.log(`Owner balance after: ${ethers.formatUnits(asset1Balance, 8)}`);
+    liabilityAmount = await loan2.liabilityAmount();
+    console.log(`Liability Amount balance after: ${ethers.formatUnits(liabilityAmount, 8)}`);
 
     await system.run(`npm run codegen`, { cwd: srcDir });
     await system.run(`npm run create-test`, { cwd: srcDir });
