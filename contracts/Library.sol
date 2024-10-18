@@ -24,6 +24,9 @@ contract Library {
         uint32 borrowingRatio,
         uint32 liquidationRatio,
         uint32 interestRate,
-        uint256 lastCollection
+        uint256 lastCollection,
+        uint32 collectorFee,
+        uint32 liquidatorFee,
+        uint32 daoFee
     );
 }

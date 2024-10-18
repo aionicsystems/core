@@ -53,3 +53,21 @@ templates:
       eventHandlers:
         - event: AnswerUpdated(indexed int256,indexed uint256,uint256)
           handler: handleAnswerUpdated
+  - name: Loan
+    kind: ethereum/contract
+    network: test
+    source:
+      abi: Loan
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/loan-mapping.ts
+      entities:
+        - LoanEntity
+      abis:
+        - name: Loan
+          file: ./artifacts/contracts/Loan.sol/Loan.json
+      eventHandlers:
+        - event: LoanEntity(indexed address,address,uint256,address,uint256,address,uint32,uint32,uint32,uint256)
+          handler: handleLoanEntity

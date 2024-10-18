@@ -24,6 +24,9 @@ contract Loan is Ownable, Library {
     uint32 public liquidationRatio;
     uint32 public interestRate;
     uint256 public lastCollection;
+    uint32 public collectorFee;
+    uint32 public liquidatorFee;
+    uint32 public daoFee;
     uint8 precision;
 
     constructor (
@@ -36,6 +39,9 @@ contract Loan is Ownable, Library {
         uint32 _interestRate,
         address _assetDataFeedAddress,
         address _etherDataFeedAddress,
+        uint32 _collectorFee,
+        uint32 _liquidatorFee,
+        uint32 _daoFee,
         uint256 _time,
         uint8 _precision
     ) Ownable(owner) {
@@ -48,8 +54,10 @@ contract Loan is Ownable, Library {
         assetDataFeedAddress = _assetDataFeedAddress;
         etherDataFeedAddress = _etherDataFeedAddress;
         lastCollection = _time;
+        collectorFee = _collectorFee;
+        liquidatorFee = _liquidatorFee;
+        daoFee = _daoFee;
         precision = _precision;
-        loanEvent();
     }
 
     function loanEvent() internal {
@@ -63,7 +71,10 @@ contract Loan is Ownable, Library {
             borrowingRatio,
             liquidationRatio,
             interestRate,
-            lastCollection
+            lastCollection,
+            collectorFee,
+            liquidatorFee,
+            daoFee
         );
     }
 
@@ -124,7 +135,6 @@ contract Loan is Ownable, Library {
         require(payment > 0, "payment must be greater than zero");
         require(payment <= liabilityAmount, "payment must less than or equal to loan liability");
         
-        require(liabilityAmount >= payment);
         require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
@@ -136,15 +146,15 @@ contract Loan is Ownable, Library {
         // Calculate amount of ether redeemed for liquidation payment
         // Collateral(USD) = Liability(USD)
         // Collateral(ETH) = Liability(Asset) * Price(Asset) / Price(ETH)
-        uint256 redemption = (payment * dataFeedPrice(assetDataFeedAddress) * 10**AggregatorV3Interface(etherDataFeedAddress).decimals() / (dataFeedPrice(etherDataFeedAddress))) / 10**AggregatorV3Interface(assetDataFeedAddress).decimals();
+        uint256 redemption = ((payment * dataFeedPrice(assetDataFeedAddress)) / (dataFeedPrice(etherDataFeedAddress)));
         
         // Calculate total liquidator payment redemption plus fee
-        uint256 liquidator = redemption + (redemption * window.getParam("liquidatorFee")) / 10**precision;
+        uint256 liquidator = redemption; //+ (redemption * window.getParam("liquidatorFee")) / 10**precision;
         payable(msg.sender).transfer(liquidator);
 
         // Calculate Dao fee
-        uint256 dao = (redemption * window.getParam("daoFee")) / 10**precision;
-        payable(address(window)).transfer(dao);
+        //uint256 dao = (redemption * window.getParam("daoFee")) / 10**precision;
+        //payable(address(window)).transfer(dao);
 
         // After transaction collateralization ratio must be less than or equal to the liquidation ratio
         require(collateralizationRatio() <= liquidationRatio);
