@@ -70,7 +70,9 @@ export const LoanOverview: FC = () => {
           loanEntity.asset.latestPrice,
           loanEntity.asset.aggregator.decimals,
           loanEntity.liquidationRatio,
-          state.Window.precision
+          state.Window.precision,
+          state.Window.daoFee,
+          state.Window.liquidatorFee,
         )
 
         loanEntity.liquidatorReward = liquidationReward(

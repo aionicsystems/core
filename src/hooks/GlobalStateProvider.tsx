@@ -65,6 +65,7 @@ export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
 
   useEffect(() => {
     if (data) {
+      console.log(data.windowEntities[0]);
       setState({
         ...state,
         Collateral: data.assetEntity,

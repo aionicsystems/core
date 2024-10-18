@@ -124,7 +124,7 @@ contract Loan is Ownable, Library {
         require(payment > 0, "payment must be greater than zero");
         require(payment <= liabilityAmount, "payment must less than or equal to loan liability");
         
-        require(liabilityAmount >= payment);
+        require(liabilityAmount >= payment, "loan liability must be greater than or equal to payment");
         require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
@@ -147,7 +147,7 @@ contract Loan is Ownable, Library {
         payable(address(window)).transfer(dao);
 
         // After transaction collateralization ratio must be less than or equal to the liquidation ratio
-        require(collateralizationRatio() <= liquidationRatio);
+        require(collateralizationRatio() <= liquidationRatio, "collateralization ratio must be less than or equal to liquidation ratio");
 
         loanEvent();
     }
