@@ -14,7 +14,7 @@ type AssetEntity @entity {
   prices: [DataPointEntity!] @derivedFrom(field: "asset")
 }
 
-type LoanEntity @entity(immutable: true) {
+type LoanEntity @entity {
   id: Bytes! # Address of Loan
   owner: OwnerEntity!
   collateralAmount: BigInt! # uint256

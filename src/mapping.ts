@@ -20,7 +20,7 @@ const ID = "id";
 export function handleAssetEntity(event: AssetEntityEvent): void {
   let asset = new AssetEntity(event.params.token)
   
-  log.debug('The Asset Address is: {} ', [event.params.token.toString()]);
+  log.debug('The Asset Address is: {} ', [event.params.token.toHexString()]);
 
   asset.name = event.params.name
   asset.symbol = event.params.symbol
@@ -62,7 +62,7 @@ export function handleLoanEntity(event: LoanEntityEvent): void {
     owner.save()
   }
   
-  log.debug('The LoanID is: {} ', [event.params.loanAddress.toString()]);
+  log.debug('The LoanID is: {} ', [event.params.loanAddress.toHexString()]);
 
   loan.owner = event.params.owner
   loan.collateralAmount = event.params.collateralAmount
@@ -101,7 +101,7 @@ export function handleWindowEntity(event: WindowEntityEvent): void {
     window = new WindowEntity(event.params.windowAddress)
   }
   
-  log.debug('The Window Address is: {} ', [event.params.windowAddress.toString()]);
+  log.debug('The Window Address is: {} ', [event.params.windowAddress.toHexString()]);
 
   window.owner = event.params.owner
   window.etherDataFeedAddress = event.params.etherDataFeedAddress
