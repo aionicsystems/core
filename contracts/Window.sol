@@ -26,10 +26,16 @@ contract Window is Ownable, Library {
     );
 
     // Number of decimal precision used in ratios and rates
-    uint8 precision;
+    uint8 public precision;
+
+    // Borrowing Ratio, DAO Fee, Liquidator Fee, Collector Fee
+    uint32 public borrowingRatio;
+    uint32 public daoFee;
+    uint32 public liquidatorFee;
+    uint32 public collectorFee;
 
     // Ether held by the contract earned through interest and liquidations
-    uint256 contractEther;
+    uint256 public contractEther;
 
     // Ether data feed address
     address public etherDataFeedAddress;
@@ -38,29 +44,24 @@ contract Window is Ownable, Library {
     // Loan mapped to Address
     mapping(address => Loan) public loans;
 
-    // Parameters are based on number of decimal precision
-    // Where if precision is 4 then 11111 represents 1.1111 or 111.11%
-    mapping(bytes32 => uint32) public params;
-
     // Assets that are approved for loan
     mapping(address => Asset) public assets;
 
     constructor (
         address owner,
         uint8 _precision,
-        uint32 borrowingRatio,
-        uint32 daoFee,
-        uint32 liquidatorFee,
-        uint32 collectorFee,
+        uint32 _borrowingRatio,
+        uint32 _collectorFee,
+        uint32 _daoFee,
+        uint32 _liquidatorFee,
         address _etherDataFeedAddress
     ) Ownable(owner) {
         precision = _precision;
-
-        params["borrowingRatio"] = borrowingRatio;
-        params["daoFee"] = daoFee;
-        params["liquidatorFee"] = liquidatorFee;
-        params["collectorFee"] = collectorFee;
-
+        borrowingRatio = _borrowingRatio;
+        collectorFee = _collectorFee;
+        daoFee = _daoFee;
+        liquidatorFee = _liquidatorFee;
+        
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorInterface(etherDataFeedAddress);
 
@@ -88,12 +89,20 @@ contract Window is Ownable, Library {
         );
     }
 
-    function setParam(bytes32 param, uint32 value) public onlyOwner {
-        params[param] = value;
+    function setBorrowingRatio(uint32 value) public onlyOwner {
+        borrowingRatio = value;
     }
 
-    function getParam(bytes32 param) external view returns (uint32) {
-        return params[param];
+    function setCollectorFee(uint32 value) public onlyOwner {
+        collectorFee = value;
+    }
+
+    function setDaoFee(uint32 value) public onlyOwner {
+        daoFee = value;
+    }
+
+    function setLiquidatorFee(uint32 value) public onlyOwner {
+        liquidatorFee = value;
     }
 
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate, uint32 liquidationRatio) public onlyOwner returns(address) {
@@ -143,7 +152,7 @@ contract Window is Ownable, Library {
         // Liability(Asset) * Price(Asset)  = Collateral(USD) / BorrowingRatio
         // Liability(Asset) = Collateral(USD) / (BorrowingRatio * Price(Asset))
         // Liability(Asset) = (Collateral(ETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
-        uint256 liabilityAmount = ((msg.value * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * params["borrowingRatio"])) / 10**etherDataFeed.decimals();
+        uint256 liabilityAmount = ((msg.value * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * borrowingRatio)) / 10**etherDataFeed.decimals();
         
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
@@ -152,14 +161,7 @@ contract Window is Ownable, Library {
             msg.sender,                                     // Loan owner
             address(this),                                  // Window Address
             assetAddress,                                   // Asset Address
-            liabilityAmount,                                // Asset Amount
-            params["borrowingRatio"],                       // Borrowing Ratio
-            assets[assetAddress].liquidationRatio(),        // Liquidation Ratio
-            assets[assetAddress].interestRate(),            // Interest Rate
-            assets[assetAddress].assetDataFeedAddress(),    // Asset Price Data Feed
-            etherDataFeedAddress,                           // Ether Price Data Feed
-            block.timestamp,                                // Time
-            precision                                       // Precision
+            liabilityAmount                                 // Asset Amount
         );
         
         // Transfer Ether to address of Loan Contract owned by Issuer
@@ -174,11 +176,13 @@ contract Window is Ownable, Library {
             address(loan).balance,
             assetAddress,
             liabilityAmount,
-            loan.assetDataFeedAddress(),
-            params["borrowingRatio"],
+            borrowingRatio,
             loan.liquidationRatio(),
             loan.interestRate(),
-            block.timestamp
+            block.timestamp,
+            collectorFee,
+            liquidatorFee,
+            daoFee
         );
         
         return liabilityAmount;

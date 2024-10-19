@@ -12,52 +12,54 @@ interface IERC20Burnable is IERC20 {
 
 interface WindowInterface {
     function getParam(bytes32) external returns (uint32);
+    function borrowingRatio() external returns (uint32);
+    function collectorFee() external returns (uint32);
+    function daoFee() external returns (uint32);
+    function liquidatorFee() external returns (uint32);
+    function precision() external returns (uint8);
+    function etherDataFeedAddress() external returns (address);
+}
+
+interface AssetInterface {
+    function liquidationRatio() external returns (uint32);
+    function interestRate() external returns (uint32);
+    function assetDataFeedAddress() external returns (address);
 }
 
 contract Loan is Ownable, Library {
     WindowInterface window;
-    address public asset;
-    address public assetDataFeedAddress;
-    address public etherDataFeedAddress;
+    AssetInterface asset;
     uint256 public liabilityAmount;
+    uint256 public lastCollection;
     uint32 public borrowingRatio;
     uint32 public liquidationRatio;
     uint32 public interestRate;
-    uint256 public lastCollection;
     uint32 public collectorFee;
-    uint32 public liquidatorFee;
     uint32 public daoFee;
+    uint32 public liquidatorFee;
     uint8 precision;
+    address public assetDataFeedAddress;
+    address public etherDataFeedAddress;
 
     constructor (
         address owner,
         address _window,
         address _asset,
-        uint256 _liabilityAmount,
-        uint32 _borrowingRatio,
-        uint32 _liquidationRatio,
-        uint32 _interestRate,
-        address _assetDataFeedAddress,
-        address _etherDataFeedAddress,
-        uint32 _collectorFee,
-        uint32 _liquidatorFee,
-        uint32 _daoFee,
-        uint256 _time,
-        uint8 _precision
+        uint256 _liabilityAmount
     ) Ownable(owner) {
         window = WindowInterface(_window);
-        asset = _asset;
+        asset = AssetInterface(_asset);
         liabilityAmount = _liabilityAmount;
-        borrowingRatio = _borrowingRatio;
-        liquidationRatio = _liquidationRatio;
-        interestRate = _interestRate;
-        assetDataFeedAddress = _assetDataFeedAddress;
-        etherDataFeedAddress = _etherDataFeedAddress;
-        lastCollection = _time;
-        collectorFee = _collectorFee;
-        liquidatorFee = _liquidatorFee;
-        daoFee = _daoFee;
-        precision = _precision;
+        lastCollection = block.timestamp;
+        borrowingRatio = window.borrowingRatio();
+        liquidationRatio = asset.liquidationRatio();
+        interestRate = asset.interestRate();
+        collectorFee = window.collectorFee();
+        daoFee = window.daoFee();
+        liquidatorFee = window.liquidatorFee();
+        precision = window.precision();
+        assetDataFeedAddress = asset.assetDataFeedAddress();
+        etherDataFeedAddress = window.etherDataFeedAddress();
     }
 
     function loanEvent() internal {
@@ -65,9 +67,8 @@ contract Loan is Ownable, Library {
             address(this),
             owner(),
             address(this).balance,
-            asset,
+            address(asset),
             liabilityAmount,
-            assetDataFeedAddress,
             borrowingRatio,
             liquidationRatio,
             interestRate,
@@ -116,7 +117,7 @@ contract Loan is Ownable, Library {
         if (payment > 0) {
             // Burn the payment. Owner needs to approve the token first.
             // Will revert if Owner does not have sufficient funds and approval.
-            IERC20Burnable(asset).burnFrom(msg.sender, payment);
+            IERC20Burnable(address(asset)).burnFrom(msg.sender, payment);
 
             // Update Loan Liability
             liabilityAmount = liabilityAmount - payment;
@@ -135,13 +136,13 @@ contract Loan is Ownable, Library {
         require(payment > 0, "payment must be greater than zero");
         require(payment <= liabilityAmount, "payment must less than or equal to loan liability");
         
-        require(IERC20Burnable(asset).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
+        require(IERC20Burnable(address(asset)).balanceOf(msg.sender) >= payment, "caller address must have payment amount in balance");
 
         // Update Loan Liability
         liabilityAmount = liabilityAmount - payment;
 
         // Burn the payment
-        IERC20Burnable(asset).burnFrom(msg.sender, payment);
+        IERC20Burnable(address(asset)).burnFrom(msg.sender, payment);
         
         // Calculate amount of ether redeemed for liquidation payment
         // Collateral(USD) = Liability(USD)
@@ -149,12 +150,12 @@ contract Loan is Ownable, Library {
         uint256 redemption = ((payment * dataFeedPrice(assetDataFeedAddress)) / (dataFeedPrice(etherDataFeedAddress)));
         
         // Calculate total liquidator payment redemption plus fee
-        uint256 liquidator = redemption; //+ (redemption * window.getParam("liquidatorFee")) / 10**precision;
+        uint256 liquidator = redemption + (redemption * liquidatorFee) / 10**precision;
         payable(msg.sender).transfer(liquidator);
 
         // Calculate Dao fee
-        //uint256 dao = (redemption * window.getParam("daoFee")) / 10**precision;
-        //payable(address(window)).transfer(dao);
+        uint256 dao = (redemption * daoFee) / 10**precision;
+        payable(address(window)).transfer(dao);
 
         // After transaction collateralization ratio must be less than or equal to the liquidation ratio
         require(collateralizationRatio() <= liquidationRatio);
@@ -173,7 +174,7 @@ contract Loan is Ownable, Library {
         
         require(interest > 0, "Interest not greater than zero");
 
-        uint256 collector = (interest * window.getParam("collectorFee")) / 10**precision;
+        uint256 collector = (interest * collectorFee) / 10**precision;
 
         // Pay window interest - collector fee
         payable(address(window)).transfer(interest - collector);

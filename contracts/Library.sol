@@ -20,13 +20,12 @@ contract Library {
         uint256 collateralAmount,
         address assetAddress,
         uint256 liabilityAmount,
-        address dataFeedAddress,
         uint32 borrowingRatio,
         uint32 liquidationRatio,
         uint32 interestRate,
         uint256 lastCollection,
         uint32 collectorFee,
-        uint32 liquidatorFee,
-        uint32 daoFee
+        uint32 daoFee,
+        uint32 liquidatorFee
     );
 }
