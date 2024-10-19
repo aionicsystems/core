@@ -158,7 +158,7 @@ contract Loan is Ownable, Library {
         payable(address(window)).transfer(dao);
 
         // After transaction collateralization ratio must be less than or equal to the liquidation ratio
-        require(collateralizationRatio() <= liquidationRatio);
+        require(collateralizationRatio() <= liquidationRatio, "collateralization ratio must be less than or equal to liquidation ratio");
 
         loanEvent();
     }

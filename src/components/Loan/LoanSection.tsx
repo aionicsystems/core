@@ -209,7 +209,9 @@ export const LoanSection: FC = () => {
           newDataItem.asset.latestPrice,
           newDataItem.asset.aggregator.decimals,
           newDataItem.liquidationRatio,
-          state.Window.precision
+          state.Window.precision,
+          state.Window.daoFee,
+          state.Window.liquidatorFee,
         );
         newDataItem.liquidatorReward = liquidationReward(
           liquidationPayment(

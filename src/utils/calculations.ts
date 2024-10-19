@@ -106,17 +106,36 @@ export const maxLiquidationAmount = (
   assetLatestPrice: BigInt,
   assetDecimals: BigInt,
   liquidationRatio: BigInt,
-  precision: BigInt
+  precision: BigInt,
+  daoFee: BigInt,
+  liquidatorFee: BigInt,
 ): number => {
   // Target collateralization ratio (liquidation ratio)
   const targetCR = Number(liquidationRatio) / Math.pow(10, Number(precision));
+  console.log(`LiquidationRatio: ${targetCR}`);
 
-  // Calculate the maximum liability amount that can be liquidated
-  const maxLiability = (Number(collateralAmount) * Number(latestPriceETH) * Math.pow(10, Number(assetDecimals))) / (targetCR * Number(assetLatestPrice) * Math.pow(10, Number(decimalsETH)));
+  const debtUsd = (Number(liabilityAmount) * Number(assetLatestPrice)) / Number(assetDecimals);
+  console.log(`Debt: ${debtUsd}`);
 
-  // Maximum amount of asset that can be liquidated
-  const maxLiquidation = Number(liabilityAmount) - maxLiability;
+  const collateralUsd = (Number(collateralAmount) * Number(latestPriceETH)) / Number(decimalsETH);
+  console.log(`Collateral: ${collateralUsd}`);
 
+  const collateralizationRatio = collateralUsd / debtUsd;
+  console.log(`Collateralization Ratio: ${collateralizationRatio}`);
+
+  const numerator = debtUsd * targetCR - collateralUsd;
+  console.log(`Numerator: ${numerator}`);
+
+  const denominator = 1 - Number(daoFee) / Math.pow(10, Number(precision)) - Number(liquidatorFee) / Math.pow(10, Number(precision));
+  console.log(`Denominator: ${denominator}`);
+
+  console.log(`Precision: ${precision}`);
+  console.log(`Dao Fee: ${daoFee}`);
+  console.log(`Liquidator Fee: ${liquidatorFee}`);
+
+  const maxLiquidation = (debtUsd * targetCR - collateralUsd) / (1 - Number(daoFee) / Math.pow(10, Number(precision)) - Number(liquidatorFee) / Math.pow(10, Number(precision)));
+  console.log(`Max Liquidation: ${maxLiquidation}`);
+  
   return Math.max(0, maxLiquidation); // Ensure the result is not negative
 };
 
