@@ -6,7 +6,7 @@ import {
   beforeAll,
   afterAll
 } from "matchstick-as/assembly/index"
-import { Address, BigInt } from "@graphprotocol/graph-ts"
+import { Address } from "@graphprotocol/graph-ts"
 import { AssetEvent } from "../generated/schema"
 import { AssetEvent as AssetEventEvent } from "../generated/Window/Window"
 import { handleAssetEvent } from "../src/window"

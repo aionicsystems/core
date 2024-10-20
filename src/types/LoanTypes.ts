@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
 import { AssetType } from "./AssetTypes.ts";
 import { OwnerType } from "./OwnerTypes.ts";
 
@@ -13,6 +12,10 @@ export type LoanType = {
   interestRate: BigInt;
   lastCollection: BigInt;
   interest: number;
+  collectorFee: BigInt;
+  daoFee: BigInt;
+  liquidatorFee: BigInt;
+  precision: BigInt;
   collectorReward: number;
   liquidationAmount: number;
   liquidatorReward: number;

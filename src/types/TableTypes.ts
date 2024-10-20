@@ -1,4 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
 import { AssetType } from "./AssetTypes";
 
 export type SortableTableHeadType<T> = {

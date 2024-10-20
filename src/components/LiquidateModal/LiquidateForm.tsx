@@ -72,8 +72,8 @@ export const LiquidateForm: FC<LiquidateFormProps> = ({ loan, collateral, window
     collateral.latestPrice,
     loan.asset.aggregator.decimals,
     collateral.aggregator.decimals,
-    window.liquidatorFee,
-    window.precision
+    loan.liquidatorFee,
+    loan.precision
   );
 
   const price = Number(loan.asset.latestPrice) / Math.pow(10, Number(loan.asset.aggregator.decimals))
