@@ -173,7 +173,7 @@ async function main() {
 
     // Simulate price changes
     await simulatePriceChange(dataFeeds, "ANVDA", BigInt(25000000000));
-    await simulatePriceChange(dataFeeds, "AAMZN", BigInt(30000000000));
+    await simulatePriceChange(dataFeeds, "AAMZN", BigInt(20000000000));
 
 
     const Asset = await hre.ethers.getContractFactory("Asset");
