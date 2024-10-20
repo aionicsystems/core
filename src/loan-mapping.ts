@@ -26,6 +26,10 @@ export function handleLoanEntity(event: LoanEntityEvent): void {
   loan.blockNumber = event.block.number
   loan.blockTimestamp = event.block.timestamp
   loan.transactionHash = event.transaction.hash
+  loan.collectorFee = event.params.collectorFee
+  loan.daoFee = event.params.daoFee
+  loan.liquidatorFee = event.params.liquidatorFee
+  loan.precision = event.params.precision
 
   loan.save()
 }

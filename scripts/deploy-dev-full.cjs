@@ -92,7 +92,7 @@ async function main() {
   try {
     const precision = BigInt(4);
     const borrowingRatio = BigInt(15000);
-    const liquidationRatio = BigInt(12500);
+    const liquidatorFee = BigInt(200);
     const daoFee = BigInt(300);
     const collectorFee = BigInt(100);
     const decimals = BigInt(8);
@@ -108,12 +108,12 @@ async function main() {
 
     const Window = await hre.ethers.getContractFactory("Window");
     const window = await Window.deploy(
-      owner,
+      owner.address,
       precision,
       borrowingRatio,
-      liquidationRatio,
-      daoFee,
       collectorFee,
+      daoFee,
+      liquidatorFee,
       ethDataFeed.getAddress()
     );
     await window.waitForDeployment();

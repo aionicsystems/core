@@ -37,7 +37,7 @@ contract Loan is Ownable, Library {
     uint32 public collectorFee;
     uint32 public daoFee;
     uint32 public liquidatorFee;
-    uint8 precision;
+    uint8 public precision;
     address public assetDataFeedAddress;
     address public etherDataFeedAddress;
 
@@ -75,7 +75,8 @@ contract Loan is Ownable, Library {
             lastCollection,
             collectorFee,
             liquidatorFee,
-            daoFee
+            daoFee,
+            precision
         );
     }
 
@@ -174,8 +175,11 @@ contract Loan is Ownable, Library {
         
         require(interest > 0, "Interest not greater than zero");
 
+        
         uint256 collector = (interest * collectorFee) / 10**precision;
-
+        require(precision > 0, "Precision must be greater than zero");
+        require(interest > collector, "Interest must be greater than collector fee");
+        
         // Pay window interest - collector fee
         payable(address(window)).transfer(interest - collector);
         

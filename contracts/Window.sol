@@ -182,7 +182,8 @@ contract Window is Ownable, Library {
             block.timestamp,
             collectorFee,
             liquidatorFee,
-            daoFee
+            daoFee,
+            precision
         );
         
         return liabilityAmount;

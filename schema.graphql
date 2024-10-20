@@ -24,6 +24,10 @@ type LoanEntity @entity {
   liquidationRatio: BigInt! #uint32
   interestRate: BigInt! # uint32
   lastCollection: BigInt! # uint256
+  collectorFee: BigInt! # uint32
+  daoFee: BigInt! # uint32
+  liquidatorFee: BigInt! # uint32
+  precision: Int! # uint8
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

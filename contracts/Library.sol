@@ -26,6 +26,7 @@ contract Library {
         uint256 lastCollection,
         uint32 collectorFee,
         uint32 daoFee,
-        uint32 liquidatorFee
+        uint32 liquidatorFee,
+        uint8 precision
     );
 }
