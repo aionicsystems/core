@@ -1,5 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts";
-
 export type WindowType = {
     id: string;
     owner: string;

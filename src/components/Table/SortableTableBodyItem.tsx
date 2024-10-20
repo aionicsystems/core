@@ -7,7 +7,6 @@ import {
   displayRatio,
 } from "../../utils/calculations.ts";
 import { AssetType } from "../../types/AssetTypes.ts";
-import { BigInt } from "@graphprotocol/graph-ts";
 
 
 export type SortableTableBodyItemProps<T> = {

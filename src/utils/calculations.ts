@@ -1,5 +1,3 @@
-import { BigInt } from "@graphprotocol/graph-ts"
-
 export const displayInterestRate = (rate: BigInt) => {
   return `${(Number(rate) * 100 * Math.pow(10, -4)).toFixed(2)}%`;
 };
