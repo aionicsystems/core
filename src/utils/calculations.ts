@@ -36,10 +36,10 @@ export const collateralizationRatioPercent = (
   latestPriceETH?: BigInt,
   decimalsETH?: BigInt,
   liabilityAmount?: BigInt,
-  assetLatestPrice?: BigInt,
-  assetDecimals?: BigInt,
+  latestPriceAsset?: BigInt,
+  decimalsAsset?: BigInt,
 ) => {
-  return `${((100 * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals)))).toFixed(0)}%`;
+  return `${((100 * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(latestPriceAsset) / Number(decimalsAsset)))).toFixed(0)}%`;
 };
 
 export const collateralizationRatio = (
@@ -47,11 +47,11 @@ export const collateralizationRatio = (
   latestPriceETH?: BigInt,
   decimalsETH?: BigInt,
   liabilityAmount?: BigInt,
-  assetLatestPrice?: BigInt,
-  assetDecimals?: BigInt,
+  latestPriceAsset?: BigInt,
+  decimalsAsset?: BigInt,
   precision?: BigInt,
 ) => {
-  return (Math.pow(10, Number(precision)) * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(assetLatestPrice) / Number(assetDecimals)));
+  return (Math.pow(10, Number(precision)) * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(latestPriceAsset) / Number(decimalsAsset)));
 };
 
 export const liquidationCheck = (
@@ -60,11 +60,11 @@ export const liquidationCheck = (
   latestPriceETH?: BigInt,
   decimalsETH?: BigInt,
   liabilityAmount?: BigInt,
-  assetLatestPrice?: BigInt,
-  assetDecimals?: BigInt,
+  latestPriceAsset?: BigInt,
+  decimalsAsset?: BigInt,
   precision?: BigInt,
 ) => {
-  return Number(liquidationRatio) > collateralizationRatio(collateralAmount, latestPriceETH, decimalsETH, liabilityAmount, assetLatestPrice, assetDecimals, precision);
+  return Number(liquidationRatio) > collateralizationRatio(collateralAmount, latestPriceETH, decimalsETH, liabilityAmount, latestPriceAsset, decimalsAsset, precision);
 };
 
 export const interest = (
@@ -101,8 +101,8 @@ export const maxLiquidationAmount = (
   latestPriceETH: BigInt,
   decimalsETH: BigInt,
   liabilityAmount: BigInt,
-  assetLatestPrice: BigInt,
-  assetDecimals: BigInt,
+  latestPriceAsset: BigInt,
+  decimalsAsset: BigInt,
   liquidationRatio: BigInt,
   precision: BigInt,
   daoFee: BigInt,
@@ -110,30 +110,10 @@ export const maxLiquidationAmount = (
 ): number => {
   // Target collateralization ratio (liquidation ratio)
   const targetCR = Number(liquidationRatio) / Math.pow(10, Number(precision));
-  console.log(`LiquidationRatio: ${targetCR}`);
-
-  const debtUsd = (Number(liabilityAmount) * Number(assetLatestPrice)) / Number(assetDecimals);
-  console.log(`Debt: ${debtUsd}`);
-
-  const collateralUsd = (Number(collateralAmount) * Number(latestPriceETH)) / Number(decimalsETH);
-  console.log(`Collateral: ${collateralUsd}`);
-
-  const collateralizationRatio = collateralUsd / debtUsd;
-  console.log(`Collateralization Ratio: ${collateralizationRatio}`);
-
-  const numerator = debtUsd * targetCR - collateralUsd;
-  console.log(`Numerator: ${numerator}`);
-
-  const denominator = 1 - Number(daoFee) / Math.pow(10, Number(precision)) - Number(liquidatorFee) / Math.pow(10, Number(precision));
-  console.log(`Denominator: ${denominator}`);
-
-  console.log(`Precision: ${precision}`);
-  console.log(`Dao Fee: ${daoFee}`);
-  console.log(`Liquidator Fee: ${liquidatorFee}`);
-
-  const maxLiquidation = (debtUsd * targetCR - collateralUsd) / (1 - Number(daoFee) / Math.pow(10, Number(precision)) - Number(liquidatorFee) / Math.pow(10, Number(precision)));
-  console.log(`Max Liquidation: ${maxLiquidation}`);
-  
+  const debtUsd = (Number(liabilityAmount) * Number(latestPriceAsset)) / Math.pow(10, Number(decimalsAsset));
+  const collateralUsd = (Number(collateralAmount) * Number(latestPriceETH)) / Math.pow(10, Number(decimalsETH));
+  const maxLiquidationUsd = (debtUsd * targetCR - collateralUsd) / (targetCR - 1 - Number(daoFee) / Math.pow(10, Number(precision)) - Number(liquidatorFee) / Math.pow(10, Number(precision)));
+  const maxLiquidation = maxLiquidationUsd / Number(latestPriceAsset) * Math.pow(10, Number(decimalsAsset));
   return Math.max(0, maxLiquidation); // Ensure the result is not negative
 };
 
@@ -141,13 +121,13 @@ export const liquidationPayment = (
   payment: number,
   assetPrice: BigInt,
   etherPrice: BigInt,
-  assetDecimals: BigInt,
+  decimalsAsset: BigInt,
   etherDecimals: BigInt,
   liquidatorFee: BigInt,
   precision: BigInt
 ): number => {
   // Calculate the redemption amount
-  const redemption = (payment * Number(assetPrice) * Math.pow(10, Number(etherDecimals))) / (Number(etherPrice) * Math.pow(10, Number(assetDecimals)));
+  const redemption = (payment * Number(assetPrice) * Math.pow(10, Number(etherDecimals))) / (Number(etherPrice) * Math.pow(10, Number(decimalsAsset)));
 
   // Calculate the liquidator payment
   const liquidator = redemption + (redemption * Number(liquidatorFee)) / Math.pow(10, Number(precision));

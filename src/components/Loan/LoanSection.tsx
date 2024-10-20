@@ -20,8 +20,6 @@ import { collectorReward, interest, liquidationCheck, liquidationPayment, liquid
 import { CollectModal } from "../CollectModal/CollectModal.tsx";
 import { LiquidateModal } from "../LiquidateModal/LiquidateModal.tsx";
 
-
-
 const borrowerTableTitles: SortableTableHeadType<LoanType>[] = [
   {
     title: "Loan ID",
@@ -125,9 +123,7 @@ const getTableTitles = (userType: string): SortableTableHeadType<LoanType>[] => 
 export const LoanSection: FC = () => {
   const { state, setState } = useGlobalState();
   const { address, isConnected } = useAccount();
-  const [tableConfig, setTableConfig] = useState<
-    SortableTableConfigType<LoanType>
-  >({
+  const [tableConfig, setTableConfig] = useState<SortableTableConfigType<LoanType>>({
     sort_order: "asc",
     sort_by: "id",
     filters: {},
@@ -195,7 +191,7 @@ export const LoanSection: FC = () => {
         dataItem.liabilityAmount,
         dataItem.asset?.latestPrice,
         dataItem.asset?.aggregator?.decimals,
-        state.Window?.precision,
+        dataItem.precision,
       );
     });
     tableData = tableData.map(dataItem => {
@@ -209,10 +205,11 @@ export const LoanSection: FC = () => {
           newDataItem.asset.latestPrice,
           newDataItem.asset.aggregator.decimals,
           newDataItem.liquidationRatio,
-          state.Window.precision,
-          state.Window.daoFee,
-          state.Window.liquidatorFee,
+          newDataItem.precision,
+          newDataItem.daoFee,
+          newDataItem.liquidatorFee,
         );
+
         newDataItem.liquidatorReward = liquidationReward(
           liquidationPayment(
             newDataItem.liquidationAmount, 
@@ -220,11 +217,11 @@ export const LoanSection: FC = () => {
             collateral.latestPrice, 
             newDataItem.asset.aggregator.decimals, 
             collateral.aggregator.decimals, 
-            state.Window.liquidatorFee, 
-            state.Window.precision
+            newDataItem.liquidatorFee, 
+            newDataItem.precision
           ),
-          state.Window.liquidatorFee,
-          state.Window.precision,
+          newDataItem.liquidatorFee,
+          newDataItem.precision,
         )
         return newDataItem;
       }
@@ -256,7 +253,6 @@ export const LoanSection: FC = () => {
 
   return (
     <>
-      
       <div className={sectionStyles.overviewHeading}>
         {isConnected && state.userType === "Borrower" && (
           <Button
@@ -281,21 +277,30 @@ export const LoanSection: FC = () => {
       {state.isModalOpen && state.modalType === "issue" && (
         <LoanAssetsModal
           modalTitle={"Select Asset"}
-          onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
+          onClose={() => {
+            setState && setState({ ...state, isModalOpen: false, modalType: "" });
+            refetch();
+          }}
           size={488}
         />
       )}
       {state.isModalOpen && state.modalType === "collect" && state.loanId && (
           <CollectModal
             modalTitle={"Collect Interest"}
-            onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
+            onClose={() => {
+              setState && setState({ ...state, isModalOpen: false, modalType: "" });
+              refetch();
+            }}
             size={400}
           />
       )}
       {state.isModalOpen && state.modalType === "liquidate" && state.loanId && (
           <LiquidateModal
             modalTitle={"Liquidate"}
-            onClose={() => setState && setState({ ...state, isModalOpen: false, modalType: "" })}
+            onClose={() => {
+              setState && setState({ ...state, isModalOpen: false, modalType: "" });
+              refetch();
+            }}
             size={400}
           />
       )}

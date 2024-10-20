@@ -15,6 +15,7 @@ export type LoanType = {
   collectorFee: BigInt;
   daoFee: BigInt;
   liquidatorFee: BigInt;
+  precision: BigInt;
   collectorReward: number;
   liquidationAmount: number;
   liquidatorReward: number;
