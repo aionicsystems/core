@@ -1,7 +1,7 @@
 import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 
 export const APIURL =
-  "http://34.72.19.102:8000/subgraphs/name/AionCoreSubgraph/";
+  "http://35.239.40.32:8000/subgraphs/name/AionCoreSubgraph/";
 export const client = new ApolloClient({
   uri: APIURL,
   cache: new InMemoryCache(),

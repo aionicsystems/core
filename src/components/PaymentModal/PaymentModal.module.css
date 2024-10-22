@@ -1,0 +1,23 @@
+.PaymentList {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 20px;
+}
+.faqText {
+    font-size: 14px;
+    color: #ffffff;
+    line-height: 20px;
+}
+.faqText:not(:first-child) {
+    margin-top: 6px;
+}
+
+@media (min-width: 768px) {
+    .loanAssetsList {
+        max-height: 464px;
+        margin-top: 25px;
+    }
+    .faqText {
+        font-size: 16px;
+    }
+}

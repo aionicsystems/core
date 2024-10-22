@@ -19,6 +19,7 @@ import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 import { collectorReward, interest, liquidationCheck, liquidationPayment, liquidationReward, maxLiquidationAmount, timestamp } from "../../utils/calculations.ts";
 import { CollectModal } from "../CollectModal/CollectModal.tsx";
 import { LiquidateModal } from "../LiquidateModal/LiquidateModal.tsx";
+import { PaymentModal } from "../PaymentModal/PaymentModal.tsx";
 
 const borrowerTableTitles: SortableTableHeadType<LoanType>[] = [
   {
@@ -297,6 +298,16 @@ export const LoanSection: FC = () => {
       {state.isModalOpen && state.modalType === "liquidate" && state.loanId && (
           <LiquidateModal
             modalTitle={"Liquidate"}
+            onClose={() => {
+              setState && setState({ ...state, isModalOpen: false, modalType: "" });
+              refetch();
+            }}
+            size={400}
+          />
+      )}
+      {state.isModalOpen && state.modalType === "payment" && state.loanId && (
+          <PaymentModal
+            modalTitle={"Payment"}
             onClose={() => {
               setState && setState({ ...state, isModalOpen: false, modalType: "" });
               refetch();

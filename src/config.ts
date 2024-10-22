@@ -10,7 +10,7 @@ export const aionicDao = {
   name: 'AionicDAO',
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
-    default: { http: ['http://34.72.19.102:8545'] },
+    default: { http: ['http://35.239.40.32:8545'] },
   }
 } as const satisfies Chain
 
@@ -25,6 +25,6 @@ export const config = createConfig({
   transports: {
     [arbitrum.id]: http(),
     [arbitrumSepolia.id]: http(),
-    [aionicDao.id]: http('http://34.72.19.102:8545'),
+    [aionicDao.id]: http('http://35.239.40.32:8545'),
   },
 });
