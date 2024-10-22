@@ -42,6 +42,26 @@ export const collateralizationRatioPercent = (
   return `${((100 * Number(collateralAmount) * (Number(latestPriceETH) / Number(decimalsETH))) / (Number(liabilityAmount) * (Number(latestPriceAsset) / Number(decimalsAsset)))).toFixed(0)}%`;
 };
 
+export const collateralizationRatioPercentAfter = (
+  payment: number,
+  collateralAmount: BigInt,
+  latestPriceETH: BigInt,
+  decimalsETH: BigInt,
+  liabilityAmount: BigInt,
+  latestPriceAsset: BigInt,
+  decimalsAsset: BigInt,
+  borrowingRatio: BigInt,
+  precision: BigInt,
+) => {
+  const debtUsdAfter = ((Number(liabilityAmount) / Math.pow(10,18) - payment) * Number(latestPriceAsset)) / Math.pow(10, Number(decimalsAsset));
+  const collateral = (Number(collateralAmount) * (Number(latestPriceETH)) / Math.pow(10, Number(decimalsETH)+18));
+
+  if ((Number(borrowingRatio) / Math.pow(10, Number(precision))) > (collateral / debtUsdAfter)) {
+    return `${(100 * collateral / (debtUsdAfter)).toFixed(0)}%`;
+  }
+  return `${(100 * Number(borrowingRatio) / Math.pow(10, Number(precision))).toFixed(0)}%`;
+};
+
 export const collateralizationRatio = (
   collateralAmount?: BigInt,
   latestPriceETH?: BigInt,
@@ -141,4 +161,29 @@ export const liquidationReward = (
   precision: BigInt
 ): number => {
   return (collateralAmount * Number(liquidatorFee)) / Math.pow(10, Number(precision));
+};
+
+export const paymentRedemption = (
+  payment: number,
+  collateral: BigInt,
+  liability: BigInt,
+  assetPrice: BigInt,
+  etherPrice: BigInt,
+  decimalsAsset: BigInt,
+  decimalsEther: BigInt,
+  borrowingRatio: BigInt,
+  precision: BigInt
+): number => {
+
+  const liability_end = Number(liability) / Math.pow(10, 18) - payment;
+  const debtUsd = (Number(liability_end) * Number(assetPrice)) / Math.pow(10, Number(decimalsAsset));
+  
+  // Calculate the liquidator payment
+  const end_collateral = (debtUsd * Number(borrowingRatio) * Math.pow(10, Number(decimalsEther))) / (Number(etherPrice) * Math.pow(10, Number(precision)));
+  console.log(end_collateral);
+  if (Number(collateral) / Math.pow(10,18) > end_collateral) {
+    return Number(collateral) / Math.pow(10,18) - end_collateral;
+  }
+
+  return 0;
 };

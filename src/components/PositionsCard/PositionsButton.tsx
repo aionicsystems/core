@@ -20,9 +20,9 @@ export const PositionsButton: FC<PositionsButtonProps> = ({
           btnType={"primary"}
           className={styles.positionsCardActionButton}
           size={"lg"}
-          onClick={() => setState && setState({ ...state, isModalOpen: true, modalType: "payback" })}
+          onClick={() => setState && setState({ ...state, isModalOpen: true, modalType: "payment" })}
         >
-          PayBack
+          Payment
         </Button>
       ) : null;
     case "Collateral":

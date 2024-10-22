@@ -1,0 +1,101 @@
+.paymentForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.paymentFormTitle {
+    color: #E9E9E9DB;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+}
+
+.inputWithUnitGrid {
+    display: grid;
+    grid-template-columns: 100px 1fr 100px; /* Three columns: left space, input/output, right label */
+    align-items: center;
+    background-color: #08101B6E;
+    border-radius: 16px;
+    padding-right: 10px;
+    width: 100%;
+}
+
+.collateralInputGrid {
+    background-color: transparent;
+    color: #ffffff;
+    padding: 19px;
+    border: none;
+    outline: none;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    width: 100%;
+}
+
+.unitLabelLeft {
+    width: 100px; /* Matches the space on the right */
+    background-color: transparent;
+}
+
+.unitLabelRight {
+    padding: 0 15px;
+    background-color: transparent;
+    font-weight: 500;
+    font-size: 16px;
+    color: #ffffff;
+    border-left: 1px solid #5a5a6b;
+    width: 100px;
+}
+
+@media (min-width: 768px) {
+    .collateralInputGrid, .issueInfoValueGrid {
+        padding: 28px;
+        font-size: 17px;
+        line-height: 23px;
+    }
+}
+
+.paymentInfoWrapper {
+    margin-top: 20px;
+}
+.paymentInfoTitle {
+    color: #E9E9E9DB;
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+.paymentInfoValue {
+    background-color: #08101B38;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    padding: 20px;
+    border-radius: 16px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+.paymentInfoValue:not(:first-child) {
+    margin-top: 5px;
+}
+@media (min-width: 768px) {
+    .paymentInfoValue {
+        font-size: 17px;
+        line-height: 23px;
+        padding: 28px;
+    }
+    .paymentInfoValue:not(:first-child) {
+        margin-top: 15px;
+    }
+    .paymentInfoWrapper {
+        margin-top: 35px;
+    }
+}
