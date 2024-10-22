@@ -111,7 +111,7 @@ contract Loan is Ownable, Library {
 
     // Payback loan with borrowed assets
     // Payback can be called with zero payment and be just a withdrawal
-    function payback(uint256 payment) public onlyOwner {
+    function repay(uint256 payment) public onlyOwner {
         require(this.owner() == msg.sender);
         require(liabilityAmount >= payment);
 
