@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("@nomicfoundation/hardhat-ethers");
+require('hardhat-dependency-compiler');
 const dotenv = require("dotenv");
 
 dotenv.config();
@@ -28,5 +29,10 @@ module.exports = {
       url: 'https://arb1.arbitrum.io/rpc',
       //accounts: [ARBITRUM_MAINNET_TEMPORARY_PRIVATE_KEY]
     }
+  },
+  dependencyCompiler: {
+    paths: [
+      '@openzeppelin/contracts/governance/Governor.sol',
+    ],
   }
 };

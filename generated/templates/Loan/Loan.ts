@@ -563,36 +563,6 @@ export class LiquidateCall__Outputs {
   }
 }
 
-export class PaybackCall extends ethereum.Call {
-  get inputs(): PaybackCall__Inputs {
-    return new PaybackCall__Inputs(this);
-  }
-
-  get outputs(): PaybackCall__Outputs {
-    return new PaybackCall__Outputs(this);
-  }
-}
-
-export class PaybackCall__Inputs {
-  _call: PaybackCall;
-
-  constructor(call: PaybackCall) {
-    this._call = call;
-  }
-
-  get payment(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-}
-
-export class PaybackCall__Outputs {
-  _call: PaybackCall;
-
-  constructor(call: PaybackCall) {
-    this._call = call;
-  }
-}
-
 export class RenounceOwnershipCall extends ethereum.Call {
   get inputs(): RenounceOwnershipCall__Inputs {
     return new RenounceOwnershipCall__Inputs(this);
@@ -615,6 +585,36 @@ export class RenounceOwnershipCall__Outputs {
   _call: RenounceOwnershipCall;
 
   constructor(call: RenounceOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class RepayCall extends ethereum.Call {
+  get inputs(): RepayCall__Inputs {
+    return new RepayCall__Inputs(this);
+  }
+
+  get outputs(): RepayCall__Outputs {
+    return new RepayCall__Outputs(this);
+  }
+}
+
+export class RepayCall__Inputs {
+  _call: RepayCall;
+
+  constructor(call: RepayCall) {
+    this._call = call;
+  }
+
+  get payment(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class RepayCall__Outputs {
+  _call: RepayCall;
+
+  constructor(call: RepayCall) {
     this._call = call;
   }
 }
