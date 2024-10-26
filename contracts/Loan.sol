@@ -185,6 +185,9 @@ contract Loan is Ownable, Library {
         
         // Pay collector ether
         payable(msg.sender).transfer(collector);
+
+        // Update last collection time
+        lastCollection = block.timestamp;
         
         loanEvent();
     }
