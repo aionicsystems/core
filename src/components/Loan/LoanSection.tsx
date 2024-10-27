@@ -3,8 +3,12 @@ import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
 import { SortableTableConfigType } from "../../types/TableTypes.ts";
-import { useQuery } from "@tanstack/react-query";
-import { client, loanEntities, loanEntitiesByOwner } from "../../repository/requests.ts";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  client,
+  loanEntities,
+  loanEntitiesByOwner,
+} from "../../repository/requests.ts";
 import { REQUEST_LOANS_ENTITIES } from "../../repository/requestKeys.ts";
 import { Loader } from "../Loader/Loader.tsx";
 import { LoanType } from "../../types/LoanTypes.ts";
@@ -19,9 +23,12 @@ import { getTableTitles } from "./LoanTableTitles.tsx";
 import { LoansMutator } from "./LoanTableData.tsx";
 
 export const LoanSection: FC = () => {
+  const queryClient = useQueryClient();
   const { state, setState } = useGlobalState();
   const { address, isConnected } = useAccount();
-  const [tableConfig, setTableConfig] = useState<SortableTableConfigType<LoanType>>({
+  const [tableConfig, setTableConfig] = useState<
+    SortableTableConfigType<LoanType>
+  >({
     sort_order: "asc",
     sort_by: "id",
     filters: {},
@@ -55,6 +62,8 @@ export const LoanSection: FC = () => {
       return null;
     },
     refetchInterval: 10000,
+    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: true,
     queryKey: [REQUEST_LOANS_ENTITIES, tableConfig],
   });
 
@@ -78,7 +87,15 @@ export const LoanSection: FC = () => {
   }, [data, state.userType]);
 
   const handleModalClose = async () => {
-    await refetch();
+    queryClient.setQueryData(
+      [REQUEST_LOANS_ENTITIES, tableConfig],
+      state.Loans,
+    );
+    await queryClient.invalidateQueries({
+      queryKey: [REQUEST_LOANS_ENTITIES, tableConfig],
+      exact: true,
+    });
+    refetch();
     setState({ ...state, isModalOpen: false, modalType: "" });
   };
 
@@ -97,7 +114,10 @@ export const LoanSection: FC = () => {
           <Button
             size={"sm"}
             btnType={"primary"}
-            onClick={() => setState && setState({ ...state, isModalOpen: true, modalType: "issue" })}
+            onClick={() =>
+              setState &&
+              setState({ ...state, isModalOpen: true, modalType: "issue" })
+            }
           >
             Issue Loan
           </Button>
@@ -112,7 +132,7 @@ export const LoanSection: FC = () => {
         callRefetch={refetch}
         collateral={state.Collateral}
       />
-      {state.Collateral ? <LoanOverview/> : <> </>}
+      {state.Collateral ? <LoanOverview /> : <> </>}
       {state.isModalOpen && state.modalType === "issue" && (
         <LoanAssetsModal
           modalTitle={"Select Asset"}
@@ -121,25 +141,25 @@ export const LoanSection: FC = () => {
         />
       )}
       {state.isModalOpen && state.modalType === "collect" && state.loanId && (
-          <CollectModal
-            modalTitle={"Collect Interest"}
-            onClose={handleModalClose}
-            size={400}
-          />
+        <CollectModal
+          modalTitle={"Collect Interest"}
+          onClose={handleModalClose}
+          size={400}
+        />
       )}
       {state.isModalOpen && state.modalType === "liquidate" && state.loanId && (
-          <LiquidateModal
-            modalTitle={"Liquidate"}
-            onClose={handleModalClose}
-            size={400}
-          />
+        <LiquidateModal
+          modalTitle={"Liquidate"}
+          onClose={handleModalClose}
+          size={400}
+        />
       )}
       {state.isModalOpen && state.modalType === "payment" && state.loanId && (
-          <PaymentModal
-            modalTitle={"Payment"}
-            onClose={handleModalClose}
-            size={400}
-          />
+        <PaymentModal
+          modalTitle={"Payment"}
+          onClose={handleModalClose}
+          size={400}
+        />
       )}
     </>
   );
