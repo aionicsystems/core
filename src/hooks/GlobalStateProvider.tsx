@@ -24,6 +24,7 @@ export interface GlobalStateInterface {
   modalType: string;
   loanId: string;
   Loan: LoanType;
+  Loans: LoanType[];
 }
 
 export const GlobalStateContext = createContext<{
