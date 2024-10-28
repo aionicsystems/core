@@ -3,8 +3,7 @@ import { LoanAssetsModal } from "../LoanAssetsModal/LoanAssetsModal.tsx";
 import { Button } from "../Button/Button.tsx";
 import { SortableTable } from "../Table/SortableTable.tsx";
 import {
-  SortableTableConfigType,
-  SortableTableHeadType,
+  SortableTableConfigType
 } from "../../types/TableTypes.ts";
 import { useQuery } from "@tanstack/react-query";
 import { client, loanEntities, loanEntitiesByOwner } from "../../repository/requests.ts";
@@ -20,110 +19,12 @@ import { collectorReward, interest, liquidationCheck, liquidationPayment, liquid
 import { CollectModal } from "../CollectModal/CollectModal.tsx";
 import { LiquidateModal } from "../LiquidateModal/LiquidateModal.tsx";
 import { PaymentModal } from "../PaymentModal/PaymentModal.tsx";
-
-const borrowerTableTitles: SortableTableHeadType<LoanType>[] = [
-  {
-    title: "Loan ID",
-    key: "id",
-    sortable: true,
-    mutateValue: (v) => `${String(v).substring(0, 8)}...`,
-  },
-  {
-    title: "Asset",
-    key: "asset.symbol",
-    sortable: true,
-  },
-  {
-    title: "Liability",
-    key: "liabilityAmount",
-    sortable: true,
-  },
-  {
-    title: "Collateral",
-    key: "collateralAmount",
-    sortable: true,
-  },
-  {
-    title: "C Ratio",
-    key: "cRatio",
-    sortable: true,
-  },
-  {
-    title: "L Ratio",
-    key: "liquidationRatio",
-    sortable: true,
-  },
-];
-
-const collectorTableTitles: SortableTableHeadType<LoanType>[] = [
-  {
-    title: "Loan ID",
-    key: "id",
-    sortable: true,
-    mutateValue: (v) => `${String(v).substring(0, 8)}...`,
-  },
-  {
-    title: "Interest Rate",
-    key: "interestRate",
-    sortable: true,
-  },
-  {
-    title: "Interest",
-    key: "interest",
-    sortable: true,
-  },
-  {
-    title: "Collector Reward",
-    key: "collectorAward",
-    sortable: true,
-  },
-];
-
-const liquidatorTableTitles: SortableTableHeadType<LoanType>[] = [
-  {
-    title: "Loan ID",
-    key: "id",
-    sortable: true,
-    mutateValue: (v) => `${String(v).substring(0, 8)}...`,
-  },
-  {
-    title: "Collateral Amount",
-    key: "collateralAmount",
-    sortable: true,
-  },
-  {
-    title: "Liability Amount",
-    key: "liabilityAmount",
-    sortable: true,
-  },
-  {
-    title: "Liquidation Amount",
-    key: "liquidationAmount",
-    sortable: true,
-  },
-  {
-    title: "Liquidator Reward",
-    key: "liquidatorReward",
-    sortable: true,
-  },
-];
-
-const getTableTitles = (userType: string): SortableTableHeadType<LoanType>[] => {
-  switch (userType) {
-    case "Borrower":
-      return borrowerTableTitles;
-    case "Collector":
-      return collectorTableTitles;
-    case "Liquidator":
-      return liquidatorTableTitles;
-    default:
-      return [];
-  }
-};
+import { getTableTitles } from "../Table/SortableTableTitles.tsx";
 
 export const LoanSection: FC = () => {
   const { state, setState } = useGlobalState();
   const { address, isConnected } = useAccount();
+  
   const [tableConfig, setTableConfig] = useState<SortableTableConfigType<LoanType>>({
     sort_order: "asc",
     sort_by: "id",
@@ -157,6 +58,7 @@ export const LoanSection: FC = () => {
             owner: tableConfig.owner,
           },
         });
+        console.log("gets here");
         return result.data;
       }
       if (state.userType === "Collector" || state.userType === "Liquidator") {
@@ -167,6 +69,8 @@ export const LoanSection: FC = () => {
             sort_order: tableConfig.sort_order,
           },
         });
+        console.log("gets here2")
+        console.log(result.data);
         return result.data;
       }
       return null;
@@ -288,7 +192,7 @@ export const LoanSection: FC = () => {
       {state.isModalOpen && state.modalType === "collect" && state.loanId && (
           <CollectModal
             modalTitle={"Collect Interest"}
-            onClose={() => {
+            onClose={async () => {
               setState && setState({ ...state, isModalOpen: false, modalType: "" });
               refetch();
             }}
