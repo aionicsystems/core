@@ -13,6 +13,8 @@ import { LiquidateModal } from "../LiquidateModal/LiquidateModal.tsx";
 import { PaymentModal } from "../PaymentModal/PaymentModal.tsx";
 import { getTableTitles } from "../Table/SortableTableTitles.tsx";
 import { liquidationCheck } from "../../utils/calculations"; // assuming import location
+import { transformLoans } from "../../utils/loanUtils.ts";
+import { client } from "../../repository/requests.ts";
 
 export const LoanSection: FC = () => {
   const { state, setState, refetch } = useGlobalState();
@@ -27,6 +29,8 @@ export const LoanSection: FC = () => {
   if (state.userType === "Liquidator" && state.Collateral) {
     tableData = tableData.filter((loan) => liquidationCheck(loan, state.Collateral!, state.Window!));
   }
+
+  tableData = transformLoans(tableData, state.Collateral!, state.Window!);
 
   return (
     <>
@@ -43,14 +47,16 @@ export const LoanSection: FC = () => {
           </Button>
         )}
       </div>
+      { state.tableData && state.tableConfig ?
       <SortableTable<LoanType>
         titles={getTableTitles(state.userType ?? "")}
-        tableData={state.tableData}
+        tableData={tableData}
         tableConfig={state.tableConfig}
         setTableConfig={(config) => setState && setState({ ...state, tableConfig: config })}
-        isError={state.error}
+        isError={state.error ?? false}
         callRefetch={refetch} // Use refetch function here
-      />
+        collateral={state.Collateral}
+      /> : <></> }
       {state.Collateral ? <LoanOverview /> : <></>}
       
       {/* Modals based on `modalType` */}
@@ -59,6 +65,7 @@ export const LoanSection: FC = () => {
           modalTitle="Select Asset"
           onClose={() => {
             setState && setState({ ...state, isModalOpen: false, modalType: "" });
+            client.cache.reset();
             refetch();
           }}
           size={488}
@@ -69,6 +76,7 @@ export const LoanSection: FC = () => {
           modalTitle="Collect Interest"
           onClose={() => {
             setState && setState({ ...state, isModalOpen: false, modalType: "" });
+            client.cache.reset();
             refetch();
           }}
           size={400}
@@ -79,6 +87,7 @@ export const LoanSection: FC = () => {
           modalTitle="Liquidate"
           onClose={() => {
             setState && setState({ ...state, isModalOpen: false, modalType: "" });
+            client.cache.reset();
             refetch();
           }}
           size={400}
@@ -89,6 +98,7 @@ export const LoanSection: FC = () => {
           modalTitle="Payment"
           onClose={() => {
             setState && setState({ ...state, isModalOpen: false, modalType: "" });
+            client.cache.reset();
             refetch();
           }}
           size={400}

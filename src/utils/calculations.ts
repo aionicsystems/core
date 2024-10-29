@@ -87,6 +87,7 @@ export const liquidationCheck = (
 };
 
 export const interest = (
+  timestamp: number,
   loan: LoanType,
   window: WindowType
 ): number => {

@@ -73,7 +73,7 @@ export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
           sort_order: state.tableConfig?.sort_order ?? "asc",
         },
       });
-
+      
       setState((prev) => ({
         ...prev,
         Collateral: result.data.assetEntity,
@@ -89,8 +89,9 @@ export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
 
   // Initial data fetch
   useEffect(() => {
+    client.cache.reset();
     fetchData();
-  }, [state.tableConfig]);
+  }, [state.tableConfig, state.userType]);
 
   return (
     <GlobalStateContext.Provider value={{ state, setState, refetch: fetchData }}>

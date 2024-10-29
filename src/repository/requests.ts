@@ -92,6 +92,8 @@ export const loanEntitiesByOwner = gql(`
     liabilityAmount
     liquidationRatio
     borrowingRatio
+    interestRate
+    lastCollection
     collectorFee
     daoFee
     liquidatorFee
@@ -182,6 +184,8 @@ export const entities = gql(`
     liabilityAmount
     liquidationRatio
     borrowingRatio
+    interestRate
+    lastCollection
     collectorFee
     daoFee
     liquidatorFee

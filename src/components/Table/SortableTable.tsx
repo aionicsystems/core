@@ -6,7 +6,6 @@ import {
 import styles from "./SortableTable.module.css";
 import { SortableTableHead } from "./SortableTableHead.tsx";
 import { SortableTableBody } from "./SortableTableBody.tsx";
-import { DefaultError, QueryObserverResult } from "@tanstack/react-query";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { AssetType } from "../../types/AssetTypes.ts";
 
@@ -21,7 +20,7 @@ export type SortableTableProps<T> = {
     page_number,
   }: SortableTableConfigType<T>) => void;
   tableConfig: SortableTableConfigType<T>;
-  callRefetch: () => Promise<QueryObserverResult<unknown, DefaultError>>;
+  callRefetch: () => Promise<void>;
   collateral?: AssetType;
 };
 

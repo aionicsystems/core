@@ -42,7 +42,7 @@ export const LoanOverview: FC = () => {
   });
 
   useEffect(() => {
-    if (data.loanEntity && state.Collateral && state.Window) {
+    if (data?.loanEntity && state.Collateral && state.Window) {
       const [loan] = transformLoans([data.loanEntity], state.Collateral, state.Window);
       setState && setState({ ...state, Loan: loan });
     }
