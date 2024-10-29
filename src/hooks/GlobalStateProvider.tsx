@@ -8,13 +8,12 @@ import {
 } from "react";
 import { WindowType } from "../types/WindowTypes";
 import { AssetType } from "../types/AssetTypes";
-import { useQuery } from "@tanstack/react-query";
-import { client, windowEntities } from "../repository/requests";
-import { REQUEST_WINDOW_ENTITIES } from "../repository/requestKeys";
+import { client, entities } from "../repository/requests";
 import { LoanType } from "../types/LoanTypes";
+import { SortableTableConfigType } from "../types/TableTypes";
 
 export interface GlobalStateInterface {
-  BigInts: Map<string, bigint>;
+  
   Window: WindowType;
   Collateral: AssetType;
   userType: string;
@@ -24,14 +23,20 @@ export interface GlobalStateInterface {
   modalType: string;
   loanId: string;
   Loan: LoanType;
+  Loans: LoanType[];
+  tableConfig: SortableTableConfigType<LoanType>;
+  tableData: LoanType[];
+  isLoading: boolean;
 }
 
 export const GlobalStateContext = createContext<{
   state: Partial<GlobalStateInterface>;
   setState: Dispatch<SetStateAction<Partial<GlobalStateInterface>>>;
+  refetch: () => Promise<void>; // Expose refetch function in the context
 }>({
   state: {},
   setState: () => {},
+  refetch: async () => {}, // Default to a no-op
 });
 
 interface GlobalStateProviderProps {
@@ -47,35 +52,48 @@ export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
     isModalOpen: false,
     modalType: "",
     loanId: "",
-  });
-
-  const { data } = useQuery({
-    queryFn: async () => {
-      try {
-        const result = await client.query({
-          query: windowEntities,
-        });
-        return result.data;
-      } catch (error) {
-        throw error;
-      }
+    tableConfig: {
+      sort_order: "asc",
+      sort_by: "id",
+      filters: {},
+      page_number: 1,
+      owner: null,
     },
-    queryKey: [REQUEST_WINDOW_ENTITIES],
+    tableData: [],
+    isLoading: false,
   });
 
-  useEffect(() => {
-    if (data) {
-      console.log(data.windowEntities[0]);
-      setState({
-        ...state,
-        Collateral: data.assetEntity,
-        Window: data.windowEntities[0],
+  const fetchData = async () => {
+    setState((prev) => ({ ...prev, isLoading: true }));
+    try {
+      const result = await client.query({
+        query: entities,
+        variables: {
+          sort_by: state.tableConfig?.sort_by ?? "id",
+          sort_order: state.tableConfig?.sort_order ?? "asc",
+        },
       });
+
+      setState((prev) => ({
+        ...prev,
+        Collateral: result.data.assetEntity,
+        Window: result.data.windowEntities[0],
+        Loans: result.data.loanEntities,
+        isLoading: false,
+      }));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setState((prev) => ({ ...prev, isLoading: false, error: true }));
     }
-  }, [data]);
+  };
+
+  // Initial data fetch
+  useEffect(() => {
+    fetchData();
+  }, [state.tableConfig]);
 
   return (
-    <GlobalStateContext.Provider value={{ state, setState }}>
+    <GlobalStateContext.Provider value={{ state, setState, refetch: fetchData }}>
       {children}
     </GlobalStateContext.Provider>
   );
