@@ -236,13 +236,11 @@ async function main() {
     );
 
     const assets = [
-      { name: "Nvidia", symbol: "ANVDA", collateralFactor: 2000, liquidationFactor: 12500, etherAmount: "1.0", initialPrice: BigInt(20000000000) },
-      { name: "Amazon", symbol: "AAMZN", collateralFactor: 3000, liquidationFactor: 12000, etherAmount: ".5", initialPrice: BigInt(15000000000) },
-      { name: "Apple", symbol: "AAAPL", collateralFactor: 4000, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(18000000000) },
-      { name: "Google", symbol: "AGOOG", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(22000000000) },
-      { name: "Microsoft", symbol: "AMCST", collateralFactor: 4000, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(21000000000) },
-      { name: "ConocoPhillips", symbol: "ACOP", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(17000000000) },
-      { name: "AMD", symbol: "AAMD", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(16000000000) }
+      { name: "AionicUSD", symbol: "AUSD", collateralFactor: 2000, liquidationFactor: 12500, etherAmount: "1.0", initialPrice: BigInt(20000000000) },
+      { name: "AionicEURO", symbol: "AEURO", collateralFactor: 3000, liquidationFactor: 12000, etherAmount: ".5", initialPrice: BigInt(15000000000) },
+      { name: "AionicYEN", symbol: "AJYN", collateralFactor: 4000, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(18000000000) },
+      { name: "AionicGPB", symbol: "AGPB", collateralFactor: 5000, liquidationFactor: 13000, etherAmount: ".5", initialPrice: BigInt(22000000000) },
+      { name: "AionicCNY", symbol: "ACNY", collateralFactor: 4000, liquidationFactor: 11000, etherAmount: ".5", initialPrice: BigInt(21000000000) },
     ];
 
     const loanAddresses = [];
