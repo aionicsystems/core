@@ -98,7 +98,7 @@ contract Loan is Ownable, Library {
         // Collateral(USD) = Collateral(ETH) * Price(ETH)
         // Liability(USD) = Liability(Asset) * Price(Asset)
         // Collateral(ETH) = Liability(Asset) * Price(Asset) * BorrowingRatio / Price(ETH)
-        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * 10**AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*10**AggregatorV3Interface(assetDataFeedAddress).decimals()*precision**4);
+        uint256 collateralEnd = (liabilityAmount * dataFeedPrice(assetDataFeedAddress) * borrowingRatio * 10**AggregatorV3Interface(etherDataFeedAddress).decimals()) / (dataFeedPrice(etherDataFeedAddress)*10**AggregatorV3Interface(assetDataFeedAddress).decimals()*10**precision);
         return address(this).balance - collateralEnd;
     }
 
