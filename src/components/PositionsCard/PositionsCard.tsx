@@ -3,7 +3,6 @@ import styles from "./PositionsCard.module.css";
 import { Card } from "../Card/Card.tsx";
 import { Badge } from "../Badge/Badge.tsx";
 import { iIcon } from "../../static/images.ts";
-import { useGlobalState } from "../../hooks/useGlobalState.tsx";
 import { PositionsButton } from "./PositionsButton.tsx";
 
 type PositionsCardProps = {
@@ -23,7 +22,6 @@ export const PositionsCard: FC<PositionsCardProps> = ({
   valueUsd,
   badgeType,
 }) => {
-  const { state } = useGlobalState();
 
   return (
     <Card className={styles.positionsCard}>

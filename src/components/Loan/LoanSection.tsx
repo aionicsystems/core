@@ -93,9 +93,9 @@ export const LoanSection: FC = () => {
           size={400}
         />
       )}
-      {state.isModalOpen && state.modalType === "payment" && state.loanId && (
+      {state.isModalOpen && state.modalType === "repay" && state.loanId && (
         <PaymentModal
-          modalTitle="Payment"
+          modalTitle="Repay"
           onClose={() => {
             setState && setState({ ...state, isModalOpen: false, modalType: "" });
             client.cache.reset();
