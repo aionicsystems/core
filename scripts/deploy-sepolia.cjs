@@ -1,55 +1,11 @@
 const hre = require("hardhat");
 const path = require('node:path');
 const { system, patching, filesystem } = require('gluegun');
-const { createApolloFetch } = require('apollo-fetch');
 const { ethers } = require('hardhat');
 const srcDir = path.join(__dirname, '..');
 const { abi } = require('../artifacts/contracts/Window.sol/Window.json');
 
-const fetchSubgraphs = createApolloFetch({ uri: 'http://localhost:8030/graphql' });
-const fetchSubgraph = createApolloFetch({
-  uri: 'http://localhost:8000/subgraphs/name/AionCoreSubgraph',
-});
-
-const waitForSubgraphToBeSynced = async () =>
-  new Promise((resolve, reject) => {
-    const deadline = Date.now() + 10 * 1000;
-
-    const checkSubgraphSynced = async () => {
-      if (Date.now() > deadline) {
-        reject('Timeout while waiting for the subgraph to be synced');
-      }
-
-      const result = await fetchSubgraphs({
-        query: `
-          {
-            statuses: indexingStatusesForSubgraphName(
-              subgraphName: "AionCoreSubgraph"
-            ) {
-              synced
-            }
-          }
-          `,
-      });
-
-      if (result.data.statuses[0].synced) {
-        setTimeout(resolve, 1000);
-      } else {
-        setTimeout(checkSubgraphSynced, 500);
-      }
-    };
-
-    setTimeout(checkSubgraphSynced, 0);
-  });
-
-async function deployMockAggregator() {
-  const Aggregator = await hre.ethers.getContractFactory("MockAggregator");
-  const aggregator = await Aggregator.deploy();
-  await aggregator.waitForDeployment();
-  return aggregator;
-}
-
-async function deployMockDataFeed(decimals, initialPrice, aggregatorAddress) {
+async function deployUsdDataFeed(decimals, initialPrice, aggregatorAddress) {
   const DataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
   const dataFeed = await DataFeed.deploy(decimals, initialPrice, aggregatorAddress);
   await dataFeed.waitForDeployment();
@@ -141,7 +97,7 @@ async function main() {
 
     const [owner] = await hre.ethers.getSigners();
 
-    const ethDataAgg = await deployMockAggregator();
+    const ethDataAgg = await deployMockAggregator(decimals);
     console.log(`Mock ETH Aggregator deployed to: ${await ethDataAgg.getAddress()}`);
 
     const ethDataFeed = await deployMockDataFeed(decimals, initialEthPrice, await ethDataAgg.getAddress());

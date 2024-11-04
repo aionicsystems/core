@@ -2,16 +2,11 @@
 
 pragma solidity ^0.8.24;
 import "hardhat/console.sol";
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 import { Loan } from "./Loan.sol";
-import { Library } from "./Library.sol";
-
-interface AggregatorInterface is AggregatorV3Interface {
-    function aggregator() external returns (address);
-}
+import { Library, AggregatorInterface } from "./Library.sol";
 
 contract Window is Ownable, Library {
     event WindowEntity(
@@ -25,6 +20,19 @@ contract Window is Ownable, Library {
         uint8 precision
     );
 
+    function emitWindowEntity() private {
+        emit WindowEntity(
+            address(this), 
+            owner(),
+            etherDataFeedAddress,
+            borrowingRatio,
+            collectorFee,
+            daoFee,
+            liquidatorFee,
+            precision
+        );
+    }
+
     // Number of decimal precision used in ratios and rates
     uint8 public precision;
 
@@ -34,15 +42,9 @@ contract Window is Ownable, Library {
     uint32 public liquidatorFee;
     uint32 public collectorFee;
 
-    // Ether held by the contract earned through interest and liquidations
-    uint256 public contractEther;
-
     // Ether data feed address
     address public etherDataFeedAddress;
     AggregatorInterface internal etherDataFeed;
-    
-    // Loan mapped to Address
-    mapping(address => Loan) public loans;
 
     // Assets that are approved for loan
     mapping(address => Asset) public assets;
@@ -77,32 +79,21 @@ contract Window is Ownable, Library {
             getChainlinkDataFeedLatestAnswer(etherDataFeed)
         );
 
-        emit WindowEntity(
-            address(this), 
-            address(owner),
-            etherDataFeedAddress,
-            borrowingRatio,
-            collectorFee,
-            daoFee,
-            liquidatorFee,
-            precision
-        );
+        emitWindowEntity();
     }
 
-    function setBorrowingRatio(uint32 value) public onlyOwner {
-        borrowingRatio = value;
+    function setWindowParameter(bytes32 parameter, uint32 value) public onlyOwner {
+        if (parameter == "borrowingRatio") borrowingRatio = value;
+        else if (parameter == "collectorFee") collectorFee = value;
+        else if (parameter == "daoFee") daoFee = value;
+        else if (parameter == "liquidatorFee") liquidatorFee = value;
+        else revert("Invalid parameter");
+
+        emitWindowEntity();
     }
 
-    function setCollectorFee(uint32 value) public onlyOwner {
-        collectorFee = value;
-    }
-
-    function setDaoFee(uint32 value) public onlyOwner {
-        daoFee = value;
-    }
-
-    function setLiquidatorFee(uint32 value) public onlyOwner {
-        liquidatorFee = value;
+    function setAssetParameter(address asset, bytes32 parameter, uint32 value) public onlyOwner {
+        Asset(asset).setParameter(parameter, value);
     }
 
     function approveAsset(address assetDataFeedAddress, string memory name, string memory symbol, uint32 rate, uint32 liquidationRatio) public onlyOwner returns(address) {
@@ -111,18 +102,6 @@ contract Window is Ownable, Library {
         AggregatorInterface dataFeed = AggregatorInterface(assetDataFeedAddress);
         emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, dataFeed.aggregator(), rate, liquidationRatio, dataFeed.decimals(), getChainlinkDataFeedLatestAnswer(dataFeed));
         return address(asset);
-    }
-
-    function getChainlinkDataFeedLatestAnswer(AggregatorInterface dataFeed) public view returns (int) {
-        // prettier-ignore
-        (
-            /* uint320 roundID */,
-            int answer,
-            /*uint startedAt*/,
-            /*uint timeStamp*/,
-            /*uint320 answeredInRound*/
-        ) = dataFeed.latestRoundData();
-        return answer;
     }
 
     function dataFeedPrice(AggregatorInterface dataFeed) public view returns (uint256) {
@@ -166,8 +145,7 @@ contract Window is Ownable, Library {
         
         // Transfer Ether to address of Loan Contract owned by Issuer
         payable(address(loan)).transfer(msg.value);
-
-        loans[address(loan)] = loan;
+        // Mint asset and assign to msg.sender
         assets[assetAddress].mint(msg.sender, liabilityAmount);
 
         emit LoanEntity(

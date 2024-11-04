@@ -4,7 +4,6 @@ const { system, patching, filesystem } = require('gluegun');
 const { createApolloFetch } = require('apollo-fetch');
 const { ethers } = require('hardhat');
 const srcDir = path.join(__dirname, '..');
-const { abi } = require('../artifacts/contracts/Window.sol/Window.json');
 
 const fetchSubgraphs = createApolloFetch({ uri: 'http://localhost:8030/graphql' });
 const fetchSubgraph = createApolloFetch({
@@ -42,18 +41,25 @@ const waitForSubgraphToBeSynced = async () =>
     setTimeout(checkSubgraphSynced, 0);
   });
 
-async function deployMockAggregator() {
-  const Aggregator = await hre.ethers.getContractFactory("MockAggregator");
-  const aggregator = await Aggregator.deploy();
-  await aggregator.waitForDeployment();
-  return aggregator;
-}
+  async function deployMockAggregator() {
+    const Aggregator = await hre.ethers.getContractFactory("MockAggregator");
+    const aggregator = await Aggregator.deploy();
+    await aggregator.waitForDeployment();
+    return aggregator;
+  }
+  
+  async function deployMockDataFeed(decimals, initialPrice, aggregatorAddress) {
+    const DataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
+    const dataFeed = await DataFeed.deploy(decimals, initialPrice, aggregatorAddress);
+    await dataFeed.waitForDeployment();
+    return dataFeed;
+  }
 
-async function deployMockDataFeed(decimals, initialPrice, aggregatorAddress) {
-  const DataFeed = await hre.ethers.getContractFactory("MockAggregatorV3Interface");
-  const dataFeed = await DataFeed.deploy(decimals, initialPrice, aggregatorAddress);
-  await dataFeed.waitForDeployment();
-  return dataFeed;
+async function deployConstantChainlinkFeed() {
+  const ConstantChainlinkFeed = await hre.ethers.getContractFactory("ConstantChainlinkFeed");
+  const feed = await ConstantChainlinkFeed.deploy();
+  await feed.waitForDeployment();
+  return feed;
 }
 
 async function approveAsset(governor, window, dataFeedAddress, name, symbol, collateralFactor, liquidationFactor) {
@@ -141,7 +147,7 @@ async function main() {
 
     const [owner] = await hre.ethers.getSigners();
 
-    const ethDataAgg = await deployMockAggregator();
+    const ethDataAgg = await deployMockAggregator(decimals);
     console.log(`Mock ETH Aggregator deployed to: ${await ethDataAgg.getAddress()}`);
 
     const ethDataFeed = await deployMockDataFeed(decimals, initialEthPrice, await ethDataAgg.getAddress());
@@ -248,10 +254,15 @@ async function main() {
     const dataFeeds = {};
 
     for (const asset of assets) {
-      const assetDataAgg = await deployMockAggregator();
-      console.log(`Mock ${asset.name} Aggregator deployed to: ${await assetDataAgg.getAddress()}`);
+      let assetDataFeed;
+      if (asset.symbol === "AUSD") {
+        assetDataFeed = await deployConstantChainlinkFeed();
+      } else {
+        const assetDataAgg = await deployMockAggregator(decimals);
+        console.log(`Mock ${asset.name} Aggregator deployed to: ${await assetDataAgg.getAddress()}`);
 
-      const assetDataFeed = await deployMockDataFeed(decimals, asset.initialPrice, await assetDataAgg.getAddress());
+        assetDataFeed = await deployMockDataFeed(decimals, asset.initialPrice, await assetDataAgg.getAddress());
+      }
       const assetDataFeedAddress = await assetDataFeed.getAddress();
       console.log(`Mock ${asset.name} Data Feed deployed to: ${assetDataFeedAddress}`);
 
@@ -291,14 +302,19 @@ async function main() {
     let liabilityAmount = await loan2.liabilityAmount();
     console.log(`Liability Amount balance before: ${ethers.formatUnits(liabilityAmount, 8)}`);
     
-    await asset1.approve(loanAddresses[1], ethers.parseEther("1"));
-    await loan2.liquidate(ethers.parseEther("1"));
-    
+    asset1Balance = await asset1.balanceOf(owner.address);
+    console.log(`Owner balance before: ${ethers.formatUnits(asset1Balance, 8)}`);
+    liabilityAmount = await loan2.liabilityAmount();
+    console.log(`Liability Amount balance before: ${ethers.formatUnits(liabilityAmount, 8)}`);
+
+    //await asset1.approve(loanAddresses[4], 1000000);
+    //await loan1.liquidate(1000000);
+
     asset1Balance = await asset1.balanceOf(owner.address);
     console.log(`Owner balance after: ${ethers.formatUnits(asset1Balance, 8)}`);
     liabilityAmount = await loan2.liabilityAmount();
     console.log(`Liability Amount balance after: ${ethers.formatUnits(liabilityAmount, 8)}`);
-
+    
     await system.run(`npm run codegen`, { cwd: srcDir });
     await system.run(`npm run create-test`, { cwd: srcDir });
     await system.run(`npm run deploy-test`, { cwd: srcDir });
