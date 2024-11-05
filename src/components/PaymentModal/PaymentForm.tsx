@@ -57,7 +57,7 @@ export const PaymentForm: FC<PaymentFormProps> = ({ loan, collateral, asyncAppro
 
     await asyncPayment({
         abi: loanAbi,
-        functionName: 'payback',
+        functionName: 'repay',
         args: [parseEther(paymentAmount)],
         address: loan.id as Address,
         nonce: nonce ?? undefined,

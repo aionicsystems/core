@@ -15,18 +15,18 @@ export const PositionsButton: FC<PositionsButtonProps> = ({
 
   switch (badgeText) {
     case "Debt":
-      return state.userType === "Borrower" ? (
+      return state.userType === "Borrower" && state.loanId ? (
         <Button
           btnType={"primary"}
           className={styles.positionsCardActionButton}
           size={"lg"}
-          onClick={() => setState && setState({ ...state, isModalOpen: true, modalType: "payment" })}
+          onClick={() => setState && setState({ ...state, isModalOpen: true, modalType: "repay" })}
         >
-          Payment
+          Repay
         </Button>
       ) : null;
     case "Collateral":
-        return state.loanId && state.userType === "Collector" ? (
+        return state.loanId && state.userType === "Collector" && state.loanId ? (
             <Button
             btnType={"primary"}
             className={styles.positionsCardActionButton}
@@ -35,7 +35,7 @@ export const PositionsButton: FC<PositionsButtonProps> = ({
             >
                 Collect
             </Button>
-        ) : state.userType === "Liquidator" ? (
+        ) : state.userType === "Liquidator" && state.loanId ? (
             <Button
             btnType={"primary"}
             className={styles.positionsCardActionButton}

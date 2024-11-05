@@ -21,16 +21,11 @@ import {
   displayRatio,
   displayCoinUSD,
   collateralizationRatioPercent,
-  displayCoin,
-  interest,
-  timestamp,
-  collectorReward,
-  maxLiquidationAmount,
-  liquidationReward,
-  liquidationPayment,
+  displayCoin
 } from "../../utils/calculations.ts";
 import { PositionsCard } from "../PositionsCard/PositionsCard.tsx";
 import { useGlobalState } from "../../hooks/useGlobalState.tsx";
+import { transformLoans } from "../../utils/loanUtils.ts";
 
 export const LoanOverview: FC = () => {
   const { state, setState } = useGlobalState();
@@ -47,44 +42,11 @@ export const LoanOverview: FC = () => {
   });
 
   useEffect(() => {
-    if (data && state.Window && state.Collateral) {
-      let loanEntity: LoanType = { ...data?.loanEntity };
-      loanEntity.interest = interest(
-        loanEntity.collateralAmount,
-        loanEntity.interestRate,
-        loanEntity.lastCollection,
-        timestamp, // Assuming current timestamp
-        state.Window.precision
-      )
-      loanEntity.collectorReward = collectorReward(
-        loanEntity.interest,
-        state.Window.collectorFee,
-        state.Window.precision
-      )
-      if (state.userType === "Liquidator") {
-        loanEntity.liquidationAmount = maxLiquidationAmount(
-          loanEntity.collateralAmount,
-          state.Collateral.latestPrice,
-          state.Collateral.aggregator.decimals,
-          loanEntity.liabilityAmount,
-          loanEntity.asset.latestPrice,
-          loanEntity.asset.aggregator.decimals,
-          loanEntity.liquidationRatio,
-          state.Window.precision,
-          state.Window.daoFee,
-          state.Window.liquidatorFee,
-        )
-
-        loanEntity.liquidatorReward = liquidationReward(
-          liquidationPayment(loanEntity.liquidationAmount, loanEntity.asset.latestPrice, state.Collateral.latestPrice, loanEntity.asset.aggregator.decimals, state.Collateral.aggregator.decimals, state.Window.liquidatorFee, state.Window.precision),
-          state.Window.liquidatorFee,
-          state.Window.precision,
-        )
-      }
-      console.log(loanEntity)
-      setState({...state, Loan: loanEntity });
+    if (data?.loanEntity && state.Collateral && state.Window) {
+      const [loan] = transformLoans([data.loanEntity], state.Collateral, state.Window);
+      setState && setState({ ...state, Loan: loan });
     }
-}, [data, state.Window]);
+  }, [data, isLoading]);
 
   if (isLoading) {
     return (

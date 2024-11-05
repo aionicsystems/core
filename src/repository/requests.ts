@@ -92,6 +92,8 @@ export const loanEntitiesByOwner = gql(`
     liabilityAmount
     liquidationRatio
     borrowingRatio
+    interestRate
+    lastCollection
     collectorFee
     daoFee
     liquidatorFee
@@ -165,3 +167,53 @@ export const windowEntities = gql(`
     }
   }
 `);
+
+export const entities = gql(`
+  query EntitiesQuery($sort_by: String, $sort_order: String) {
+  assetEntity (id: "0x0000000000000000000000000000000000000000") {
+    id
+    symbol
+    latestPrice
+    aggregator {
+      decimals
+    }
+  }
+  loanEntities(orderBy: $sort_by, orderDirection: $sort_order) {
+    id
+    collateralAmount
+    liabilityAmount
+    liquidationRatio
+    borrowingRatio
+    interestRate
+    lastCollection
+    collectorFee
+    daoFee
+    liquidatorFee
+    precision
+    asset {
+      id
+      latestPrice
+      rate
+      liquidationRatio
+      dataFeedAddress
+      symbol
+      name
+      aggregator {
+        decimals
+      }
+    }
+  __typename
+  }
+  windowEntities {
+    id
+    owner
+    borrowingRatio
+    collectorFee
+    daoFee
+    etherDataFeedAddress
+    liquidatorFee
+    precision
+  }
+}
+`);
+
