@@ -10,13 +10,35 @@ const SEED_PHRASE = process.env.SEED_PHRASE
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: {
-    version: "0.8.24",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 1000,
+    compilers: [
+      {
+        version: "0.8.24",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1000,
+          },
+        },
       },
-    },
+      {
+        version: "0.6.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1000,
+          },
+        },
+      },
+      {
+        version: "0.5.16",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1000,
+          },
+        },
+      },
+    ],
   },
   networks: {
     hardhat: {
@@ -33,6 +55,10 @@ module.exports = {
   dependencyCompiler: {
     paths: [
       '@openzeppelin/contracts/governance/Governor.sol',
+      '@uniswap/v2-core/contracts/UniswapV2Factory.sol',
+      '@uniswap/v2-periphery/contracts/UniswapV2Router02.sol',
+      '@uniswap/v2-periphery/contracts/test/WETH9.sol',
+      '@openzeppelin/contracts/token/ERC20/ERC20.sol',
     ],
   }
 };

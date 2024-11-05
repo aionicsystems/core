@@ -1,12 +1,16 @@
 const hre = require("hardhat");
 const path = require('node:path');
+// Importing required modules and libraries from the ethers.js library.
+const { Contract, ContractFactory } = require("ethers");
 const { system, patching, filesystem } = require('gluegun');
 const { createApolloFetch } = require('apollo-fetch');
 const { ethers } = require('hardhat');
 const srcDir = path.join(__dirname, '..');
-
-// Remove node-fetch import if using Node.js v18+
-// const fetch = require('node-fetch'); // Remove this line if on Node.js v18+
+const factoryArtifact = require("@uniswap/v2-core/build/UniswapV2Factory.json");
+const routerArtifact = require("@uniswap/v2-periphery/build/UniswapV2Router02.json");
+const pairArtifact = require("@uniswap/v2-periphery/build/IUniswapV2Pair.json");
+const USDTArtifact = require("@openzeppelin/contracts/build/contracts/ERC20.json");
+const WETH9 = require("@uniswap/v2-periphery/build/WETH9.json");
 
 const fetchSubgraphs = createApolloFetch({ uri: 'http://localhost:8030/graphql' });
 const fetchSubgraph = createApolloFetch({
@@ -63,6 +67,108 @@ async function deployConstantChainlinkFeed() {
   const feed = await ConstantChainlinkFeed.deploy();
   await feed.waitForDeployment();
   return feed;
+}
+
+async function deployUniswapContracts(owner) {
+  console.log(`Deploying contracts with the account: ${owner.address}`);
+
+  // 2. Initialize a new contract factory for the Uniswap V2 Factory.
+  // This factory requires the ABI and bytecode from the factoryArtifact.
+  const Factory = new ContractFactory(
+    factoryArtifact.abi,
+    factoryArtifact.bytecode,
+    owner
+  );
+
+  // 3. Use the initialized factory to deploy a new Factory contract.
+  // The deployment is signed by the owner.
+  const factory = await Factory.deploy(owner.address);
+
+  // 4. After deployment, retrieve the address of the newly deployed Factory contract.
+  const factoryAddress = await factory.getAddress();
+  console.log(`Factory deployed to ${factoryAddress}`);
+
+  // 18. Initialize a new contract factory for the WETH9 contract.
+  const WETH = new ContractFactory(WETH9.abi, WETH9.bytecode, owner);
+  const weth = await WETH.deploy();
+  const wethAddress = await weth.getAddress();
+  console.log(`WETH deployed to ${wethAddress}`);
+
+  const wethDeposit = await weth.deposit({ value: ethers.parseEther("1000") });
+
+  // 19. Initialize a new contract factory for the Router contract.
+  const Router = new ContractFactory(
+    routerArtifact.abi,
+    routerArtifact.bytecode,
+    owner
+  );
+
+  // 20. Deploy the Router contract using the above-initialized factory.
+  const router = await Router.deploy(factoryAddress, wethAddress);
+  const routerAddress = await router.getAddress();
+  console.log(`Router deployed to ${routerAddress}`);
+
+  return { factory, router, weth };
+}
+
+async function addLiquidity(router, tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline) {
+  // Check if tokenA and tokenB are contract addresses
+  const codeA = await hre.ethers.provider.getCode(tokenA);
+  const codeB = await hre.ethers.provider.getCode(tokenB);
+
+  if (codeA === '0x' || codeB === '0x') {
+    throw new Error('One of the token addresses is not a contract');
+  }
+
+  // Approve the router to spend the tokens
+  const tokenAContract = await hre.ethers.getContractAt("@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20", tokenA);
+  const tokenBContract = await hre.ethers.getContractAt("WETH9", await tokenB);
+
+  const routerAddress = await router.getAddress();
+
+  // Check balances
+  const balanceA = await tokenAContract.balanceOf(to);
+  const balanceB = await tokenBContract.balanceOf(to);
+  console.log(`Balance of tokenA: ${balanceA.toString()}`);
+  console.log(`Balance of tokenB: ${balanceB.toString()}`);
+
+  if (Number(balanceA) < Number(amountADesired) || Number(balanceB) < Number(amountBDesired)) {
+    console.log(`AmountA: ${amountADesired.toString()}, AmountB: ${amountBDesired.toString()}`);
+    console.log(`BalanceA: ${balanceA.toString()}, BalanceB: ${balanceB.toString()}`);
+    throw new Error('Insufficient token balance');
+  }
+
+  // Approve tokens
+  const allowanceA = await tokenAContract.allowance(to, routerAddress);
+  const allowanceB = await tokenBContract.allowance(to, routerAddress);
+  console.log(`Allowance of tokenA: ${allowanceA.toString()}`);
+  console.log(`Allowance of tokenB: ${allowanceB.toString()}`);
+
+  if (Number(allowanceA) < Number(amountADesired)) {
+    const approveTxA = await tokenAContract.approve(routerAddress, amountADesired);
+    await approveTxA.wait();
+    console.log(`Approved ${amountADesired.toString()} of tokenA to router`);
+  }
+
+  if (Number(allowanceB) < Number(amountBDesired)) {
+    const approveTxB = await tokenBContract.approve(routerAddress, amountBDesired);
+    await approveTxB.wait();
+    console.log(`Approved ${amountBDesired.toString()} of tokenB to router`);
+  }
+
+  // Add liquidity
+  const tx = await router.addLiquidity(
+    tokenA,
+    tokenB,
+    amountADesired,
+    amountBDesired,
+    amountAMin,
+    amountBMin,
+    to,
+    deadline
+  );
+  await tx.wait();
+  console.log(`Liquidity added for pair ${tokenA} - ${tokenB}`);
 }
 
 async function approveAsset(windowContract, dataFeedAddress, name, symbol, collateralFactor, liquidationFactor) {
@@ -229,6 +335,21 @@ async function main() {
     for (let i = 1; i <= 2; i++) {
       const loanContract = Loan.attach(loanAddresses[i]);
       await loanContract.collect();
+    }
+
+    // Deploy Uniswap contracts
+    const { factory, router, weth } = await deployUniswapContracts(owner);
+
+    // Add liquidity for each asset pair with USDT
+    for (const asset of assets) {
+      const assetAddress = assetAddresses[asset.symbol];
+      const amountTokenDesired = ethers.parseUnits("1", 18); // Example amount
+      const amountTokenMin = ethers.parseUnits("1", 18); // Example amount
+      const amountUSDTDesired = ethers.parseUnits("10", 6); // Example amount (USDT typically has 6 decimals)
+      const amountUSDTMin = ethers.parseUnits("90", 6); // Example amount (USDT typically has 6 decimals)
+      const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from the current Unix time
+      console.log(`Adding liquidity for ${assetAddress} - USDT pair...`);
+      await addLiquidity(router, assetAddress, weth.getAddress(), amountTokenDesired, amountUSDTDesired, amountTokenMin, amountUSDTMin, owner.address, deadline);
     }
 
     // Start continuous price updates for non-constant feeds
