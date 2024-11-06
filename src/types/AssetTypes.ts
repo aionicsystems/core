@@ -7,6 +7,7 @@ export type AssetType = {
   latestPrice: BigInt;
   liquidationRatio: BigInt;
   aggregator: {
+    id: string;
     decimals: BigInt;
   };
 };

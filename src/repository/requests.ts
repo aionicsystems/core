@@ -83,6 +83,7 @@ export const loanEntitiesByOwner = gql(`
     symbol
     latestPrice
     aggregator {
+      id
       decimals
     }
   }
@@ -107,6 +108,7 @@ export const loanEntitiesByOwner = gql(`
       symbol
       name
       aggregator {
+        id
         decimals
       }
     }
@@ -138,12 +140,25 @@ export const loanSingleEntity = gql(
       symbol
       name
       aggregator {
+        id
         decimals
       }
     }
   }
 }`,
 );
+
+export const aggregatorEntity = gql(
+  `query aggregatorEntity ($id: Bytes) {
+  aggregatorEntity(id: $id) {
+    id
+    decimals
+    prices(orderDirection: asc, orderBy: blockTimestamp) {
+      blockTimestamp
+      price
+    }
+  }
+}`);
 
 export const windowEntities = gql(`
   query WindowEntitiesQuery {
@@ -175,6 +190,7 @@ export const entities = gql(`
     symbol
     latestPrice
     aggregator {
+      id
       decimals
     }
   }
@@ -199,6 +215,7 @@ export const entities = gql(`
       symbol
       name
       aggregator {
+        id
         decimals
       }
     }
