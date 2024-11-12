@@ -1,10 +1,10 @@
 import { log } from "@graphprotocol/graph-ts";
 import {
   LoanEntity as LoanEntityEvent,
-} from "../generated/templates/Loan/Loan"
+} from "../../generated/templates/Loan/Loan"
 import {
   LoanEntity,
-} from "../generated/schema"
+} from "../../generated/schema"
 
 
 export function handleLoanEntity(event: LoanEntityEvent): void {

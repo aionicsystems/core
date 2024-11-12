@@ -3,6 +3,7 @@ type AssetEntity @entity {
   name: String! # string
   symbol: String! # string
   dataFeedAddress: Bytes! # address
+  decimals: Int! # uint8
   aggregator: AggregatorEntity! # address
   rate: BigInt! # 500 = 5%
   liquidationRatio: BigInt! # 12500 = 125%
@@ -73,4 +74,28 @@ type WindowEntity @entity {
   daoFee: BigInt! # uint32
   liquidatorFee: BigInt! # uint32
   precision: Int! # uint8
+}
+
+type PairEntity @entity {
+  # pair address
+  id: ID!
+  asset0: AssetEntity!
+  asset1: AssetEntity!
+  reserve0: BigInt!
+  reserve1: BigInt!
+  decimals: Int
+  prices: [PriceEntity!] @derivedFrom(field: "pair")
+}
+
+type PriceEntity @entity {
+  id: Bytes! # Address of Price
+  pair: PairEntity!
+  asset0: AssetEntity!
+  asset1: AssetEntity!
+  reserve0: BigInt!
+  reserve1: BigInt!
+  price: BigInt! # uint256 // needs to be equivalent to aggregator price format
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }

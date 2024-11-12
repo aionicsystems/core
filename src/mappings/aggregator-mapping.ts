@@ -1,8 +1,8 @@
 import { Address, dataSource } from "@graphprotocol/graph-ts";
 import {
   AnswerUpdated as AnswerUpdatedEvent,
-} from "../generated/templates/Aggregator/AggregatorInterface";
-import { AggregatorEntity, AssetEntity, DataPointEntity } from "../generated/schema";
+} from "../../generated/templates/Aggregator/AggregatorInterface";
+import { AggregatorEntity, AssetEntity, DataPointEntity } from "../../generated/schema";
 
 const ID = "id";
 

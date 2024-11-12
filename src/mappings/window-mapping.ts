@@ -4,7 +4,7 @@ import {
   LoanEntity as LoanEntityEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
   WindowEntity as WindowEntityEvent
-} from "../generated/Window/Window"
+} from "../../generated/Window/Window"
 import {
   AggregatorEntity,
   AssetEntity,
@@ -12,8 +12,8 @@ import {
   OwnerEntity,
   OwnershipTransferred,
   WindowEntity
-} from "../generated/schema"
-import { Aggregator as AggregatorTemplate, Loan as LoanTemplate } from "../generated/templates";
+} from "../../generated/schema"
+import { Aggregator as AggregatorTemplate, Loan as LoanTemplate } from "../../generated/templates";
 
 const ID = "id";
 
@@ -25,6 +25,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.name = event.params.name
   asset.symbol = event.params.symbol
   asset.dataFeedAddress = event.params.dataFeedAddress
+  asset.decimals = event.params.decimals
   asset.aggregator = event.params.aggregatorAddress
   asset.rate = event.params.rate
   asset.liquidationRatio = event.params.liquidationRatio

@@ -32,7 +32,29 @@ dataSources:
           handler: handleWindowEntity
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-      file: ./src/mapping.ts
+      file: ./src/mappings/window-mapping.ts
+
+  - kind: ethereum/contract
+    name: Factory
+    network: test
+    source:
+      address: '0x068cD8dd6F1ddD374292821F51124E27dF0FA262'
+      abi: Factory
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/factory-mapping.ts
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: Factory
+          file: ./artifacts/@uniswap/v2-core/contracts/UniswapV2Factory.sol/UniswapV2Factory.json
+      eventHandlers:
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handleNewPair
 templates:
   - name: Aggregator
     kind: ethereum/contract
@@ -43,7 +65,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/price-data-feed.ts
+      file: ./src/mappings/aggregator-mapping.ts
       entities:
         - AggregatorEntity
         - DataPointEntity
@@ -62,7 +84,7 @@ templates:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
-      file: ./src/loan-mapping.ts
+      file: ./src/mappings/loan-mapping.ts
       entities:
         - LoanEntity
       abis:
@@ -71,3 +93,32 @@ templates:
       eventHandlers:
         - event: LoanEntity(indexed address,address,uint256,address,uint256,uint32,uint32,uint32,uint256,uint32,uint32,uint32,uint8)
           handler: handleLoanEntity
+  - name: Pair
+    kind: ethereum/contract
+    network: test
+    source:
+      abi: Pair
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      file: ./src/mappings/pair-mapping.ts
+      entities:
+        - Pair
+        - Token
+      abis:
+        - name: Pair
+          file: ./artifacts/@uniswap/v2-core/contracts/UniswapV2Pair.sol/UniswapV2Pair.json
+        - name: Factory
+          file: ./artifacts/@uniswap/v2-core/contracts/UniswapV2Factory.sol/UniswapV2Factory.json
+      eventHandlers:
+        - event: Mint(indexed address,uint256,uint256)
+          handler: handleMint
+        - event: Burn(indexed address,uint256,uint256,indexed address)
+          handler: handleBurn
+        - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
+          handler: handleSwap
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Sync(uint112,uint112)
+          handler: handleSync

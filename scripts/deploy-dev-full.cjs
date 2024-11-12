@@ -88,6 +88,12 @@ async function deployUniswapContracts(owner) {
   const factoryAddress = await factory.getAddress();
   console.log(`Factory deployed to ${factoryAddress}`);
 
+  await patching.replace(
+    path.join(srcDir, 'subgraph.yaml'),
+    'DEPLOYED_UNISWAP_FACTORY_ADDRESS',
+    factoryAddress,
+  );
+
   // 18. Initialize a new contract factory for the WETH9 contract.
   const WETH = new ContractFactory(WETH9.abi, WETH9.bytecode, owner);
   const weth = await WETH.deploy();

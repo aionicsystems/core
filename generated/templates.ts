@@ -29,3 +29,13 @@ export class Loan extends DataSourceTemplate {
     DataSourceTemplate.createWithContext("Loan", [address.toHex()], context);
   }
 }
+
+export class Pair extends DataSourceTemplate {
+  static create(address: Address): void {
+    DataSourceTemplate.create("Pair", [address.toHex()]);
+  }
+
+  static createWithContext(address: Address, context: DataSourceContext): void {
+    DataSourceTemplate.createWithContext("Pair", [address.toHex()], context);
+  }
+}
