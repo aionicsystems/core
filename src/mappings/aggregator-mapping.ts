@@ -11,24 +11,24 @@ export function handleAnswerUpdated(event: AnswerUpdatedEvent): void {
   let addressString = context.getString(ID);
   let address = Address.fromString(addressString);
 
-  // Create a new PriceDataPoint
-  let dataPointId = event.transaction.hash; // txHash as bytes
-  let dataPoint = new DataPointEntity(dataPointId); // id is txHash
-  dataPoint.aggregator = address; // address of this feed
-  dataPoint.price = event.params.current; // BigInt
-  dataPoint.roundId = event.params.roundId; // BigInt
-  dataPoint.blockNumber = event.block.number;
-  dataPoint.blockTimestamp = event.params.updatedAt; // BigInt
-  
   let aggregator = AggregatorEntity.load(address)
   if (aggregator != null) {
+
+    // Create a new PriceDataPoint
+    let dataPointId = event.transaction.hash; // txHash as bytes
+    let dataPoint = new DataPointEntity(dataPointId); // id is txHash
+    dataPoint.asset = aggregator.asset; // String
+    dataPoint.price = event.params.current.toBigDecimal().div(aggregator.decimals); // BigDecimal
+    dataPoint.roundId = event.params.roundId; // BigInt
+    dataPoint.blockNumber = event.block.number;
+    dataPoint.blockTimestamp = event.params.updatedAt; // BigInt
+
     let asset = AssetEntity.load(aggregator.asset)
     if (asset != null) {
       asset.latestPrice = dataPoint.price;
       asset.save();
     }
-    dataPoint.asset = aggregator.asset
-  }
 
-  dataPoint.save();
+    dataPoint.save();
+  }
 }

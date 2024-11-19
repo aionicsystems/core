@@ -375,7 +375,10 @@ async function main() {
         try {
           const newPrice = await fetchExchangeRate(currencyCode);
           const newPriceScaled = BigInt(Math.round(newPrice * 10 ** Number(decimals)));
-          await simulatePriceChange(assetPriceFeeds, symbol, newPriceScaled);
+          const currentPrice = await assetPriceFeeds[symbol].latestAnswer();
+          if (currentPrice !== newPriceScaled) {
+            await simulatePriceChange(assetPriceFeeds, symbol, newPriceScaled);
+          }
         } catch (error) {
           console.error(`Failed to update price for ${symbol}: ${error.message}`);
         }

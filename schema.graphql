@@ -11,7 +11,7 @@ type AssetEntity @entity {
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   loans: [LoanEntity!]! @derivedFrom(field: "asset")
-  latestPrice: BigInt! # int256
+  latestPrice: BigDecimal! # USD/ASSET
   prices: [DataPointEntity!] @derivedFrom(field: "asset")
 }
 
@@ -59,7 +59,7 @@ type DataPointEntity @entity {
   id: Bytes! # bytes - transaction hash
   asset: AssetEntity!
   aggregator: AggregatorEntity!
-  price: BigInt! # int256
+  price: BigDecimal! # int256
   roundId: BigInt! # uint256
   blockNumber: BigInt! # uint256
   blockTimestamp: BigInt! # uint256
@@ -77,13 +77,11 @@ type WindowEntity @entity {
 }
 
 type PairEntity @entity {
-  # pair address
   id: ID!
   asset0: AssetEntity!
   asset1: AssetEntity!
   reserve0: BigInt!
   reserve1: BigInt!
-  decimals: Int
   prices: [PriceEntity!] @derivedFrom(field: "pair")
 }
 
@@ -94,7 +92,7 @@ type PriceEntity @entity {
   asset1: AssetEntity!
   reserve0: BigInt!
   reserve1: BigInt!
-  price: BigInt! # uint256 // needs to be equivalent to aggregator price format
+  price: BigDecimal! # uint256 // needs to be equivalent to aggregator price format
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!

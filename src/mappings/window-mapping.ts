@@ -1,10 +1,12 @@
 import { log, DataSourceContext } from "@graphprotocol/graph-ts";
+
 import {
   AssetEntity as AssetEntityEvent,
   LoanEntity as LoanEntityEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
   WindowEntity as WindowEntityEvent
 } from "../../generated/Window/Window"
+
 import {
   AggregatorEntity,
   AssetEntity,
@@ -33,7 +35,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.blockNumber = event.block.number
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
-  asset.latestPrice = event.params.latestPrice
+  asset.latestPrice = event.params.latestPrice.toBigDecimal().div(asset.decimals); // BigDecimal
   
   asset.save()
 
