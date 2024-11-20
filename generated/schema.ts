@@ -212,6 +212,27 @@ export class AssetEntity extends Entity {
       "prices",
     );
   }
+
+  get latestMarketPrice(): BigDecimal {
+    let value = this.get("latestMarketPrice");
+    if (!value || value.kind == ValueKind.NULL) {
+      throw new Error("Cannot return null for a required field.");
+    } else {
+      return value.toBigDecimal();
+    }
+  }
+
+  set latestMarketPrice(value: BigDecimal) {
+    this.set("latestMarketPrice", Value.fromBigDecimal(value));
+  }
+
+  get marketPrices(): PriceEntityLoader {
+    return new PriceEntityLoader(
+      "AssetEntity",
+      this.get("id")!.toBytes().toHexString(),
+      "marketPrices",
+    );
+  }
 }
 
 export class LoanEntity extends Entity {
@@ -1105,8 +1126,8 @@ export class PriceEntity extends Entity {
     this.set("pair", Value.fromString(value));
   }
 
-  get asset0(): Bytes {
-    let value = this.get("asset0");
+  get asset(): Bytes {
+    let value = this.get("asset");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
@@ -1114,47 +1135,8 @@ export class PriceEntity extends Entity {
     }
   }
 
-  set asset0(value: Bytes) {
-    this.set("asset0", Value.fromBytes(value));
-  }
-
-  get asset1(): Bytes {
-    let value = this.get("asset1");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBytes();
-    }
-  }
-
-  set asset1(value: Bytes) {
-    this.set("asset1", Value.fromBytes(value));
-  }
-
-  get reserve0(): BigInt {
-    let value = this.get("reserve0");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set reserve0(value: BigInt) {
-    this.set("reserve0", Value.fromBigInt(value));
-  }
-
-  get reserve1(): BigInt {
-    let value = this.get("reserve1");
-    if (!value || value.kind == ValueKind.NULL) {
-      throw new Error("Cannot return null for a required field.");
-    } else {
-      return value.toBigInt();
-    }
-  }
-
-  set reserve1(value: BigInt) {
-    this.set("reserve1", Value.fromBigInt(value));
+  set asset(value: Bytes) {
+    this.set("asset", Value.fromBytes(value));
   }
 
   get price(): BigDecimal {

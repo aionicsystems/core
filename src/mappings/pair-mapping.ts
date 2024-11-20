@@ -6,7 +6,7 @@ import {
 
 import { AssetEntity } from "../../generated/schema"
 import { UniswapV2Pair } from "../../generated/UniswapV2Pair/UniswapV2Pair"
-import { BigDecimal, BigInt, Address } from "@graphprotocol/graph-ts"
+import { BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 
 export function handleSwap(event: SwapEvent): void {
     // Load the pair contract to get token addresses
@@ -23,23 +23,20 @@ export function handleSwap(event: SwapEvent): void {
     let assetETH: AssetEntity | null = null
     let asset: AssetEntity | null = null
 
-    // Need to orient properly
-    let asset0 = AssetEntity.load(token0Address.toHex())
-    if (asset0 != null) {
-        if (asset0.symbol == "WETH" || asset0.symbol == "ETH") {
-            assetETH = asset0
-        } else {
-            asset = asset0
-        }
-    }
-
     let amountETHTotal = BigInt.fromI32(0)
     let amountAssetTotal = BigInt.fromI32(0)
-  
+    
+    let asset0 = AssetEntity.load(token0Address.toHex())
     let asset1 = AssetEntity.load(token1Address.toHex())
-    if (asset1 != null) {
+    
+    // Create a new PriceEntity
+    let priceId = event.transaction.hash.toHex()
+    let priceEntity = new PriceEntity(priceId)
+
+    if (asset1 != null && asset0 != null) {
         if (asset1.symbol == "WETH" || asset1.symbol == "ETH") {
             assetETH = asset1
+            asset = asset0
             // Determine the swap direction and calculate the price
             amountETHTotal = amount1In.gt(BigInt.zero())
               ? amount1In
@@ -47,7 +44,10 @@ export function handleSwap(event: SwapEvent): void {
             amountAssetTotal = amount0In.gt(BigInt.zero())
               ? amount0In
               : amount0Out
-        } else {
+        }
+
+        if (asset0.symbol == "WETH" || asset0.symbol == "ETH") {
+            assetETH = asset0
             asset = asset1
             // Determine the swap direction and calculate the price
             amountETHTotal = amount0In.gt(BigInt.zero())
@@ -66,7 +66,7 @@ export function handleSwap(event: SwapEvent): void {
 
     // Initialize price variable
     let ethAssetPrice: BigDecimal
-    ethAssetPrice = amountETHTotal.times(new BigInt(Math.pow(10,8))).div(amountAssetTotal.toBigDecimal())
+    ethAssetPrice = (amountETHTotal.toBigDecimal()).div(amountAssetTotal.toBigDecimal())
 
     // Fetch the ETH/USD price from the AssetEntity for ETH
     let ethUSDPrice = assetETH.latestPrice
@@ -78,22 +78,15 @@ export function handleSwap(event: SwapEvent): void {
     let usdAssetPrice = ethAssetPrice.times(ethUSDPrice.toBigDecimal())
     console.log(`USD/Asset Price: ${usdAssetPrice.toString()}`)
 
-    // Create a new PriceEntity
-    let priceId = event.transaction.hash.toHex()
-    let priceEntity = new PriceEntity(priceId)
+   
     priceEntity.pair = event.address.toHex()
-    priceEntity.asset0 = asset0.id
-    priceEntity.asset1 = asset1.id
+    priceEntity.asset = asset.id
     priceEntity.reserve0 = amount0In.plus(amount0Out)
     priceEntity.reserve1 = amount1In.plus(amount1Out)
-    priceEntity.price = usdAssetPrice.times(new BigDecimal(Math.pow(10, 8)) truncate(0) // Convert BigDecimal to BigInt
+    priceEntity.price = usdAssetPrice
     priceEntity.blockNumber = event.block.number
     priceEntity.blockTimestamp = event.block.timestamp
     priceEntity.transactionHash = event.transaction.hash
 
     priceEntity.save()
-}
-
-function toDecimal(value: BigInt, decimals: i32): BigDecimal {
-    return value.toBigDecimal().div(BigInt.fromI32(10).pow(decimals as u8).toBigDecimal())
 }

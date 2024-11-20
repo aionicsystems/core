@@ -13,6 +13,8 @@ type AssetEntity @entity {
   loans: [LoanEntity!]! @derivedFrom(field: "asset")
   latestPrice: BigDecimal! # USD/ASSET
   prices: [DataPointEntity!] @derivedFrom(field: "asset")
+  latestMarketPrice: BigDecimal! # USD/ASSET
+  marketPrices: [PriceEntity!] @derivedFrom(field: "asset")
 }
 
 type LoanEntity @entity {
@@ -88,10 +90,7 @@ type PairEntity @entity {
 type PriceEntity @entity {
   id: Bytes! # Address of Price
   pair: PairEntity!
-  asset0: AssetEntity!
-  asset1: AssetEntity!
-  reserve0: BigInt!
-  reserve1: BigInt!
+  asset: AssetEntity!
   price: BigDecimal! # uint256 // needs to be equivalent to aggregator price format
   blockNumber: BigInt!
   blockTimestamp: BigInt!
