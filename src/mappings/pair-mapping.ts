@@ -1,19 +1,15 @@
 import {
     PairEntity,
     PriceEntity,
-    Swap as SwapEvent
-} from '../types/schema'
+    AssetEntity
+} from '../../generated/schema'
 
-import { AssetEntity } from "../../generated/schema"
-import { UniswapV2Pair } from "../../generated/UniswapV2Pair/UniswapV2Pair"
+import { Swap as SwapEvent } from "../../generated/templates/Pair/Pair"
 import { BigDecimal, BigInt } from "@graphprotocol/graph-ts"
 
 export function handleSwap(event: SwapEvent): void {
-    // Load the pair contract to get token addresses
-    let pairContract = UniswapV2Pair.bind(event.address)
-    let token0Address = pairContract.token0()
-    let token1Address = pairContract.token1()
-    
+    let pair = PairEntity.load(event.address);
+    if (!pair) {return}
     // Extract amounts from the event
     let amount0In = event.params.amount0In
     let amount1In = event.params.amount1In
@@ -26,12 +22,10 @@ export function handleSwap(event: SwapEvent): void {
     let amountETHTotal = BigInt.fromI32(0)
     let amountAssetTotal = BigInt.fromI32(0)
     
-    let asset0 = AssetEntity.load(token0Address.toHex())
-    let asset1 = AssetEntity.load(token1Address.toHex())
+    let asset0 = AssetEntity.load(pair.asset0)
+    let asset1 = AssetEntity.load(pair.asset1)
     
-    // Create a new PriceEntity
-    let priceId = event.transaction.hash.toHex()
-    let priceEntity = new PriceEntity(priceId)
+    let priceEntity = new PriceEntity(event.transaction.hash)
 
     if (asset1 != null && asset0 != null) {
         if (asset1.symbol == "WETH" || asset1.symbol == "ETH") {
@@ -70,23 +64,20 @@ export function handleSwap(event: SwapEvent): void {
 
     // Fetch the ETH/USD price from the AssetEntity for ETH
     let ethUSDPrice = assetETH.latestPrice
-    if (ethUSDPrice == null) {
-        return
-    }
 
     // Calculate the USD/asset price
     let usdAssetPrice = ethAssetPrice.times(ethUSDPrice)
     console.log(`USD/Asset Price: ${usdAssetPrice.toString()}`)
 
+    asset.latestMarketPrice = usdAssetPrice;
+    asset.save();
    
-    priceEntity.pair = event.address.toHex()
+    priceEntity.pair = event.address
     priceEntity.asset = asset.id
-    priceEntity.reserve0 = amount0In.plus(amount0Out)
-    priceEntity.reserve1 = amount1In.plus(amount1Out)
     priceEntity.price = usdAssetPrice
     priceEntity.blockNumber = event.block.number
     priceEntity.blockTimestamp = event.block.timestamp
     priceEntity.transactionHash = event.transaction.hash
-
+    console.log(`PriceEntity: ${priceEntity.price.toString()}`)
     priceEntity.save()
 }

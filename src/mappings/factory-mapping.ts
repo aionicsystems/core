@@ -7,7 +7,7 @@ import { DataSourceContext } from "@graphprotocol/graph-ts";
 const ID = "id";
 
 export function handleNewPair(event: PairCreated): void {
-  let pair = new PairEntity(event.params.pair.toHexString())
+  let pair = new PairEntity(event.params.pair)
   
   // This needs to be updated after local testnet
   pair.asset0 = event.params.token0

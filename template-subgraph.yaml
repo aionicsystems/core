@@ -112,13 +112,5 @@ templates:
         - name: Factory
           file: ./artifacts/@uniswap/v2-core/contracts/UniswapV2Factory.sol/UniswapV2Factory.json
       eventHandlers:
-        - event: Mint(indexed address,uint256,uint256)
-          handler: handleMint
-        - event: Burn(indexed address,uint256,uint256,indexed address)
-          handler: handleBurn
         - event: Swap(indexed address,uint256,uint256,uint256,uint256,indexed address)
           handler: handleSwap
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: Sync(uint112,uint112)
-          handler: handleSync

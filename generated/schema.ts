@@ -971,9 +971,9 @@ export class WindowEntity extends Entity {
 }
 
 export class PairEntity extends Entity {
-  constructor(id: string) {
+  constructor(id: Bytes) {
     super();
-    this.set("id", Value.fromString(id));
+    this.set("id", Value.fromBytes(id));
   }
 
   save(): void {
@@ -981,32 +981,36 @@ export class PairEntity extends Entity {
     assert(id != null, "Cannot save PairEntity entity without an ID");
     if (id) {
       assert(
-        id.kind == ValueKind.STRING,
-        `Entities of type PairEntity must have an ID of type String but the id '${id.displayData()}' is of type ${id.displayKind()}`,
+        id.kind == ValueKind.BYTES,
+        `Entities of type PairEntity must have an ID of type Bytes but the id '${id.displayData()}' is of type ${id.displayKind()}`,
       );
-      store.set("PairEntity", id.toString(), this);
+      store.set("PairEntity", id.toBytes().toHexString(), this);
     }
   }
 
-  static loadInBlock(id: string): PairEntity | null {
-    return changetype<PairEntity | null>(store.get_in_block("PairEntity", id));
+  static loadInBlock(id: Bytes): PairEntity | null {
+    return changetype<PairEntity | null>(
+      store.get_in_block("PairEntity", id.toHexString()),
+    );
   }
 
-  static load(id: string): PairEntity | null {
-    return changetype<PairEntity | null>(store.get("PairEntity", id));
+  static load(id: Bytes): PairEntity | null {
+    return changetype<PairEntity | null>(
+      store.get("PairEntity", id.toHexString()),
+    );
   }
 
-  get id(): string {
+  get id(): Bytes {
     let value = this.get("id");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set id(value: string) {
-    this.set("id", Value.fromString(value));
+  set id(value: Bytes) {
+    this.set("id", Value.fromBytes(value));
   }
 
   get asset0(): Bytes {
@@ -1064,7 +1068,7 @@ export class PairEntity extends Entity {
   get prices(): PriceEntityLoader {
     return new PriceEntityLoader(
       "PairEntity",
-      this.get("id")!.toString(),
+      this.get("id")!.toBytes().toHexString(),
       "prices",
     );
   }
@@ -1113,17 +1117,17 @@ export class PriceEntity extends Entity {
     this.set("id", Value.fromBytes(value));
   }
 
-  get pair(): string {
+  get pair(): Bytes {
     let value = this.get("pair");
     if (!value || value.kind == ValueKind.NULL) {
       throw new Error("Cannot return null for a required field.");
     } else {
-      return value.toString();
+      return value.toBytes();
     }
   }
 
-  set pair(value: string) {
-    this.set("pair", Value.fromString(value));
+  set pair(value: Bytes) {
+    this.set("pair", Value.fromBytes(value));
   }
 
   get asset(): Bytes {

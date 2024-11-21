@@ -56,6 +56,7 @@ module.exports = {
     paths: [
       '@openzeppelin/contracts/governance/Governor.sol',
       '@uniswap/v2-core/contracts/UniswapV2Factory.sol',
+      '@uniswap/v2-core/contracts/UniswapV2Pair.sol',
       '@uniswap/v2-periphery/contracts/UniswapV2Router02.sol',
       '@uniswap/v2-periphery/contracts/test/WETH9.sol',
       '@openzeppelin/contracts/token/ERC20/ERC20.sol',

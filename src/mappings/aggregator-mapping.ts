@@ -1,23 +1,15 @@
-import { Address, dataSource } from "@graphprotocol/graph-ts";
 import {
   AnswerUpdated as AnswerUpdatedEvent,
 } from "../../generated/templates/Aggregator/AggregatorInterface";
 import { AggregatorEntity, AssetEntity, DataPointEntity } from "../../generated/schema";
 import { convertPriceToDecimal } from "./util";
 
-const ID = "id";
-
 export function handleAnswerUpdated(event: AnswerUpdatedEvent): void {
-  let context = dataSource.context();
-  let addressString = context.getString(ID);
-  let address = Address.fromString(addressString);
-
-  let aggregator = AggregatorEntity.load(address)
+  let aggregator = AggregatorEntity.load(event.address)
   if (aggregator != null) {
 
     // Create a new PriceDataPoint
-    let dataPointId = event.transaction.hash; // txHash as bytes
-    let dataPoint = new DataPointEntity(dataPointId); // id is txHash
+    let dataPoint = new DataPointEntity(event.transaction.hash); // id is txHash
     dataPoint.asset = aggregator.asset; // String
     dataPoint.price = convertPriceToDecimal(event.params.current, aggregator.decimals); // BigDecimal
     dataPoint.roundId = event.params.roundId; // BigInt

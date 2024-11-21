@@ -39,7 +39,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
   asset.latestPrice = convertPriceToDecimal(event.params.latestPrice, event.params.decimals);
-  
+  asset.latestMarketPrice = asset.latestPrice;
   asset.save()
 
   // Create the new Price Data Feed Template
