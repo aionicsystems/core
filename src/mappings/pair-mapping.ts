@@ -75,7 +75,7 @@ export function handleSwap(event: SwapEvent): void {
     }
 
     // Calculate the USD/asset price
-    let usdAssetPrice = ethAssetPrice.times(ethUSDPrice.toBigDecimal())
+    let usdAssetPrice = ethAssetPrice.times(ethUSDPrice)
     console.log(`USD/Asset Price: ${usdAssetPrice.toString()}`)
 
    

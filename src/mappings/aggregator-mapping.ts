@@ -3,6 +3,7 @@ import {
   AnswerUpdated as AnswerUpdatedEvent,
 } from "../../generated/templates/Aggregator/AggregatorInterface";
 import { AggregatorEntity, AssetEntity, DataPointEntity } from "../../generated/schema";
+import { convertPriceToDecimal } from "./util";
 
 const ID = "id";
 
@@ -18,7 +19,7 @@ export function handleAnswerUpdated(event: AnswerUpdatedEvent): void {
     let dataPointId = event.transaction.hash; // txHash as bytes
     let dataPoint = new DataPointEntity(dataPointId); // id is txHash
     dataPoint.asset = aggregator.asset; // String
-    dataPoint.price = event.params.current.toBigDecimal().div(aggregator.decimals); // BigDecimal
+    dataPoint.price = convertPriceToDecimal(event.params.current, aggregator.decimals); // BigDecimal
     dataPoint.roundId = event.params.roundId; // BigInt
     dataPoint.blockNumber = event.block.number;
     dataPoint.blockTimestamp = event.params.updatedAt; // BigInt

@@ -15,7 +15,10 @@ import {
   OwnershipTransferred,
   WindowEntity
 } from "../../generated/schema"
+
 import { Aggregator as AggregatorTemplate, Loan as LoanTemplate } from "../../generated/templates";
+
+import { convertPriceToDecimal } from "./util";
 
 const ID = "id";
 
@@ -35,7 +38,7 @@ export function handleAssetEntity(event: AssetEntityEvent): void {
   asset.blockNumber = event.block.number
   asset.blockTimestamp = event.block.timestamp
   asset.transactionHash = event.transaction.hash
-  asset.latestPrice = event.params.latestPrice.toBigDecimal().div(asset.decimals); // BigDecimal
+  asset.latestPrice = convertPriceToDecimal(event.params.latestPrice, event.params.decimals);
   
   asset.save()
 
