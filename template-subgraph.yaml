@@ -68,6 +68,7 @@ templates:
       file: ./src/mappings/aggregator-mapping.ts
       entities:
         - AggregatorEntity
+        - AssetEntity
         - DataPointEntity
       abis:
         - name: AggregatorInterface

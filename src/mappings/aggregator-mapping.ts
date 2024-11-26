@@ -11,6 +11,7 @@ export function handleAnswerUpdated(event: AnswerUpdatedEvent): void {
     // Create a new PriceDataPoint
     let dataPoint = new DataPointEntity(event.transaction.hash); // id is txHash
     dataPoint.asset = aggregator.asset; // String
+    dataPoint.aggregator = event.address; // String
     dataPoint.price = convertPriceToDecimal(event.params.current, aggregator.decimals); // BigDecimal
     dataPoint.roundId = event.params.roundId; // BigInt
     dataPoint.blockNumber = event.block.number;
