@@ -1,5 +1,5 @@
 # Aion Core Repository
-# React + TypeScript + Vite + Hardhat + Wagmi + TheGraph
+# Solidity + React + TypeScript + Vite + Hardhat + Wagmi + TheGraph
 
 Requirements for development:
 Node
