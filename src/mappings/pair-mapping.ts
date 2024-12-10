@@ -1,7 +1,8 @@
 import {
     PairEntity,
     PriceEntity,
-    AssetEntity
+    AssetEntity,
+    TokenEntity
 } from '../../generated/schema'
 
 import { Swap as SwapEvent } from "../../generated/templates/Pair/Pair"
@@ -16,21 +17,22 @@ export function handleSwap(event: SwapEvent): void {
     let amount0Out = event.params.amount0Out
     let amount1Out = event.params.amount1Out
 
-    let assetETH: AssetEntity | null = null
+    let assetETH: TokenEntity | null = null
     let asset: AssetEntity | null = null
 
     let amountETHTotal = BigInt.fromI32(0)
     let amountAssetTotal = BigInt.fromI32(0)
     
-    let asset0 = AssetEntity.load(pair.asset0)
-    let asset1 = AssetEntity.load(pair.asset1)
+    let token0 = TokenEntity.load(pair.token0)
+    let token1 = TokenEntity.load(pair.token1)
     
     let priceEntity = new PriceEntity(event.transaction.hash)
 
-    if (asset1 != null && asset0 != null) {
-        if (asset1.symbol == "WETH" || asset1.symbol == "ETH") {
-            assetETH = asset1
-            asset = asset0
+    if (token1 != null && token0 != null) {
+        if (token1.symbol == "WETH" || token1.symbol == "ETH") {
+            assetETH = token1
+            asset = AssetEntity.load(token0.id)
+            
             // Determine the swap direction and calculate the price
             amountETHTotal = amount1In.gt(BigInt.zero())
               ? amount1In
@@ -40,9 +42,9 @@ export function handleSwap(event: SwapEvent): void {
               : amount0Out
         }
 
-        if (asset0.symbol == "WETH" || asset0.symbol == "ETH") {
-            assetETH = asset0
-            asset = asset1
+        if (token0.symbol == "WETH" || token0.symbol == "ETH") {
+            assetETH = token0
+            asset = AssetEntity.load(token1.id)
             // Determine the swap direction and calculate the price
             amountETHTotal = amount0In.gt(BigInt.zero())
               ? amount0In

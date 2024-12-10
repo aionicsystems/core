@@ -3,18 +3,16 @@ type AssetEntity @entity {
   name: String! # string
   symbol: String! # string
   dataFeedAddress: Bytes! # address
-  decimals: Int! # uint8
-  aggregator: AggregatorEntity! # address
+  aggregators: [AggregatorEntity!] @derivedFrom(field: "dataFeedAddress")
   rate: BigInt! # 500 = 5%
   liquidationRatio: BigInt! # 12500 = 125%
-  blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   loans: [LoanEntity!]! @derivedFrom(field: "asset")
-  latestPrice: BigDecimal! # USD/ASSET
-  prices: [DataPointEntity!] @derivedFrom(field: "asset")
+  latestProtocolPrice: BigDecimal! # USD/ASSET
+  protocolPrices: [DataPointEntity!] @derivedFrom(field: "token")
   latestMarketPrice: BigDecimal! # USD/ASSET
-  marketPrices: [PriceEntity!] @derivedFrom(field: "asset")
+  marketPrices: [PriceEntity!] @derivedFrom(field: "token")
 }
 
 type LoanEntity @entity {
@@ -52,14 +50,15 @@ type OwnershipTransferred @entity(immutable: true) {
 
 type AggregatorEntity @entity {
   id: Bytes! # address
-  asset: AssetEntity!
+  dataFeedAddress: Bytes! # address
+  token: TokenEntity!
   decimals: Int # uint8
   prices: [DataPointEntity!] @derivedFrom(field: "aggregator")
 }
 
 type DataPointEntity @entity {
   id: Bytes! # bytes - transaction hash
-  asset: AssetEntity!
+  token: TokenEntity!
   aggregator: AggregatorEntity!
   price: BigDecimal! # int256
   roundId: BigInt! # uint256
@@ -80,8 +79,8 @@ type WindowEntity @entity {
 
 type PairEntity @entity {
   id: Bytes!
-  asset0: AssetEntity!
-  asset1: AssetEntity!
+  asset: AssetEntity!
+  token: TokenEntity!
   reserve0: BigInt!
   reserve1: BigInt!
   prices: [PriceEntity!] @derivedFrom(field: "pair")
@@ -91,7 +90,19 @@ type PriceEntity @entity {
   id: Bytes! # Address of Price
   pair: PairEntity!
   asset: AssetEntity!
+  token: TokenEntity!
   price: BigDecimal! # uint256 // needs to be equivalent to aggregator price format
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type TokenEntity @entity {
+  id: Bytes!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  totalSupply: BigInt!
   blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
