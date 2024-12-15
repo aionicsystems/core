@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 const path = require('node:path');
 // Importing required modules and libraries from the ethers.js library.
-const { Contract, ContractFactory } = require("ethers");
+const { Contract, ContractFactory, parseUnits } = require("ethers");
 const { system, patching, filesystem } = require('gluegun');
 const { createApolloFetch } = require('apollo-fetch');
 const { ethers } = require('hardhat');
@@ -114,7 +114,7 @@ async function deployUniswapContracts(owner) {
   const routerAddress = await router.getAddress();
   console.log(`Router deployed to ${routerAddress}`);
 
-  return { factory, router, weth };
+  return { factory, router, weth, wethAddress };
 }
 
 async function addLiquidity(router, tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline) {
@@ -128,7 +128,7 @@ async function addLiquidity(router, tokenA, tokenB, amountADesired, amountBDesir
 
   // Approve the router to spend the tokens
   const tokenAContract = await hre.ethers.getContractAt("@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20", tokenA);
-  const tokenBContract = await hre.ethers.getContractAt("WETH9", await tokenB);
+  const tokenBContract = await hre.ethers.getContractAt("@openzeppelin/contracts/token/ERC20/IERC20.sol:IERC20", tokenB);
 
   const routerAddress = await router.getAddress();
 
@@ -184,9 +184,24 @@ async function approveAsset(windowContract, dataFeedAddress, name, symbol, colla
   return assetEntityEvents[0].args[0];
 }
 
-async function issueLoan(windowContract, assetAddress, etherAmount) {
-  const options = { value: ethers.parseEther(etherAmount) };
-  const tx = await windowContract.issue(assetAddress, options);
+async function issueLoanWithWETH(windowContract, assetAddress, wethAmount, weth) {
+  // Approve the WETH transfer to the Window contract
+  const approveTx = await weth.approve(await windowContract.getAddress(), wethAmount);
+  await approveTx.wait();
+  console.log(`Approved ${wethAmount.toString()} WETH to Window contract`);
+
+  const tx = await windowContract.issue(assetAddress, wethAmount);
+  const result = await tx.wait();
+  
+  return {
+    loanAddress: result.logs[4].args[0],
+    amountIssued: result.logs[4].args[4]
+  };
+}
+
+async function issueLoanWithETH(windowContract, assetAddress, ethAmount) {
+  const options = { value: ethers.parseEther(ethAmount) };
+  const tx = await windowContract.issueWithETH(assetAddress, options);
   const result = await tx.wait();
 
   return {
@@ -264,6 +279,9 @@ async function main() {
     const ethPriceFeed = await deployMockDataFeed(decimals, initialEthPrice, await ethAggregator.getAddress());
     console.log(`Mock ETH Data Feed deployed to: ${await ethPriceFeed.getAddress()}`);
 
+    // Deploy Uniswap contracts
+    const { factory, router, weth, wethAddress } = await deployUniswapContracts(owner);
+
     const Window = await hre.ethers.getContractFactory("Window");
     const windowContract = await Window.deploy(
       owner.address,
@@ -272,7 +290,8 @@ async function main() {
       collectorFee,
       daoFee,
       liquidatorFee,
-      ethPriceFeed.getAddress()
+      ethPriceFeed.getAddress(),
+      wethAddress
     );
     await windowContract.waitForDeployment();
     console.log(`Window deployed to: ${await windowContract.getAddress()}`);
@@ -323,10 +342,9 @@ async function main() {
         asset.liquidationFactor
       );
       console.log(`Asset Address: ${assetAddress}`);
-
       assetAddresses[asset.symbol] = assetAddress;
 
-      const loan = await issueLoan(windowContract, assetAddress, asset.collateralEtherAmount);
+      const loan = await issueLoanWithWETH(windowContract, assetAddress, parseUnits("1", 18), weth);
       console.log(`Loan Address: ${loan.loanAddress}`);
       console.log(`Amount Asset Issued: ${loan.amountIssued} ${asset.symbol}`);
 
@@ -343,19 +361,24 @@ async function main() {
       await loanContract.collect();
     }
 
-    // Deploy Uniswap contracts
-    const { factory, router, weth } = await deployUniswapContracts(owner);
-
-    // Add liquidity for each asset pair with USDT
+    // Add liquidity for each asset pair with WETH
     for (const asset of assets) {
       const assetAddress = assetAddresses[asset.symbol];
-      const amountTokenDesired = ethers.parseUnits("1", 18); // Example amount
-      const amountTokenMin = ethers.parseUnits("1", 18); // Example amount
-      const amountUSDTDesired = ethers.parseUnits("10", 6); // Example amount (USDT typically has 6 decimals)
-      const amountUSDTMin = ethers.parseUnits("90", 6); // Example amount (USDT typically has 6 decimals)
+      const amountTokenDesired = ethers.utils.parseUnits("1", 18); // Example amount
+      const amountTokenMin = ethers.utils.parseUnits("1", 18); // Example amount
+      const amountWETHDesired = ethers.utils.parseUnits("10", 18); // Example amount (WETH typically has 18 decimals)
+      const amountWETHMin = ethers.utils.parseUnits("9", 18); // Example amount (WETH typically has 18 decimals)
       const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from the current Unix time
-      console.log(`Adding liquidity for ${assetAddress} - USDT pair...`);
-      await addLiquidity(router, assetAddress, weth.getAddress(), amountTokenDesired, amountUSDTDesired, amountTokenMin, amountUSDTMin, owner.address, deadline);
+      console.log(`Adding liquidity for ${assetAddress} - WETH pair...`);
+      await addLiquidity(router, assetAddress, weth.getAddress(), amountTokenDesired, amountWETHDesired, amountTokenMin, amountWETHMin, owner.address, deadline);
+    }
+
+    // Test issuing loans with ETH
+    for (const asset of assets) {
+      const assetAddress = assetAddresses[asset.symbol];
+      const loan = await issueLoanWithETH(windowContract, assetAddress, "1.0"); // Example amount in ETH
+      console.log(`Loan Address: ${loan.loanAddress}`);
+      console.log(`Amount Asset Issued: ${loan.amountIssued} ${asset.symbol}`);
     }
 
     // Start continuous price updates for non-constant feeds

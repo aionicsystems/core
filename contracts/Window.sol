@@ -7,6 +7,8 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Asset } from "./Asset.sol";
 import { Loan } from "./Loan.sol";
 import { Library, AggregatorInterface } from "./Library.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IWETH } from "./IWETH.sol"; // Interface for WETH;
 
 contract Window is Ownable, Library {
     event WindowEntity(
@@ -46,6 +48,10 @@ contract Window is Ownable, Library {
     address public etherDataFeedAddress;
     AggregatorInterface internal etherDataFeed;
 
+    // WETH token address
+    address public wethAddress;
+    IWETH internal weth;
+
     // Assets that are approved for loan
     mapping(address => Asset) public assets;
 
@@ -56,7 +62,8 @@ contract Window is Ownable, Library {
         uint32 _collectorFee,
         uint32 _daoFee,
         uint32 _liquidatorFee,
-        address _etherDataFeedAddress
+        address _etherDataFeedAddress,
+        address _wethAddress
     ) Ownable(owner) {
         precision = _precision;
         borrowingRatio = _borrowingRatio;
@@ -67,17 +74,8 @@ contract Window is Ownable, Library {
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorInterface(etherDataFeedAddress);
 
-        emit AssetEntity(
-            address(0), 
-            "Ether", 
-            "ETH", 
-            etherDataFeedAddress,
-            AggregatorInterface(etherDataFeedAddress).aggregator(),
-            0,
-            0,
-            AggregatorInterface(etherDataFeedAddress).decimals(),
-            getChainlinkDataFeedLatestAnswer(etherDataFeed)
-        );
+        wethAddress = _wethAddress;
+        weth = IWETH(_wethAddress);
 
         emitWindowEntity();
     }
@@ -114,25 +112,37 @@ contract Window is Ownable, Library {
         etherDataFeedAddress = _etherDataFeedAddress;
         etherDataFeed = AggregatorInterface(_etherDataFeedAddress);
     }
- 
-    // Issue loan by depositing collateral and receiving
+
+    function setWethAddress(address _wethAddress) public onlyOwner {
+        wethAddress = _wethAddress;
+        weth = IWETH(_wethAddress);
+    }
+
+    // Issue loan by depositing WETH as collateral and receiving
     // loaned assets with collateralization at Borrowing Rate
     function issue(
-        address assetAddress
-    ) payable public returns (uint256) {
-        require(msg.value > 0, "Amount ETH must be greater than zero");
+        address assetAddress,
+        uint256 wethAmount
+    ) public returns (uint256) {
+        require(wethAmount > 0, "Amount WETH must be greater than zero");
         require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
 
         AggregatorInterface assetDataFeed = AggregatorInterface(assets[assetAddress].assetDataFeedAddress());
         
         // Liability(USD) = Collateral(USD) / BorrowingRatio
         // Liability(USD) = Liability(Asset) * Price(Asset)
-        // Collateral(USD) = Collateral(ETH) * Price(ETH)
+        // Collateral(USD) = Collateral(WETH) * Price(ETH)
         // Liability(Asset) * Price(Asset)  = Collateral(USD) / BorrowingRatio
         // Liability(Asset) = Collateral(USD) / (BorrowingRatio * Price(Asset))
-        // Liability(Asset) = (Collateral(ETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
-        uint256 liabilityAmount = ((msg.value * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * borrowingRatio)) / 10**etherDataFeed.decimals();
+        // Liability(Asset) = (Collateral(WETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
+        uint256 liabilityAmount = ((wethAmount * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * borrowingRatio)) / 10**etherDataFeed.decimals();
         
+        require(weth.balanceOf(msg.sender) >= wethAmount, "Insufficient WETH balance");
+        require(weth.allowance(msg.sender, address(this)) >= wethAmount, "Insufficient WETH allowance");
+
+        // Transfer WETH to the contract
+        weth.transferFrom(msg.sender, address(this), wethAmount);
+
         // Each loan is a new contract with a new address exclusive to this loan and owned by borrower
         // User collateral for the issued loan is only ever stored in this contract with no other funds from
         // other loans or users.
@@ -143,15 +153,16 @@ contract Window is Ownable, Library {
             liabilityAmount                                 // Asset Amount
         );
         
-        // Transfer Ether to address of Loan Contract owned by Issuer
-        payable(address(loan)).transfer(msg.value);
+        // Transfer WETH to address of Loan Contract owned by Issuer
+        require(weth.transfer(address(loan), wethAmount), "WETH transfer to loan failed");
+        
         // Mint asset and assign to msg.sender
         assets[assetAddress].mint(msg.sender, liabilityAmount);
 
         emit LoanEntity(
             address(loan), 
             msg.sender,
-            address(loan).balance,
+            wethAmount,
             assetAddress,
             liabilityAmount,
             borrowingRatio,
@@ -165,6 +176,23 @@ contract Window is Ownable, Library {
         );
         
         return liabilityAmount;
+        
+    }
+
+    // Issue loan by depositing ETH as collateral and receiving
+    // loaned assets with collateralization at Borrowing Rate
+    function issueWithETH(
+        address assetAddress
+    ) public payable returns (uint256) {
+        uint256 ethAmount = msg.value;
+        require(ethAmount > 0, "Amount ETH must be greater than zero");
+        require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
+
+        // Convert ETH to WETH
+        weth.deposit{value: ethAmount}();
+
+        // Call issue to handle the rest of the process
+        return issue(assetAddress, ethAmount);
     }
 
     event Received(address, uint);

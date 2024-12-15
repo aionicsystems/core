@@ -8,7 +8,7 @@ dataSources:
     name: Window
     network: test
     source:
-      address: '0x36c982c74176A667fA32c47Ce20004A7b830cDD4'
+      address: '0x5D755a76Fa6ae38B71Accf03e7FCe877A02FE5DC'
       abi: Window
       startBlock: 0
     mapping:
@@ -38,7 +38,7 @@ dataSources:
     name: Factory
     network: test
     source:
-      address: '0x068cD8dd6F1ddD374292821F51124E27dF0FA262'
+      address: 'DEPLOYED_UNISWAP_FACTORY_ADDRESS'
       abi: Factory
       startBlock: 0
     mapping:
