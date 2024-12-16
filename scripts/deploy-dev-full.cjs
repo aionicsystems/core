@@ -193,9 +193,11 @@ async function issueLoanWithWETH(windowContract, assetAddress, wethAmount, weth)
   const tx = await windowContract.issue(assetAddress, wethAmount);
   const result = await tx.wait();
   
+  console.log("timestamp: ", result.logs[5].args[8])
+
   return {
-    loanAddress: result.logs[4].args[0],
-    amountIssued: result.logs[4].args[4]
+    loanAddress: result.logs[5].args[0],
+    amountIssued: result.logs[5].args[4]
   };
 }
 
@@ -364,21 +366,13 @@ async function main() {
     // Add liquidity for each asset pair with WETH
     for (const asset of assets) {
       const assetAddress = assetAddresses[asset.symbol];
-      const amountTokenDesired = ethers.utils.parseUnits("1", 18); // Example amount
-      const amountTokenMin = ethers.utils.parseUnits("1", 18); // Example amount
-      const amountWETHDesired = ethers.utils.parseUnits("10", 18); // Example amount (WETH typically has 18 decimals)
-      const amountWETHMin = ethers.utils.parseUnits("9", 18); // Example amount (WETH typically has 18 decimals)
+      const amountTokenDesired = parseUnits("1", 18); // Example amount
+      const amountTokenMin = parseUnits("1", 18); // Example amount
+      const amountWETHDesired = parseUnits("10", 18); // Example amount (WETH typically has 18 decimals)
+      const amountWETHMin = parseUnits("9", 18); // Example amount (WETH typically has 18 decimals)
       const deadline = Math.floor(Date.now() / 1000) + 60 * 20; // 20 minutes from the current Unix time
       console.log(`Adding liquidity for ${assetAddress} - WETH pair...`);
-      await addLiquidity(router, assetAddress, weth.getAddress(), amountTokenDesired, amountWETHDesired, amountTokenMin, amountWETHMin, owner.address, deadline);
-    }
-
-    // Test issuing loans with ETH
-    for (const asset of assets) {
-      const assetAddress = assetAddresses[asset.symbol];
-      const loan = await issueLoanWithETH(windowContract, assetAddress, "1.0"); // Example amount in ETH
-      console.log(`Loan Address: ${loan.loanAddress}`);
-      console.log(`Amount Asset Issued: ${loan.amountIssued} ${asset.symbol}`);
+      await addLiquidity(router, assetAddress, await weth.getAddress(), amountTokenDesired, amountWETHDesired, amountTokenMin, amountWETHMin, owner.address, deadline);
     }
 
     // Start continuous price updates for non-constant feeds

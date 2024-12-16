@@ -137,9 +137,6 @@ contract Window is Ownable, Library {
         // Liability(Asset) = (Collateral(WETH) * Price(ETH)) / (BorrowingRatio * Price(Asset))
         uint256 liabilityAmount = ((wethAmount * dataFeedPrice(etherDataFeed) * 10**precision * 10**assetDataFeed.decimals()) / (dataFeedPrice(assetDataFeed) * borrowingRatio)) / 10**etherDataFeed.decimals();
         
-        require(weth.balanceOf(msg.sender) >= wethAmount, "Insufficient WETH balance");
-        require(weth.allowance(msg.sender, address(this)) >= wethAmount, "Insufficient WETH allowance");
-
         // Transfer WETH to the contract
         weth.transferFrom(msg.sender, address(this), wethAmount);
 
@@ -150,7 +147,15 @@ contract Window is Ownable, Library {
             msg.sender,                                     // Loan owner
             address(this),                                  // Window Address
             assetAddress,                                   // Asset Address
-            liabilityAmount                                 // Asset Amount
+            liabilityAmount,                                // Asset Amount
+            wethAmount,                                     // Collateral Amount
+            assets[assetAddress].interestRate(),                                              // Interest Rate (set to 0 for now)
+            assets[assetAddress].liquidationRatio(),                                              // Liquidation Ratio (set to 0 for now)
+            collectorFee,                                   // Collector Fee
+            liquidatorFee,                                  // Liquidator Fee
+            daoFee,                                         // DAO Fee
+            precision,                                      // Precision
+            wethAddress                                     // WETH Address
         );
         
         // Transfer WETH to address of Loan Contract owned by Issuer
@@ -177,22 +182,6 @@ contract Window is Ownable, Library {
         
         return liabilityAmount;
         
-    }
-
-    // Issue loan by depositing ETH as collateral and receiving
-    // loaned assets with collateralization at Borrowing Rate
-    function issueWithETH(
-        address assetAddress
-    ) public payable returns (uint256) {
-        uint256 ethAmount = msg.value;
-        require(ethAmount > 0, "Amount ETH must be greater than zero");
-        require(assets[assetAddress].owner() == address(this), "Asset must be owned by contract");
-
-        // Convert ETH to WETH
-        weth.deposit{value: ethAmount}();
-
-        // Call issue to handle the rest of the process
-        return issue(assetAddress, ethAmount);
     }
 
     event Received(address, uint);

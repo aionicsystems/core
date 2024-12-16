@@ -19,8 +19,8 @@ contract Asset is ERC20, ERC20Burnable, Ownable, Library {
             symbol(), 
             assetDataFeedAddress,
             AggregatorInterface(assetDataFeedAddress).aggregator(),
-            0,
-            0,
+            interestRate,
+            liquidationRatio,
             AggregatorInterface(assetDataFeedAddress).decimals(),
             getChainlinkDataFeedLatestAnswer(AggregatorInterface(assetDataFeedAddress))
         );

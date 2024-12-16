@@ -13,7 +13,7 @@ abstract contract Library {
         string symbol, 
         address dataFeedAddress,
         address aggregatorAddress,
-        uint32 rate,
+        uint32 interestRate,
         uint32 liquidationRatio,
         uint8 decimals,
         int256 latestPrice 
