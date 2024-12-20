@@ -145,17 +145,10 @@ contract Window is Ownable, Library {
         // other loans or users.
         Loan loan = new Loan(
             msg.sender,                                     // Loan owner
-            address(this),                                  // Window Address
+            payable(address(this)),                         // Window Address
             assetAddress,                                   // Asset Address
             liabilityAmount,                                // Asset Amount
-            wethAmount,                                     // Collateral Amount
-            assets[assetAddress].interestRate(),                                              // Interest Rate (set to 0 for now)
-            assets[assetAddress].liquidationRatio(),                                              // Liquidation Ratio (set to 0 for now)
-            collectorFee,                                   // Collector Fee
-            liquidatorFee,                                  // Liquidator Fee
-            daoFee,                                         // DAO Fee
-            precision,                                      // Precision
-            wethAddress                                     // WETH Address
+            wethAmount                                      // Collateral Amount
         );
         
         // Transfer WETH to address of Loan Contract owned by Issuer

@@ -83,16 +83,10 @@ async function deployUniswapContracts(owner) {
   // 3. Use the initialized factory to deploy a new Factory contract.
   // The deployment is signed by the owner.
   const factory = await Factory.deploy(owner.address);
-
+  await factory.waitForDeployment();
   // 4. After deployment, retrieve the address of the newly deployed Factory contract.
   const factoryAddress = await factory.getAddress();
   console.log(`Factory deployed to ${factoryAddress}`);
-
-  await patching.replace(
-    path.join(srcDir, 'subgraph.yaml'),
-    'DEPLOYED_UNISWAP_FACTORY_ADDRESS',
-    factoryAddress,
-  );
 
   // 18. Initialize a new contract factory for the WETH9 contract.
   const WETH = new ContractFactory(WETH9.abi, WETH9.bytecode, owner);
@@ -299,11 +293,19 @@ async function main() {
     console.log(`Window deployed to: ${await windowContract.getAddress()}`);
 
     filesystem.copy('template-subgraph.yaml', 'subgraph.yaml', { overwrite: true });
+    
     await patching.replace(
       path.join(srcDir, 'subgraph.yaml'),
       'DEPLOYED_CONTRACT_ADDRESS',
       windowContract.target,
     );
+
+    await patching.replace(
+      path.join(srcDir, 'subgraph.yaml'),
+      'DEPLOYED_UNISWAP_FACTORY_ADDRESS',
+      factory.target,
+    );
+
 
     const loanAddresses = [];
     const assetAddresses = {};

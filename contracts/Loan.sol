@@ -5,34 +5,22 @@ import "hardhat/console.sol";
 
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IWETH } from "./IWETH.sol"; // Interface for WETH
+import { Library, AggregatorInterface } from "./Library.sol";
+import { Window } from "./Window.sol";
+import { Asset } from "./Asset.sol";
 
-contract Loan is Ownable {
-    event LoanEntity(
-        address indexed loanAddress,
-        address owner,
-        address window,
-        address asset,
-        uint256 amount,
-        uint256 collateral,
-        uint32 interestRate,
-        uint32 liquidationRatio,
-        uint256 lastCollection,
-        uint32 collectorFee,
-        uint32 liquidatorFee,
-        uint32 daoFee,
-        uint8 precision
-    );
+contract Loan is Ownable, Library {
 
     function loanEvent() private {
         emit LoanEntity(
             address(this),
             owner(),
-            window,
-            asset,
-            amount,
-            collateral,
-            interestRate,
+            collateralAmount,
+            assetAddress,
+            liabilityAmount,
+            borrowingRatio,
             liquidationRatio,
+            interestRate,
             lastCollection,
             collectorFee,
             liquidatorFee,
@@ -50,12 +38,13 @@ contract Loan is Ownable {
     uint32 public collectorFee;
     uint32 public liquidatorFee;
     uint32 public daoFee;
+    uint32 public borrowingRatio;
 
     // Collateral amount in WETH
-    uint256 public collateral;
+    uint256 public collateralAmount;
 
     // Asset amount
-    uint256 public amount;
+    uint256 public liabilityAmount;
 
     // Last collection timestamp
     uint256 public lastCollection;
@@ -64,7 +53,7 @@ contract Loan is Ownable {
     address public window;
 
     // Asset contract address
-    address public asset;
+    address public assetAddress;
 
     // WETH token address
     address public wethAddress;
@@ -72,30 +61,31 @@ contract Loan is Ownable {
 
     constructor(
         address _owner,
-        address _window,
+        address payable _window,
         address _asset,
-        uint256 _amount,
-        uint256 _collateral,
-        uint32 _interestRate,
-        uint32 _liquidationRatio,
-        uint32 _collectorFee,
-        uint32 _liquidatorFee,
-        uint32 _daoFee,
-        uint8 _precision,
-        address _wethAddress
+        uint256 _liabilityAmount,
+        uint256 _collateralAmount
     ) Ownable(_owner) {
         window = _window;
-        asset = _asset;
-        amount = _amount;
-        collateral = _collateral;
-        interestRate = _interestRate;
-        liquidationRatio = _liquidationRatio;
-        collectorFee = _collectorFee;
-        liquidatorFee = _liquidatorFee;
-        daoFee = _daoFee;
-        precision = _precision;
-        wethAddress = _wethAddress;
-        weth = IWETH(_wethAddress);
+        assetAddress = _asset;
+        liabilityAmount = _liabilityAmount;
+        collateralAmount = _collateralAmount;
+
+        // Retrieve parameters from Window contract
+        Window windowContract = Window(_window);
+        precision = windowContract.precision();
+        collectorFee = windowContract.collectorFee();
+        liquidatorFee = windowContract.liquidatorFee();
+        daoFee = windowContract.daoFee();
+        borrowingRatio = windowContract.borrowingRatio();
+        wethAddress = windowContract.wethAddress();
+        weth = IWETH(wethAddress);
+
+        // Retrieve parameters from Asset contract
+        Asset assetContract = Asset(_asset);
+        interestRate = assetContract.interestRate();
+        liquidationRatio = assetContract.liquidationRatio();
+
         lastCollection = block.timestamp;
 
         loanEvent();
