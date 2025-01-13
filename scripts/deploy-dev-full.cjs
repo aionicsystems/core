@@ -292,11 +292,25 @@ async function main() {
     await windowContract.waitForDeployment();
     console.log(`Window deployed to: ${await windowContract.getAddress()}`);
 
+    const Registrar = await hre.ethers.getContractFactory("Registrar");
+    const registrarContract = await Window.deploy(
+      owner.address,
+      precision,
+      borrowingRatio,
+      collectorFee,
+      daoFee,
+      liquidatorFee,
+      ethPriceFeed.getAddress(),
+      wethAddress
+    );
+    await windowContract.waitForDeployment();
+    console.log(`Window deployed to: ${await windowContract.getAddress()}`);
+
     filesystem.copy('template-subgraph.yaml', 'subgraph.yaml', { overwrite: true });
     
     await patching.replace(
       path.join(srcDir, 'subgraph.yaml'),
-      'DEPLOYED_CONTRACT_ADDRESS',
+      'DEPLOYED_WINDOW_CONTRACT_ADDRESS',
       windowContract.target,
     );
 

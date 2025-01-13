@@ -5,6 +5,7 @@ type AssetEntity @entity {
   token: TokenEntity!
   rate: BigInt! # 500 = 5%
   liquidationRatio: BigInt! # 12500 = 125%
+  blockNumber: BigInt!
   blockTimestamp: BigInt!
   transactionHash: Bytes!
   loans: [LoanEntity!]! @derivedFrom(field: "asset")

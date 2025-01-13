@@ -6,6 +6,10 @@ interface AggregatorInterface is AggregatorV3Interface {
     function aggregator() external returns (address);
 }
 
+interface RegistrarInterface {
+    function aggregator() external returns (address);
+}
+
 abstract contract Library {
     event AssetEntity(
         address indexed token, 
