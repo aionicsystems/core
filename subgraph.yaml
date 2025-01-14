@@ -17,6 +17,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - AssetEntity
+        - TokenEntity
         - LoanEntity
         - AggregatorEntity
         - OwnerTransferred
@@ -26,6 +27,8 @@ dataSources:
       eventHandlers:
         - event: AssetEntity(indexed address,string,string,address,address,uint32,uint32,uint8,int256)
           handler: handleAssetEntity
+        - event: TokenEntity(indexed address,string,string,address,address,uint8,int256)
+          handler: handleTokenEntity
         - event: LoanEntity(indexed address,address,uint256,address,uint256,uint32,uint32,uint32,uint256,uint32,uint32,uint32,uint8)
           handler: handleLoanEntity
         - event: WindowEntity(indexed address,address,address,uint32,uint32,uint32,uint32,uint8)

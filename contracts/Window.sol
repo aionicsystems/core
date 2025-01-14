@@ -55,6 +55,9 @@ contract Window is Ownable, Library {
     // Assets that are approved for loan
     mapping(address => Asset) public assets;
 
+    // Tokens with Chainlink data feeds
+    mapping(address => AggregatorInterface) public tokens;
+
     constructor (
         address owner,
         uint8 _precision,
@@ -100,6 +103,21 @@ contract Window is Ownable, Library {
         AggregatorInterface dataFeed = AggregatorInterface(assetDataFeedAddress);
         emit AssetEntity(address(asset), name, symbol, assetDataFeedAddress, dataFeed.aggregator(), rate, liquidationRatio, dataFeed.decimals(), getChainlinkDataFeedLatestAnswer(dataFeed));
         return address(asset);
+    }
+
+    function approveToken(address tokenDataFeedAddress, string memory name, string memory symbol) public onlyOwner returns(address) {
+        AggregatorInterface dataFeed = AggregatorInterface(tokenDataFeedAddress);
+        tokens[tokenDataFeedAddress] = dataFeed;
+        emit TokenEntity(
+            tokenDataFeedAddress,
+            name,
+            symbol,
+            tokenDataFeedAddress,
+            dataFeed.aggregator(),
+            dataFeed.decimals(),
+            getChainlinkDataFeedLatestAnswer(dataFeed)
+        );
+        return tokenDataFeedAddress;
     }
 
     function dataFeedPrice(AggregatorInterface dataFeed) public view returns (uint256) {

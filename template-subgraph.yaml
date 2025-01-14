@@ -5,40 +5,10 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: Registrar
-    network: test
-    source:
-      address: 'DEPLOYED_REGISTRAR_CONTRACT_ADDRESS'
-      abi: Registrar
-      startBlock: 0
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - AssetEntity
-        - LoanEntity
-        - AggregatorEntity
-        - OwnerTransferred
-      abis:
-        - name: Registrar
-          file: ./artifacts/contracts/Window.sol/Window.json
-      eventHandlers:
-        - event: AssetEntity(indexed address,string,string,address,address,uint32,uint32,uint8,int256)
-          handler: handleAssetEntity
-        - event: LoanEntity(indexed address,address,uint256,address,uint256,uint32,uint32,uint32,uint256,uint32,uint32,uint32,uint8)
-          handler: handleLoanEntity
-        - event: WindowEntity(indexed address,address,address,uint32,uint32,uint32,uint32,uint8)
-          handler: handleWindowEntity
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/mappings/window-mapping.ts
-
-  - kind: ethereum/contract
     name: Window
     network: test
     source:
-      address: 'DEPLOYED_CONTRACT_ADDRESS'
+      address: 'DEPLOYED_WINDOW_CONTRACT_ADDRESS'
       abi: Window
       startBlock: 0
     mapping:
@@ -47,6 +17,7 @@ dataSources:
       language: wasm/assemblyscript
       entities:
         - AssetEntity
+        - TokenEntity
         - LoanEntity
         - AggregatorEntity
         - OwnerTransferred
@@ -56,6 +27,8 @@ dataSources:
       eventHandlers:
         - event: AssetEntity(indexed address,string,string,address,address,uint32,uint32,uint8,int256)
           handler: handleAssetEntity
+        - event: TokenEntity(indexed address,string,string,address,address,uint8,int256)
+          handler: handleTokenEntity
         - event: LoanEntity(indexed address,address,uint256,address,uint256,uint32,uint32,uint32,uint256,uint32,uint32,uint32,uint8)
           handler: handleLoanEntity
         - event: WindowEntity(indexed address,address,address,uint32,uint32,uint32,uint32,uint8)

@@ -148,6 +148,48 @@ export class OwnershipTransferred__Params {
   }
 }
 
+export class TokenEntity extends ethereum.Event {
+  get params(): TokenEntity__Params {
+    return new TokenEntity__Params(this);
+  }
+}
+
+export class TokenEntity__Params {
+  _event: TokenEntity;
+
+  constructor(event: TokenEntity) {
+    this._event = event;
+  }
+
+  get tokenAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get name(): string {
+    return this._event.parameters[1].value.toString();
+  }
+
+  get symbol(): string {
+    return this._event.parameters[2].value.toString();
+  }
+
+  get dataFeedAddress(): Address {
+    return this._event.parameters[3].value.toAddress();
+  }
+
+  get aggregatorAddress(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
+  get decimals(): i32 {
+    return this._event.parameters[5].value.toI32();
+  }
+
+  get latestPrice(): BigInt {
+    return this._event.parameters[6].value.toBigInt();
+  }
+}
+
 export class Loan extends ethereum.SmartContract {
   static bind(address: Address): Loan {
     return new Loan("Loan", address);

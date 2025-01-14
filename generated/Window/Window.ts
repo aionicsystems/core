@@ -170,6 +170,48 @@ export class Received__Params {
   }
 }
 
+export class TokenEntity extends ethereum.Event {
+  get params(): TokenEntity__Params {
+    return new TokenEntity__Params(this);
+  }
+}
+
+export class TokenEntity__Params {
+  _event: TokenEntity;
+
+  constructor(event: TokenEntity) {
+    this._event = event;
+  }
+
+  get tokenAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get name(): string {
+    return this._event.parameters[1].value.toString();
+  }
+
+  get symbol(): string {
+    return this._event.parameters[2].value.toString();
+  }
+
+  get dataFeedAddress(): Address {
+    return this._event.parameters[3].value.toAddress();
+  }
+
+  get aggregatorAddress(): Address {
+    return this._event.parameters[4].value.toAddress();
+  }
+
+  get decimals(): i32 {
+    return this._event.parameters[5].value.toI32();
+  }
+
+  get latestPrice(): BigInt {
+    return this._event.parameters[6].value.toBigInt();
+  }
+}
+
 export class WindowEntity extends ethereum.Event {
   get params(): WindowEntity__Params {
     return new WindowEntity__Params(this);
@@ -259,6 +301,45 @@ export class Window extends ethereum.SmartContract {
         ethereum.Value.fromString(symbol),
         ethereum.Value.fromUnsignedBigInt(rate),
         ethereum.Value.fromUnsignedBigInt(liquidationRatio),
+      ],
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  approveToken(
+    tokenDataFeedAddress: Address,
+    name: string,
+    symbol: string,
+  ): Address {
+    let result = super.call(
+      "approveToken",
+      "approveToken(address,string,string):(address)",
+      [
+        ethereum.Value.fromAddress(tokenDataFeedAddress),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromString(symbol),
+      ],
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_approveToken(
+    tokenDataFeedAddress: Address,
+    name: string,
+    symbol: string,
+  ): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "approveToken",
+      "approveToken(address,string,string):(address)",
+      [
+        ethereum.Value.fromAddress(tokenDataFeedAddress),
+        ethereum.Value.fromString(name),
+        ethereum.Value.fromString(symbol),
       ],
     );
     if (result.reverted) {
@@ -476,6 +557,25 @@ export class Window extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toI32());
   }
 
+  tokens(param0: Address): Address {
+    let result = super.call("tokens", "tokens(address):(address)", [
+      ethereum.Value.fromAddress(param0),
+    ]);
+
+    return result[0].toAddress();
+  }
+
+  try_tokens(param0: Address): ethereum.CallResult<Address> {
+    let result = super.tryCall("tokens", "tokens(address):(address)", [
+      ethereum.Value.fromAddress(param0),
+    ]);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   wethAddress(): Address {
     let result = super.call("wethAddress", "wethAddress():(address)", []);
 
@@ -592,6 +692,48 @@ export class ApproveAssetCall__Outputs {
   _call: ApproveAssetCall;
 
   constructor(call: ApproveAssetCall) {
+    this._call = call;
+  }
+
+  get value0(): Address {
+    return this._call.outputValues[0].value.toAddress();
+  }
+}
+
+export class ApproveTokenCall extends ethereum.Call {
+  get inputs(): ApproveTokenCall__Inputs {
+    return new ApproveTokenCall__Inputs(this);
+  }
+
+  get outputs(): ApproveTokenCall__Outputs {
+    return new ApproveTokenCall__Outputs(this);
+  }
+}
+
+export class ApproveTokenCall__Inputs {
+  _call: ApproveTokenCall;
+
+  constructor(call: ApproveTokenCall) {
+    this._call = call;
+  }
+
+  get tokenDataFeedAddress(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+
+  get name(): string {
+    return this._call.inputValues[1].value.toString();
+  }
+
+  get symbol(): string {
+    return this._call.inputValues[2].value.toString();
+  }
+}
+
+export class ApproveTokenCall__Outputs {
+  _call: ApproveTokenCall;
+
+  constructor(call: ApproveTokenCall) {
     this._call = call;
   }
 

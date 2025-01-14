@@ -23,6 +23,16 @@ abstract contract Library {
         int256 latestPrice 
     );
 
+    event TokenEntity(
+        address indexed tokenAddress,
+        string name,
+        string symbol,
+        address dataFeedAddress,
+        address aggregatorAddress,
+        uint8 decimals,
+        int256 latestPrice
+    );
+
     event LoanEntity(
         address indexed loanAddress, 
         address owner,
